@@ -1,0 +1,37 @@
+{
+  "name": "quasar-app-extension-qwindow",
+  "version": "1.0.0-alpha.1",
+  "description": "QWindow App Extension for Quasar",
+  "author": "Jeff Galbraith <jeff@quasar.dev>",
+  "license": "MIT",
+  "main": "src/index.js",
+  "scripts": {
+    "lint": "eslint --ext .js,.vue src",
+    "lint-fix": "eslint --ext .js,.vue src --fix",
+    "build-demo": "cd ./demo && yarn build && cd .. && cp ./_redirects ./demo/dist/spa && rm -r -f ./docs && cp -r ./demo/dist/spa/. ./docs",
+    "test": "echo \"No test specified\" && exit 0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/quasarframework/app-extension-qwindow.git"
+  },
+  "bugs": "https://github.com/quasarframework/app-extension-qwindow/issues",
+  "homepage": "https://github.com/quasarframework/app-extension-qwindow",
+  "engines": {
+    "node": ">= 8.9.0",
+    "npm": ">= 5.6.0",
+    "yarn": ">= 1.6.0"
+  },
+  "devDependencies": {
+    "@vue/eslint-config-standard": "^4.0.0",
+    "babel-eslint": "^10.0.2",
+    "eslint": "^6.0.1",
+    "eslint-loader": "^2.1.2",
+    "eslint-plugin-vue": "^5.2.3",
+    "fs": "^0.0.2",
+    "path": "^0.12.7"
+  }
+}

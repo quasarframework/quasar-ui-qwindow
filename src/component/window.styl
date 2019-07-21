@@ -1,0 +1,110 @@
+.q-window
+  color currentColor
+
+  &__titlebar
+    top 0
+    left 0
+    flex none
+    display flex
+    flex-wrap: nowrap;
+    overflow hidden
+    padding 2px 8px
+    border-width 0 0 1px
+    border-style solid
+    width 100%
+    box-sizing border-box
+    white-space nowrap
+    border-radius 0
+
+    &--dense
+      min-height 16px!important
+
+    &--title
+      display flex
+      flex-wrap nowrap
+      flex 1
+      justify-content left
+      font-size 1rem
+      padding 4px
+
+    &--actions
+      color currentColor
+
+    &--action-item
+      padding 2px 4px
+
+  &__body
+    width 100%
+    overflow hidden
+
+  &__focused
+    border-color rgba(0,0,0,.2)
+    box-shadow 1px 1px 7px 1px rgba(0,0,0,.2)
+
+  &__border
+    border-color #dbdbdb
+
+  &__resize
+    &-handle
+      position absolute
+      z-index 1
+      background-color transparent
+      font-size 0
+      line-height 6px
+      opacity 0
+      zoom 1
+
+      &--top
+        top -3px
+        left 0
+        width 100%
+        height 6px
+        cursor n-resize
+        &-left
+          top -3px
+          left -3px
+          width 6px
+          height 6px
+          cursor nw-resize
+        &-right
+          top -3px
+          right -3px
+          width 6px
+          height 6px
+          cursor ne-resize
+      &--right
+        top 0
+        right -3px
+        width 6px
+        height 100%
+        cursor e-resize
+      &--bottom
+        bottom -3px
+        left 0
+        width 100%
+        height 6px
+        cursor s-resize
+        &-left
+          bottom -3px
+          left -3px
+          width 6px
+          height 6px
+          cursor sw-resize
+        &-right
+          bottom -3px
+          right -3px
+          width 6px
+          height 6px
+          cursor se-resize
+      &--left
+          top 0
+          left -3px
+          width 6px
+          height 100%
+          cursor w-resize
+      &--titlebar
+        top 0
+        left 0
+        width 100%
+        height 100%
+        cursor move
