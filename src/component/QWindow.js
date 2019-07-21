@@ -14,7 +14,8 @@ import {
   QItem,
   QItemSection,
   QIcon,
-  ClosePopup
+  ClosePopup,
+  AppFullscreen
 } from 'quasar'
 
 const startingZOrder = 4000
@@ -47,6 +48,7 @@ export default function (ssrContext) {
       },
       embedded: Boolean,
       pinned: Boolean,
+      fullscreen: Boolean,
       disabled: Boolean,
       tabindex: [Number, String],
       dense: Boolean,
@@ -91,6 +93,12 @@ export default function (ssrContext) {
           minWidth: 100,
           dragging: false
         },
+        restoreState: {
+          top: 10,
+          left: 10,
+          bottom: 400,
+          right: 400
+        },
         zIndex: 4000,
         mouseOffsetX: -1,
         mouseOffsetY: -1,
@@ -109,6 +117,10 @@ export default function (ssrContext) {
     },
 
     beforeMount () {
+      if (this.$q.fullscreen === void 0) {
+        AppFullscreen.install(this)
+      }
+
       this.id = ++QWindowCount
       layers[this.id] = {
         window: this
@@ -223,6 +235,9 @@ export default function (ssrContext) {
       this.__setStateInfo('visible', this.isVisible === true)
       this.__setStateInfo('embedded', this.isEmbedded === true)
       this.__setStateInfo('pinned', this.isPinned === true)
+      if (this.fullscreen) {
+        this.fullscreenEnter()
+      }
     },
 
     computed: {
@@ -234,6 +249,9 @@ export default function (ssrContext) {
       },
       isPinned () {
         return this.pinned === true || (this.stateInfo.pinned && this.stateInfo.pinned.state)
+      },
+      isFullscreen () {
+        return this.fullscreen === true || (this.stateInfo.fullscreen && this.stateInfo.fullscreen.state === true)
       },
       isDisabled () {
         return this.disabled === true
@@ -387,6 +405,25 @@ export default function (ssrContext) {
       },
       'stateInfo.inned.state' (val) {
         this.$forceUpdate()
+      },
+      '$q.fullscreen.isActive' (val) {
+        this.__setStateInfo('fullscreen', val)
+        this.$emit('fullscreen', val)
+        if (val) {
+          this.__setFullscreen()
+        } else {
+          this.__restoreFullscreen()
+        }
+      },
+      '$q.screen.height' (val) {
+        if (this.__getStateInfo('fullscreen') === true) {
+          this.state.bottom = val - 1
+        }
+      },
+      '$q.screen.width' (val) {
+        if (this.__getStateInfo('fullscreen') === true) {
+          this.state.right = val - 1
+        }
       }
     },
 
@@ -439,14 +476,17 @@ export default function (ssrContext) {
 
       // go into fullscreen mode
       fullscreenEnter () {
+        this.$q.fullscreen.request()
       },
 
       // leave fullscreen mode
       fullscreenLeave () {
+        this.$q.fullscreen.exit()
       },
 
       // toggle fullscreen mode
       toggleFullscreen () {
+        this.$q.fullscreen.isActive ? this.fullscreenLeave() : this.fullscreenEnter()
       },
 
       bringToFront () {
@@ -468,6 +508,25 @@ export default function (ssrContext) {
 
       __getStateInfo (id) {
         return this.stateInfo[id].state
+      },
+
+      __setFullscreen () {
+        this.restoreState.top = this.state.top
+        this.restoreState.left = this.state.left
+        this.restoreState.bottom = this.state.bottom
+        this.restoreState.right = this.state.right
+
+        this.state.top = 0
+        this.state.left = 0
+        this.state.bottom = this.$q.screen.height - 1
+        this.state.right = this.$q.screen.width - 1
+      },
+
+      __restoreFullscreen () {
+        this.state.top = this.restoreState.top
+        this.state.left = this.restoreState.left
+        this.state.bottom = this.restoreState.bottom
+        this.state.right = this.restoreState.right
       },
 
       // internal functions
@@ -664,12 +723,15 @@ export default function (ssrContext) {
             (this.dense === true ? ' q-window__titlebar--dense' : '') +
             (this.isEmbedded !== true ? ' absolute' : ''),
           class: this.titlebarClass,
-          style: this.tbStyle
+          style: this.tbStyle,
+          attrs: {
+            draggable: false
+          }
         }, [
           titlebarSlot === void 0 ? this.__renderTitle(h) : '',
           titlebarSlot === void 0 ? this.__renderMoreButton(h) : '',
           titlebarSlot !== void 0 ? titlebarSlot : '',
-          (this.isEmbedded !== true && this.isPinned !== true) && this.__renderResizeHandle(h, 'q-window__resize-handle--titlebar', 44) // width of more button
+          (this.isEmbedded !== true && this.isPinned !== true && this.isFullscreen) && this.__renderResizeHandle(h, 'q-window__resize-handle--titlebar', 44) // width of more button
         ])
       },
 
@@ -706,7 +768,10 @@ export default function (ssrContext) {
         const defaultSlot = this.$slots.default
         return h('div', {
           staticClass: 'q-window__body row',
-          style: this.bodyStyle
+          style: this.bodyStyle,
+          attrs: {
+            draggable: false
+          }
         }, [
           defaultSlot
         ])
