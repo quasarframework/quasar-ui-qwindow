@@ -30,7 +30,7 @@ export default {
 
   data () {
     return {
-      actions: ['pin', 'lock', 'minimize', 'maximize', 'close', 'fullscreen']
+      actions: ['pin', 'lock', 'minimize', 'maximize', 'fullscreen']
     }
   }
 }
