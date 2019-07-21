@@ -7,14 +7,14 @@
 
 const extendConf = function (conf) {
   // make sure qwindow boot file is registered
-  conf.boot.push('~@quasar/quasar-app-extension-qwindow/src/boot/qwindow.js')
+  conf.boot.push('~quasar-app-extension-qwindow/src/boot/qwindow.js')
   console.log(` App Extension (qwindow) Info: 'Adding qwindow boot reference to your quasar.conf.js'`)
 
   // make sure boot & component files transpile
   conf.build.transpileDependencies.push(/quasar-app-extension-qwindow[\\/]src/)
 
   // make sure qwindow css goes through webpack to avoid ssr issues
-  conf.css.push('~@quasar/quasar-app-extension-qwindow/src/component/window.styl')
+  conf.css.push('~quasar-app-extension-qwindow/src/component/window.styl')
   console.log(` App Extension (qwindow) Info: 'Adding window.styl css reference to your quasar.conf.js'`)
 }
 
