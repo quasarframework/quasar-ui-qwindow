@@ -411,26 +411,25 @@ export default function (ssrContext) {
           })
         }
       },
-      'stateInfo.inned.state' (val) {
-        this.$forceUpdate()
-      },
       '$q.fullscreen.isActive' (val) {
-        this.__setStateInfo('fullscreen', val)
-        this.$emit('fullscreen', val)
-        if (val) {
-          this.__setFullscreen()
-        } else {
-          this.__restoreFullscreen()
+        if (this.fullscreenInitiated === true) {
+          this.__setStateInfo('fullscreen', val)
+          this.$emit('fullscreen', val)
+          if (val) {
+            this.__setFullscreen()
+          } else {
+            this.__restoreFullscreen()
+          }
         }
       },
       '$q.screen.height' (val) {
-        if (this.__getStateInfo('fullscreen') === true) {
-          this.state.bottom = val - 1
+        if (this.isFullscreen === true) {
+          this.state.bottom = val
         }
       },
       '$q.screen.width' (val) {
-        if (this.__getStateInfo('fullscreen') === true) {
-          this.state.right = val - 1
+        if (this.isFullscreen === true) {
+          this.state.right = val
         }
       }
     },
@@ -487,12 +486,14 @@ export default function (ssrContext) {
 
       // go into fullscreen mode
       fullscreenEnter () {
+        this.fullscreenInitiated = true
         this.$q.fullscreen.request()
       },
 
       // leave fullscreen mode
       fullscreenLeave () {
         this.$q.fullscreen.exit()
+        this.fullscreenInitiated = false
       },
 
       // toggle fullscreen mode
