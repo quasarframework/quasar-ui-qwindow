@@ -1,12 +1,14 @@
 <template>
   <q-page class="flex flex-center">
     <q-window
-      contentClass="bg-grey-1"
+      ref="window"
+      title="About Quasar Framework"
       :height="500"
       :width="600"
       :actions="actions"
       bring-to-front-after-drag
-      title="About Quasar Framework"
+      :menu-func="updateMenu"
+      contentClass="bg-grey-1"
     >
       <div class="q-pa-md fit scroll">
         <q-scroll-area style="width: 100%; height: 100%">
@@ -31,6 +33,53 @@ export default {
   data () {
     return {
       actions: ['pin', 'lock', 'minimize', 'maximize', 'fullscreen']
+    }
+  },
+
+  methods: {
+    updateMenu (menuItems) {
+      if (menuItems[menuItems.length - 1].key === 'visible') {
+        menuItems.splice(menuItems.length - 1, 0, 'separator')
+      }
+      if (this.$refs.window.isEmbedded !== true) {
+        let sendToBack = {
+          key: 'sendtoback',
+          state: false,
+          on: {
+            label: 'Send to Back',
+            icon: '',
+            func: this.sendToBack
+          },
+          off: {
+            label: 'Send to Back',
+            icon: '',
+            func: this.sendToBack
+          }
+        }
+        let bringToFront = {
+          key: 'bringtofront',
+          state: false,
+          on: {
+            label: 'Bring To Front',
+            icon: '',
+            func: this.bringToFront
+          },
+          off: {
+            label: 'Bring To Front',
+            icon: '',
+            func: this.bringToFront
+          }
+        }
+        menuItems.splice(menuItems.length, 0, 'separator')
+        menuItems.splice(menuItems.length, 0, sendToBack)
+        menuItems.splice(menuItems.length, 0, bringToFront)
+      }
+    },
+    bringToFront () {
+      this.$refs.window.bringToFront()
+    },
+    sendToBack () {
+      this.$refs.window.sendToBack()
     }
   }
 }

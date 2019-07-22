@@ -87,14 +87,17 @@
         <q-separator />
         <q-window
         v-if="visible === true"
-        contentClass="bg-grey-1"
+        ref="window"
+        title="Quasar Embedded Layout"
         :height="500"
         :width="600"
         :actions="actions"
         :embedded="embedded"
         :visible="visible"
         :pinned="pinned"
-        title="Quasar Embedded Layout"
+        bring-to-front-after-drag
+        :menu-func="updateMenu"
+        contentClass="bg-grey-1"
         @embedded="(v) => embedded = v"
         @visible="(v) => visible = v"
         @pinned="(v) => pinned = v"
@@ -196,7 +199,6 @@
 </template>
 
 <script>
-import { openURL } from 'quasar'
 
 export default {
   name: 'MyLayout',
@@ -212,7 +214,50 @@ export default {
     }
   },
   methods: {
-    openURL
+    updateMenu (menuItems) {
+      if (menuItems[menuItems.length - 1].key === 'visible') {
+        menuItems.splice(menuItems.length - 1, 0, 'separator')
+      }
+      if (this.$refs.window.isEmbedded !== true) {
+        let sendToBack = {
+          key: 'sendtoback',
+          state: false,
+          on: {
+            label: 'Send to Back',
+            icon: '',
+            func: this.sendToBack
+          },
+          off: {
+            label: 'Send to Back',
+            icon: '',
+            func: this.sendToBack
+          }
+        }
+        let bringToFront = {
+          key: 'bringtofront',
+          state: false,
+          on: {
+            label: 'Bring To Front',
+            icon: '',
+            func: this.bringToFront
+          },
+          off: {
+            label: 'Bring To Front',
+            icon: '',
+            func: this.bringToFront
+          }
+        }
+        menuItems.splice(menuItems.length - 1, 0, 'separator')
+        menuItems.splice(menuItems.length - 2, 0, sendToBack)
+        menuItems.splice(menuItems.length - 2, 0, bringToFront)
+      }
+    },
+    bringToFront () {
+      this.$refs.window.bringToFront()
+    },
+    sendToBack () {
+      this.$refs.window.sendToBack()
+    }
   }
 }
 </script>
