@@ -58,7 +58,8 @@ module.exports = function (ctx) {
       // Quasar plugins
       plugins: [
         'Notify',
-        'Platform'
+        'Platform',
+        'Screen'
       ]
     },
 

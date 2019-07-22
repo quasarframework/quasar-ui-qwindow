@@ -149,22 +149,19 @@
 
             <q-page-container>
               <q-page style="padding-top: 60px" class="q-pa-md">
-                <p v-for="n in 15" :key="n">
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Fugit nihil praesentium molestias a adipisci, dolore vitae odit, quidem consequatur optio voluptates asperiores pariatur eos numquam rerum delectus commodi perferendis voluptate?
-                </p>
-
-                <q-page-sticky position="top-left" :offset="[18, 68]">
-                  <q-btn round color="primary" icon="arrow_back" class="rotate-45" />
-                </q-page-sticky>
-                <q-page-sticky position="top-right" :offset="[18, 68]">
-                  <q-btn round color="primary" icon="arrow_upward" class="rotate-45" />
-                </q-page-sticky>
-                <q-page-sticky position="bottom-left" :offset="[18, 18]">
-                  <q-btn round color="primary" icon="arrow_forward" class="rotate-135" />
-                </q-page-sticky>
-                <q-page-sticky position="bottom-right" :offset="[18, 18]">
-                  <q-btn round color="primary" icon="arrow_forward" class="rotate-45" />
-                </q-page-sticky>
+                <q-markdown>
+Some information about **QWindow**:
+1. It starts off embedded, but you can `unlock` it from the menu to make it `float`
+2. If floating, you can `embed` it back again
+3. If floating, you can move it around (via caption), or resize it (via sides and corners)
+4. If a QWindow is embeddable, you can `close` it while in embedded or floating states. It is up to the developer to provide a way to bring it back (ex: via a QBtn - close this window and try it!)
+5. You can enter fullscreen mode (currently while floating)
+6. The menu can be manipulated in devland. Notice the "Bring to Front" and "Send to Back" functions (while floating)
+7. QWindow is embeddable anywhere like a normal HTML element. It displayes slotted content provided by the developer
+8. On any move or resize (while floatin), `position` is emitted with `{x, y, width, height }` values
+9. If initial `startX`, `startY`, `width` and `height` are not given, defaults will be used. The algorithm always makes sure two windows do not completely overlap each other on initial render
+10. There is a special property `bring-to-front-after-drag` that ensures a dragged/resized window always remains on top
+                </q-markdown>
 
                 <q-page-sticky position="top" expand class="bg-accent text-white">
                   <q-toolbar>
