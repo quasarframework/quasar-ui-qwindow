@@ -375,7 +375,8 @@ export default function (ssrContext) {
 
       classes () {
         return '' +
-          (this.isDisabled !== true ? ' q-focusable q-hoverable' : ' disabled')
+          (this.isDisabled !== true ? ' q-focusable q-hoverable' : ' disabled') +
+          (this.isEmbedded !== true ? ' q-window__floating' : '')
       },
 
       attrs () {
