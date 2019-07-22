@@ -14,6 +14,7 @@ import {
   QItem,
   QItemSection,
   QIcon,
+  QSeparator,
   ClosePopup,
   AppFullscreen
 } from 'quasar'
@@ -69,6 +70,7 @@ export default function (ssrContext) {
           'fullscreen'].includes(action))
       },
       bringToFrontAfterDrag: Boolean,
+      menuFunc: Function,
       titlebarStyle: [String, Object, Array],
       titlebarClass: [String, Object, Array],
       contentClass: [String, Object, Array],
@@ -116,9 +118,6 @@ export default function (ssrContext) {
 
       this.id = ++QWindowCount
       this.$set(layers, this.id, { window: this })
-      // layers[this.id] = {
-      //   window: this
-      // }
     },
 
     beforeDestroy () {
@@ -436,7 +435,10 @@ export default function (ssrContext) {
     },
 
     methods: {
-      // public function
+      // ------------------------------
+      // public methods
+      // ------------------------------
+
       // show the component
       show () {
         this.__setStateInfo('visible', true)
@@ -516,6 +518,10 @@ export default function (ssrContext) {
         }
         this.zIndex = startingZOrder
       },
+
+      // ------------------------------
+      // private methods
+      // ------------------------------
 
       __setStateInfo (id, val) {
         this.stateInfo[id].state = val
@@ -652,14 +658,18 @@ export default function (ssrContext) {
         }
       },
 
-      __renderMoreItem (h, stateInfo, key) {
+      __renderMoreItem (h, stateInfo) {
         if (stateInfo === void 0) {
           return ''
         }
 
+        if (typeof stateInfo === 'string' && stateInfo === 'separator') {
+          return h(QSeparator)
+        }
+
         return h(QItem, {
           attrs: {
-            key: key
+            key: stateInfo.key
           },
           directives: [
             {
@@ -690,11 +700,35 @@ export default function (ssrContext) {
         ])
       },
 
-      __renderMoreItems (h) {
-        return this.computedActions.map(key => this.__renderMoreItem(h, this.stateInfo[key], key))
+      __renderMoreItems (h, menuData) {
+        return menuData.map(stateInfo => this.__renderMoreItem(h, stateInfo))
       },
 
       __renderMoreMenu (h) {
+        // this two issues happen during early render
+        if (this.computedActions.length === 0) {
+          return ''
+        }
+        let keys = Object.keys(this.stateInfo)
+        if (keys.length === 0) {
+          return ''
+        }
+
+        // get stateInfo for each menu item
+        let menuData = []
+        this.computedActions.map(key => {
+          if (this.stateInfo[key]) {
+            menuData.push({ ...this.stateInfo[key], key: key })
+          }
+        })
+        // let user manipulate menu
+        if (this.menuFunc) {
+          this.menuFunc(menuData)
+        }
+
+        // TODO: temp code
+        // menuData.splice(menuData.length - 1, 0, 'separator')
+
         return h(QMenu, {
           attrs: {
             zIndex: this.isEmbedded === true ? void 0 : this.computedZIndex + 1
@@ -706,7 +740,7 @@ export default function (ssrContext) {
               dense: true
             }
           }, [
-            ...this.__renderMoreItems(h)
+            ...this.__renderMoreItems(h, menuData)
           ])
         ])
       },
