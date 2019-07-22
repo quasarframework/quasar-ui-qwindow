@@ -23,14 +23,7 @@ const startingZOrder = 4000
 let QWindowCount = 0
 let defaultX = 20
 let defaultY = 20
-let layers = []
-
-function layersSort (a, b) {
-  return a.window.zIndex < b.window.zIndex
-}
-function sortLayers () {
-  layers.sort(layersSort)
-}
+let layers = {}
 
 export default function (ssrContext) {
   return Vue.extend({
@@ -122,9 +115,10 @@ export default function (ssrContext) {
       }
 
       this.id = ++QWindowCount
-      layers[this.id] = {
-        window: this
-      }
+      this.$set(layers, this.id, { window: this })
+      // layers[this.id] = {
+      //   window: this
+      // }
     },
 
     beforeDestroy () {
@@ -305,6 +299,20 @@ export default function (ssrContext) {
         }
 
         return actions
+      },
+
+      computedSortedLayers () {
+        let sortedLayers = []
+        let keys = Object.keys(layers)
+        for (let index = 0; index < keys.length; ++index) {
+          sortedLayers.push(layers[keys[index]])
+        }
+        function sort (a, b) {
+          return a.zOrder > b.zOrder
+        }
+        sortedLayers.sort(sort)
+
+        return sortedLayers
       },
 
       style () {
@@ -489,8 +497,9 @@ export default function (ssrContext) {
         this.$q.fullscreen.isActive ? this.fullscreenLeave() : this.fullscreenEnter()
       },
 
+      // bring this window to the front
       bringToFront () {
-        sortLayers()
+        let layers = this.computedSortedLayers
         for (let index = 0; index < layers.length; ++index) {
           let layer = layers[index]
           layer.window.zIndex = startingZOrder + index
@@ -498,8 +507,14 @@ export default function (ssrContext) {
         this.zIndex = startingZOrder + layers.length
       },
 
+      // send this window to the back
       sendToBack () {
-        sortLayers()
+        let layers = this.computedSortedLayers
+        for (let index = 0; index < layers.length; ++index) {
+          let layer = layers[index]
+          layer.window.zIndex = startingZOrder + index + 1
+        }
+        this.zIndex = startingZOrder
       },
 
       __setStateInfo (id, val) {
