@@ -558,9 +558,7 @@ export default function (ssrContext) {
       },
 
       onDrag (e, resizeHandle) {
-        e.dataTransfer.effectAllowed = 'none'
-
-        if (e.clientX === 0 || e.clientY === 0) {
+        if ((e.clientX && e.clientX === 0) || (e.clientY && e.clientY === 0)) {
           return
         }
 
@@ -578,25 +576,41 @@ export default function (ssrContext) {
 
         switch (resizeHandle) {
           case 'q-window__resize-handle--top':
-            this.state.top = e.clientY - parent.offsetTop
+            if (this.$q.platform.is.mobile === true) {
+              this.state.top = e.changedTouches[0].clientY - parent.offsetTop
+            } else {
+              this.state.top = e.clientY - parent.offsetTop
+            }
             if (this.computedHeight < this.state.minHeight) {
               this.state.top = tmpBottom - this.state.minHeight
             }
             break
           case 'q-window__resize-handle--left':
-            this.state.left = e.clientX - parent.offsetLeft
+            if (this.$q.platform.is.mobile === true) {
+              this.state.left = e.changedTouches[0].clientX - parent.offsetLeft
+            } else {
+              this.state.left = e.clientX - parent.offsetLeft
+            }
             if (this.computedWidth < this.state.minWidth) {
               this.state.left = tmpRight - this.state.minWidth
             }
             break
           case 'q-window__resize-handle--right':
-            this.state.right = e.clientX - parent.offsetLeft
+            if (this.$q.platform.is.mobile === true) {
+              this.state.right = e.changedTouches[0].clientX - parent.offsetLeft
+            } else {
+              this.state.right = e.clientX - parent.offsetLeft
+            }
             if (this.computedWidth < this.state.minWidth) {
               this.state.right = tmpLeft - this.state.minWidth
             }
             break
           case 'q-window__resize-handle--bottom':
-            this.state.bottom = e.clientY - parent.offsetTop
+            if (this.$q.platform.is.mobile === true) {
+              this.state.bottom = e.changedTouches[0].clientY - parent.offsetTop
+            } else {
+              this.state.bottom = e.clientY - parent.offsetTop
+            }
             if (this.computedHeight < this.state.minHeight) {
               this.state.bottom = tmpTop - this.state.minHeight
             }
@@ -618,18 +632,45 @@ export default function (ssrContext) {
             this.onDrag(e, 'q-window__resize-handle--right')
             break
           case 'q-window__resize-handle--titlebar':
-            this.state.top = e.clientY - grandparent.offsetTop - this.mouseOffsetY
+            if (this.$q.platform.is.mobile === true) {
+              this.state.top = e.changedTouches[0].clientY - grandparent.offsetTop - this.mouseOffsetY
+              this.state.left = e.changedTouches[0].clientX - grandparent.offsetLeft - this.mouseOffsetX
+            } else {
+              this.state.top = e.clientY - grandparent.offsetTop - this.mouseOffsetY
+              this.state.left = e.clientX - grandparent.offsetLeft - this.mouseOffsetX
+            }
             this.state.bottom = this.state.top + tmpHeight
-            this.state.left = e.clientX - grandparent.offsetLeft - this.mouseOffsetX
             this.state.right = this.state.left + tmpWidth
             break
         }
+        // console.log('state:', JSON.stringify(this.state))
+      },
+
+      onTouchMove (e, resizeHandle) {
+        this.onDrag(e, resizeHandle)
       },
 
       onDragStart (e, resizeHandle) {
-        this.mouseOffsetX = e.offsetX
-        this.mouseOffsetY = e.offsetY
+        if (this.$q.platform.is.mobile !== true) {
+          // needed for desktops
+          prevent(e)
+        }
+        if (e.dataTransfer && e.dataTransfer.effectAllowed) {
+          e.dataTransfer.effectAllowed = 'none'
+        }
+
+        if (this.$q.platform.is.mobile === true) {
+          this.mouseOffsetX = e.changedTouches[0].clientX - this.state.left
+          this.mouseOffsetY = e.changedTouches[0].clientY - this.state.top
+        } else {
+          this.mouseOffsetX = e.offsetX
+          this.mouseOffsetY = e.offsetY
+        }
         this.state.dragging = true
+      },
+
+      onTouchStart (e, resizeHandle) {
+        this.onDragStart(e, resizeHandle)
       },
 
       onDragEnter (e, resizeHandle) {
@@ -637,15 +678,15 @@ export default function (ssrContext) {
       },
 
       onDragOver (e, resizeHandle) {
-        prevent(e)
+        // prevent(e)
       },
 
       onDragLeave (e, resizeHandle) {
-        prevent(e)
+        // prevent(e)
       },
 
       onDragEnd (e, resizeHandle) {
-        prevent(e)
+        // prevent(e)
         this.mouseOffsetX = -1
         this.mouseOffsetY = -1
         this.state.dragging = false
@@ -658,6 +699,10 @@ export default function (ssrContext) {
         if (this.bringToFrontAfterDrag === true) {
           this.bringToFront()
         }
+      },
+
+      onTouchEnd (e, resizeHandle) {
+        this.onDragEnd(e, resizeHandle)
       },
 
       __renderMoreItem (h, stateInfo) {
@@ -806,7 +851,10 @@ export default function (ssrContext) {
             dragover: (e) => this.onDragOver(e, resizeHandle),
             dragleave: (e) => this.onDragLeave(e, resizeHandle),
             dragend: (e) => this.onDragEnd(e, resizeHandle),
-            touchmove: (e) => {}
+            // touchmove: (e) => {}
+            touchstart: (e) => this.onTouchStart(e, resizeHandle),
+            touchmove: (e) => this.onTouchMove(e, resizeHandle),
+            touchend: (e) => this.onTouchEnd(e, resizeHandle)
           }
         })
       },
@@ -829,8 +877,8 @@ export default function (ssrContext) {
       },
 
       __render (h) {
-        const isFocused = (document && document.activeElement === this.$el)
-        console.log('isFocused:', isFocused)
+        // const isFocused = (document && document.activeElement === this.$el)
+        // console.log('isFocused:', isFocused)
 
         return h('div', {
           staticClass: 'q-window ' + this.classes,
