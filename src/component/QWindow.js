@@ -731,7 +731,7 @@ export default function (ssrContext) {
           titlebarSlot === void 0 ? this.__renderTitle(h) : '',
           titlebarSlot === void 0 ? this.__renderMoreButton(h) : '',
           titlebarSlot !== void 0 ? titlebarSlot : '',
-          (this.isEmbedded !== true && this.isPinned !== true && this.isFullscreen) && this.__renderResizeHandle(h, 'q-window__resize-handle--titlebar', 44) // width of more button
+          (this.isEmbedded !== true && this.isPinned !== true && this.isFullscreen !== true) && this.__renderResizeHandle(h, 'q-window__resize-handle--titlebar', 44) // width of more button
         ])
       },
 
