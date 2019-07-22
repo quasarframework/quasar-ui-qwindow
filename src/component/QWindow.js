@@ -577,7 +577,7 @@ export default function (ssrContext) {
         switch (resizeHandle) {
           case 'q-window__resize-handle--top':
             if (this.$q.platform.is.mobile === true) {
-              this.state.top = e.changedTouches[0].clientY - parent.offsetTop
+              this.state.top = e.touches[0].clientY - parent.offsetTop
             } else {
               this.state.top = e.clientY - parent.offsetTop
             }
@@ -587,7 +587,7 @@ export default function (ssrContext) {
             break
           case 'q-window__resize-handle--left':
             if (this.$q.platform.is.mobile === true) {
-              this.state.left = e.changedTouches[0].clientX - parent.offsetLeft
+              this.state.left = e.touches[0].clientX - parent.offsetLeft
             } else {
               this.state.left = e.clientX - parent.offsetLeft
             }
@@ -597,7 +597,7 @@ export default function (ssrContext) {
             break
           case 'q-window__resize-handle--right':
             if (this.$q.platform.is.mobile === true) {
-              this.state.right = e.changedTouches[0].clientX - parent.offsetLeft
+              this.state.right = e.touches[0].clientX - parent.offsetLeft
             } else {
               this.state.right = e.clientX - parent.offsetLeft
             }
@@ -607,7 +607,7 @@ export default function (ssrContext) {
             break
           case 'q-window__resize-handle--bottom':
             if (this.$q.platform.is.mobile === true) {
-              this.state.bottom = e.changedTouches[0].clientY - parent.offsetTop
+              this.state.bottom = e.touches[0].clientY - parent.offsetTop
             } else {
               this.state.bottom = e.clientY - parent.offsetTop
             }
@@ -633,8 +633,8 @@ export default function (ssrContext) {
             break
           case 'q-window__resize-handle--titlebar':
             if (this.$q.platform.is.mobile === true) {
-              this.state.top = e.changedTouches[0].clientY - grandparent.offsetTop - this.mouseOffsetY
-              this.state.left = e.changedTouches[0].clientX - grandparent.offsetLeft - this.mouseOffsetX
+              this.state.top = e.touches[0].clientY - grandparent.offsetTop - this.mouseOffsetY
+              this.state.left = e.touches[0].clientX - grandparent.offsetLeft - this.mouseOffsetX
             } else {
               this.state.top = e.clientY - grandparent.offsetTop - this.mouseOffsetY
               this.state.left = e.clientX - grandparent.offsetLeft - this.mouseOffsetX
@@ -647,6 +647,17 @@ export default function (ssrContext) {
       },
 
       onTouchMove (e, resizeHandle) {
+        let touchY = e.touches[0].clientY
+        let touchYDelta = touchY - this.lastTouchY
+        if (window.pageYOffset === 0) {
+          // to supress pull-to-refresh preventDefault
+          // on the overscrolling touchmove when
+          // window.pageYOffset === 0
+          if (touchYDelta > 0) {
+            prevent(e)
+          }
+        }
+
         this.onDrag(e, resizeHandle)
       },
 
@@ -660,8 +671,12 @@ export default function (ssrContext) {
         }
 
         if (this.$q.platform.is.mobile === true) {
-          this.mouseOffsetX = e.changedTouches[0].clientX - this.state.left
-          this.mouseOffsetY = e.changedTouches[0].clientY - this.state.top
+          // pull-to-refresh happens when the document's
+          // Y offset is zero
+          this.lastTouchY = e.touches[0].clientY
+
+          this.mouseOffsetX = e.touches[0].clientX - this.state.left
+          this.mouseOffsetY = e.touches[0].clientY - this.state.top
         } else {
           this.mouseOffsetX = e.offsetX
           this.mouseOffsetY = e.offsetY
