@@ -18,7 +18,8 @@ import {
   ClosePopup
 } from 'quasar'
 
-const startingZOrder = 4000
+const startingZIndex = 4000
+const maxZIndex = 2147483647
 
 let QWindowCount = 0
 let defaultX = 20
@@ -91,7 +92,8 @@ export default function (ssrContext) {
           top: 10,
           left: 10,
           bottom: 400,
-          right: 400
+          right: 400,
+          zIndex: 4000
         },
         zIndex: 4000,
         mouseOffsetX: -1,
@@ -306,7 +308,7 @@ export default function (ssrContext) {
           sortedLayers.push(layers[keys[index]])
         }
         function sort (a, b) {
-          return a.zOrder > b.zOrder
+          return a.zIndex > b.zIndex
         }
         sortedLayers.sort(sort)
 
@@ -417,6 +419,7 @@ export default function (ssrContext) {
           if (val === true) {
             this.__savePosition()
             this.__setFillPosition()
+            this.zIndex = maxZIndex
           } else {
             this.__restorePosition()
           }
@@ -511,9 +514,9 @@ export default function (ssrContext) {
         let layers = this.computedSortedLayers
         for (let index = 0; index < layers.length; ++index) {
           let layer = layers[index]
-          layer.window.zIndex = startingZOrder + index
+          layer.window.zIndex = startingZIndex + index
         }
-        this.zIndex = startingZOrder + layers.length
+        this.zIndex = startingZIndex + layers.length
       },
 
       // send this window to the back
@@ -521,9 +524,9 @@ export default function (ssrContext) {
         let layers = this.computedSortedLayers
         for (let index = 0; index < layers.length; ++index) {
           let layer = layers[index]
-          layer.window.zIndex = startingZOrder + index + 1
+          layer.window.zIndex = startingZIndex + index + 1
         }
-        this.zIndex = startingZOrder
+        this.zIndex = startingZIndex
       },
 
       // ------------------------------
@@ -557,6 +560,7 @@ export default function (ssrContext) {
         this.restoreState.left = this.state.left
         this.restoreState.bottom = this.state.bottom
         this.restoreState.right = this.state.right
+        this.restoreState.zIndex = this.computedZIndex
       },
 
       __restorePosition () {
@@ -564,6 +568,7 @@ export default function (ssrContext) {
         this.state.left = this.restoreState.left
         this.state.bottom = this.restoreState.bottom
         this.state.right = this.restoreState.right
+        this.zIndex = this.restoreState.zIndex
       },
 
       // internal functions
