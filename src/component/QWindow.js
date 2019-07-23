@@ -453,6 +453,9 @@ export default function (ssrContext) {
 
       // embedded
       lock () {
+        if (this.__getStateInfo('fullscreen') === true) {
+          this.fullscreenLeave()
+        }
         this.__setStateInfo('embedded', true)
         this.$emit('embedded', true)
       },
