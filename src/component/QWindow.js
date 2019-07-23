@@ -558,8 +558,10 @@ export default function (ssrContext) {
       },
 
       onDrag (e, resizeHandle) {
-        if ((e.clientX && e.clientX === 0) || (e.clientY && e.clientY === 0)) {
-          return
+        if (this.$q.platform.is.mobile !== true) {
+          if (e.clientX === 0 || e.clientY === 0) {
+            return
+          }
         }
 
         // save existing state
@@ -664,7 +666,7 @@ export default function (ssrContext) {
       onDragStart (e, resizeHandle) {
         if (this.$q.platform.is.mobile !== true) {
           // needed for desktops
-          prevent(e)
+          // prevent(e)
         }
         if (e.dataTransfer && e.dataTransfer.effectAllowed) {
           e.dataTransfer.effectAllowed = 'none'
