@@ -38,10 +38,10 @@ export default {
 
   methods: {
     updateMenu (menuItems) {
-      if (menuItems[menuItems.length - 1].key === 'visible') {
-        menuItems.splice(menuItems.length - 1, 0, 'separator')
-      }
-      if (this.$refs.window.isEmbedded !== true) {
+      if (this.$refs.window.isEmbedded !== true && this.$refs.window.isFullscreen !== true) {
+        if (menuItems[menuItems.length - 1].key === 'visible') {
+          menuItems.splice(menuItems.length - 1, 0, 'separator')
+        }
         let sendToBack = {
           key: 'sendtoback',
           state: false,
