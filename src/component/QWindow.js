@@ -284,7 +284,10 @@ export default function (ssrContext) {
           actions.push('embedded')
         }
         if (this.actions.includes('pin')) {
-          actions.push('pinned')
+          // cannot pin if in fullscreen
+          if (this.__getStateInfo('fullscreen') !== true) {
+            actions.push('pinned')
+          }
         }
         if (this.actions.includes('fullscreen')) {
           actions.push('fullscreen')
