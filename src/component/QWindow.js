@@ -15,8 +15,7 @@ import {
   QItemSection,
   QIcon,
   QSeparator,
-  ClosePopup,
-  AppFullscreen
+  ClosePopup
 } from 'quasar'
 
 const startingZOrder = 4000
@@ -97,6 +96,7 @@ export default function (ssrContext) {
         zIndex: 4000,
         mouseOffsetX: -1,
         mouseOffsetY: -1,
+        fullscreenInitiated: false,
         handles: [
           'q-window__resize-handle--top',
           'q-window__resize-handle--left',
@@ -112,10 +112,6 @@ export default function (ssrContext) {
     },
 
     beforeMount () {
-      if (this.$q.fullscreen === void 0) {
-        AppFullscreen.install(this)
-      }
-
       this.id = ++QWindowCount
       this.$set(layers, this.id, { window: this })
     },
@@ -415,11 +411,15 @@ export default function (ssrContext) {
         if (this.fullscreenInitiated === true) {
           this.__setStateInfo('fullscreen', val)
           this.$emit('fullscreen', val)
-          if (val) {
-            this.__setFullscreen()
+          if (val === true) {
+            this.__savePosition()
+            this.__setFillPosition()
           } else {
-            this.__restoreFullscreen()
+            this.__restorePosition()
           }
+        }
+        if (val === false) {
+          this.fullscreenInitiated = val
         }
       },
       '$q.screen.height' (val) {
@@ -493,7 +493,6 @@ export default function (ssrContext) {
       // leave fullscreen mode
       fullscreenLeave () {
         this.$q.fullscreen.exit()
-        this.fullscreenInitiated = false
       },
 
       // toggle fullscreen mode
@@ -526,26 +525,35 @@ export default function (ssrContext) {
       // ------------------------------
 
       __setStateInfo (id, val) {
-        this.stateInfo[id].state = val
+        if (id in this.stateInfo) {
+          this.stateInfo[id].state = val
+          return true
+        }
+        return false
       },
 
       __getStateInfo (id) {
-        return this.stateInfo[id].state
+        if (id in this.stateInfo) {
+          return this.stateInfo[id].state
+        }
+        return false
       },
 
-      __setFullscreen () {
-        this.restoreState.top = this.state.top
-        this.restoreState.left = this.state.left
-        this.restoreState.bottom = this.state.bottom
-        this.restoreState.right = this.state.right
-
+      __setFillPosition () {
         this.state.top = 0
         this.state.left = 0
         this.state.bottom = this.$q.screen.height - 1
         this.state.right = this.$q.screen.width - 1
       },
 
-      __restoreFullscreen () {
+      __savePosition () {
+        this.restoreState.top = this.state.top
+        this.restoreState.left = this.state.left
+        this.restoreState.bottom = this.state.bottom
+        this.restoreState.right = this.state.right
+      },
+
+      __restorePosition () {
         this.state.top = this.restoreState.top
         this.state.left = this.restoreState.left
         this.state.bottom = this.restoreState.bottom
@@ -919,20 +927,6 @@ export default function (ssrContext) {
           classes: this.$options.classes,
           components: this.$options.components,
           directives: this.$options.directives
-        }
-
-        if (this.__onPortalClose !== void 0) {
-          obj.methods = {
-            __qClosePopup: this.__onPortalClose
-          }
-        }
-
-        const onCreated = this.__onPortalCreated
-
-        if (onCreated !== void 0) {
-          obj.created = function () {
-            onCreated(this)
-          }
         }
 
         this.__portal = getVm(this, obj).$mount()

@@ -13,6 +13,11 @@ const extendConf = function (conf) {
   // make sure boot & component files transpile
   conf.build.transpileDependencies.push(/quasar-app-extension-qwindow[\\/]src/)
 
+  // make sure these plugins are in the build
+  conf.framework.plugins.push('AppFullscreen')
+  conf.framework.plugins.push('Platform')
+  conf.framework.plugins.push('Screen')
+
   // make sure qwindow css goes through webpack to avoid ssr issues
   conf.css.push('~quasar-app-extension-qwindow/src/component/window.styl')
   console.log(` App Extension (qwindow) Info: 'Adding window.styl css reference to your quasar.conf.js'`)
