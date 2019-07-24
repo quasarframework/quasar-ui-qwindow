@@ -1082,17 +1082,14 @@ export default function (ssrContext) {
           this.menuFunc(menuData)
         }
 
-        let style = {
-          zIndex: (this.isEmbedded === true) ? void 0 : this.computedZIndex + 1
-        }
-
-        return h(QMenu, {
-          style: style
-        }, [
+        return h(QMenu, [
           h(QList, {
             props: {
               highlight: true,
               dense: true
+            },
+            style: {
+              zIndex: (this.isEmbedded === true) ? void 0 : this.computedZIndex + 1
             }
           }, [
             ...this.__renderMoreItems(h, menuData)
