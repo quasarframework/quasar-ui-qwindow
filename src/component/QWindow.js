@@ -1039,7 +1039,7 @@ export default function (ssrContext) {
           ],
           props: {
             clickable: true,
-            dense: true
+            dense: this.dense
           },
           on: {
             click: () => (stateInfo.state === true ? stateInfo.off.func() : stateInfo.on.func())
