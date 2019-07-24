@@ -1045,7 +1045,11 @@ export default function (ssrContext) {
             click: () => (stateInfo.state === true ? stateInfo.off.func() : stateInfo.on.func())
           }
         }, [
-          h(QItemSection, stateInfo.state ? stateInfo.off.label : stateInfo.on.label),
+          h(QItemSection, {
+            props: {
+              noWrap: true
+            }
+          }, stateInfo.state === true ? stateInfo.off.label : stateInfo.on.label),
           h(QItemSection, {
             props: {
               avatar: true
