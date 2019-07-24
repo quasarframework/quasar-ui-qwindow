@@ -19,7 +19,9 @@ import {
 } from 'quasar'
 
 const startingZIndex = 4000
-const maxZIndex = 2147483647
+// -1 to allow for QMenu popup
+// const maxZIndex = 2147483647 - 1
+const maxZIndex = startingZIndex
 
 let QWindowCount = 0
 let defaultX = 20
@@ -43,9 +45,27 @@ export default function (ssrContext) {
       embedded: Boolean,
       pinned: Boolean,
       fullscreen: Boolean,
+      maximized: Boolean,
+      minimized: Boolean,
       disabled: Boolean,
-      tabindex: [Number, String],
       dense: Boolean,
+
+      color: {
+        type: String,
+        default: '#787878'
+      },
+      backgroundColor: {
+        type: String
+      },
+      borderWidth: {
+        type: String,
+        default: '1px'
+      },
+      borderStyle: {
+        type: String,
+        default: 'solid'
+      },
+      borderColor: String,
 
       startX: [Number, String],
       startY: [Number, String],
@@ -93,7 +113,11 @@ export default function (ssrContext) {
           left: 10,
           bottom: 400,
           right: 400,
-          zIndex: 4000
+          zIndex: 4000,
+          pinned: false,
+          embedded: false,
+          maximixed: false,
+          minimized: false
         },
         zIndex: 4000,
         mouseOffsetX: -1,
@@ -156,7 +180,7 @@ export default function (ssrContext) {
           }
         },
         embedded: {
-          state: false,
+          state: true,
           on: {
             label: 'Embed',
             icon: 'lock_outline',
@@ -181,7 +205,7 @@ export default function (ssrContext) {
             func: this.unpin
           }
         },
-        maximized: {
+        maximize: {
           state: false,
           on: {
             label: 'Maximize',
@@ -194,7 +218,7 @@ export default function (ssrContext) {
             func: this.restore
           }
         },
-        minimized: {
+        minimize: {
           state: false,
           on: {
             label: 'Minimize',
@@ -223,11 +247,29 @@ export default function (ssrContext) {
       }
 
       // adjust initial user states
-      this.__setStateInfo('visible', this.isVisible === true)
-      this.__setStateInfo('embedded', this.isEmbedded === true)
-      this.__setStateInfo('pinned', this.isPinned === true)
-      if (this.fullscreen) {
+      if (this.visible === true) {
+        this.show()
+      } else {
+        this.hide()
+      }
+      if (this.embedded === true) {
+        this.lock()
+      } else {
+        this.unlock()
+      }
+      if (this.pinned === true) {
+        this.pin()
+      } else {
+        this.unpin()
+      }
+      if (this.fullscreen === true) {
         this.fullscreenEnter()
+      } else {
+        if (this.maximize === true) {
+          this.maximize()
+        } else if (this.minimize === true) {
+          // this.minimize()
+        }
       }
     },
 
@@ -244,6 +286,13 @@ export default function (ssrContext) {
       isFullscreen () {
         return this.fullscreen === true || (this.stateInfo.fullscreen && this.stateInfo.fullscreen.state === true)
       },
+      isMaximized () {
+        return this.maximized === true || (this.stateInfo.maximize && this.stateInfo.maximize.state === true)
+      },
+      isMinimized () {
+        return this.minimized === true || (this.stateInfo.minimize && this.stateInfo.minimize.state === true)
+      },
+
       isDisabled () {
         return this.disabled === true
       },
@@ -252,8 +301,17 @@ export default function (ssrContext) {
         return this.state.dragging === true
       },
 
-      computedTabIndex () {
-        return this.isDisabled === true ? -1 : this.tabindex || 0
+      canDrag () {
+        return this.isVisible === true &&
+          this.isEmbedded !== true &&
+          this.isPinned !== true &&
+          this.isFullscreen !== true &&
+          this.isMaximized !== true &&
+          this.isMinimized !== true
+      },
+
+      hasStateInfo () {
+        return Object.keys(this.stateInfo).length > 0
       },
 
       computedVisibility () {
@@ -286,14 +344,29 @@ export default function (ssrContext) {
           actions.push('embedded')
         }
         if (this.actions.includes('pin')) {
-          // cannot pin if in fullscreen
-          if (this.__getStateInfo('fullscreen') !== true) {
+          // cannot pin if in embedded, maximized or fullscreen
+          if (this.isEmbedded !== true && this.isMaximized !== true && this.isFullscreen !== true) {
             actions.push('pinned')
           }
         }
         if (this.actions.includes('fullscreen')) {
-          actions.push('fullscreen')
+          // can't go into fullscreen if embedded or maximized
+          if (this.isEmbedded !== true && this.isMaximized !== true) {
+            actions.push('fullscreen')
+          }
         }
+        if (this.actions.includes('maximize')) {
+          // cannot maximize if in fullscreen
+          if (this.isEmbedded !== true && this.isFullscreen !== true) {
+            actions.push('maximize')
+          }
+        }
+        // if (this.actions.includes('minimize')) {
+        //   // cannot maximize if in fullscreen
+        //   if (this.isFullscreen !== true) {
+        //     actions.push('minimize')
+        //   }
+        // }
         if (this.actions.includes('close')) {
           actions.push('visible')
         }
@@ -317,7 +390,17 @@ export default function (ssrContext) {
 
       style () {
         let style
-        if (this.isEmbedded) {
+        if (this.isMinimized === true) {
+          style = {
+            position: 'relative',
+            visibility: this.computedVisibility,
+            height: this.computedToolbarHeight + 'px',
+            borderWidth: '1px',
+            borderStyle: 'solid',
+            color: '#787878',
+            minWidth: '100px'
+          }
+        } else if (this.isEmbedded === true) {
           style = {
             position: 'relative',
             visibility: this.computedVisibility,
@@ -328,9 +411,10 @@ export default function (ssrContext) {
           style = {
             position: 'absolute',
             display: 'inline-block',
-            borderWidth: '1px',
-            borderStyle: 'solid',
-            color: '#787878',
+            borderWidth: this.borderWidth,
+            borderStyle: this.borderStyle,
+            color: this.color,
+            backgroundColor: this.backgroundColor,
             width: this.computedWidth + 'px',
             height: this.computedHeight + 'px',
             padding: 0,
@@ -369,7 +453,7 @@ export default function (ssrContext) {
         }
         return {
           position: 'absolute',
-          top: '40px',
+          top: this.computedToolbarHeight + 'px',
           height: this.computedHeight - this.computedToolbarHeight - 2 + 'px'
         }
       },
@@ -378,13 +462,6 @@ export default function (ssrContext) {
         return '' +
           (this.isDisabled !== true ? ' q-focusable q-hoverable' : ' disabled') +
           (this.isEmbedded !== true ? ' q-window__floating' : '')
-      },
-
-      attrs () {
-        let attrs = {
-          tabindex: this.computedTabIndex
-        }
-        return attrs
       }
     },
 
@@ -412,13 +489,23 @@ export default function (ssrContext) {
           })
         }
       },
+      'stateInfo.maximize.state' (val) {
+        if (!val) {
+          this.__restorePosition()
+        }
+      },
+      'stateInfo.minimize.state' (val) {
+        if (!val) {
+          this.__restorePosition()
+        }
+      },
       '$q.fullscreen.isActive' (val) {
         if (this.fullscreenInitiated === true) {
           this.__setStateInfo('fullscreen', val)
           this.$emit('fullscreen', val)
           if (val === true) {
             this.__savePosition()
-            this.__setFillPosition()
+            this.__setFullWindowPosition()
             this.zIndex = maxZIndex
           } else {
             this.__restorePosition()
@@ -459,6 +546,10 @@ export default function (ssrContext) {
 
       // embedded
       lock () {
+        if (this.__getStateInfo('visible') !== true) {
+          // not allowed
+          return
+        }
         if (this.__getStateInfo('fullscreen') === true) {
           this.fullscreenLeave()
         }
@@ -468,44 +559,102 @@ export default function (ssrContext) {
 
       // floating
       unlock () {
+        if (this.__getStateInfo('visible') !== true) {
+          // not allowed
+          return
+        }
         this.__setStateInfo('embedded', false)
         this.$emit('embedded', false)
       },
 
       // pinned (can't move or re-size)
       pin () {
+        if (this.__getStateInfo('visible') !== true) {
+          // not allowed
+          return
+        }
         this.__setStateInfo('pinned', true)
         this.$emit('pinned', true)
       },
 
       // move and resize available, if not embedded
       unpin () {
+        if (this.__getStateInfo('visible') !== true) {
+          // not allowed
+          return
+        }
         this.__setStateInfo('pinned', false)
         this.$emit('pinned', false)
       },
 
       maximize () {
+        if (this.__getStateInfo('visible') !== true) {
+          // not allowed
+          return
+        }
+        this.__savePosition()
+        this.__setFullWindowPosition()
+        this.zIndex = maxZIndex
+
+        this.__setStateInfo('embedded', false)
+        this.$nextTick(() => {
+          this.__setStateInfo('maximize', true)
+          this.$emit('maximize', true)
+        })
       },
 
       minimize () {
+        if (this.__getStateInfo('visible') !== true) {
+          // not allowed
+          return
+        }
+        this.__savePosition()
+        this.__setMinimizePosition()
+
+        this.__setStateInfo('embedded', true)
+        this.__setStateInfo('minimize', true)
+        this.$emit('minimize', true)
       },
 
       restore () {
+        if (this.__getStateInfo('visible') !== true) {
+          // not allowed
+          return
+        }
+        if (this.__getStateInfo('maximize') === true) {
+          this.__setStateInfo('maximize', false)
+          this.$emit('maximize', false)
+        } else if (this.__getStateInfo('minimize') === true) {
+          this.__setStateInfo('minimize', false)
+          this.$emit('minimize', false)
+        }
       },
 
       // go into fullscreen mode
       fullscreenEnter () {
+        if (this.__getStateInfo('visible') !== true) {
+          // not allowed
+          return
+        }
         this.fullscreenInitiated = true
         this.$q.fullscreen.request()
       },
 
       // leave fullscreen mode
       fullscreenLeave () {
+        if (this.__getStateInfo('visible') !== true) {
+          // not allowed
+          return
+        }
         this.$q.fullscreen.exit()
       },
 
       // toggle fullscreen mode
       toggleFullscreen () {
+        if (this.__getStateInfo('visible') !== true) {
+          // not allowed
+          return
+        }
         this.$q.fullscreen.isActive ? this.fullscreenLeave() : this.fullscreenEnter()
       },
 
@@ -548,11 +697,18 @@ export default function (ssrContext) {
         return false
       },
 
-      __setFillPosition () {
+      __setFullWindowPosition () {
         this.state.top = 0
         this.state.left = 0
         this.state.bottom = this.$q.screen.height - 1
         this.state.right = this.$q.screen.width - 1
+      },
+
+      __setMinimizePosition () {
+        let elements = document.getElementsByClassName('q-notifications__list--bottom')
+        if (elements.length > 0) {
+          elements[0].appendChild(this.$el)
+        }
       },
 
       __savePosition () {
@@ -561,6 +717,10 @@ export default function (ssrContext) {
         this.restoreState.bottom = this.state.bottom
         this.restoreState.right = this.state.right
         this.restoreState.zIndex = this.computedZIndex
+        this.restoreState.pinned = this.__getStateInfo('pinned')
+        this.restoreState.embedded = this.__getStateInfo('embedded')
+        this.restoreState.maximixe = this.__getStateInfo('maximize')
+        this.restoreState.minimize = this.__getStateInfo('minimize')
       },
 
       __restorePosition () {
@@ -569,6 +729,10 @@ export default function (ssrContext) {
         this.state.bottom = this.restoreState.bottom
         this.state.right = this.restoreState.right
         this.zIndex = this.restoreState.zIndex
+        this.__setStateInfo('pinned', this.restoreState.pinned)
+        this.__setStateInfo('embedded', this.restoreState.embedded)
+        this.__setStateInfo('maximize', this.restoreState.maximixe)
+        this.__setStateInfo('minimize', this.restoreState.minimize)
       },
 
       // internal functions
@@ -787,35 +951,26 @@ export default function (ssrContext) {
         return menuData.map(stateInfo => this.__renderMoreItem(h, stateInfo))
       },
 
-      __renderMoreMenu (h) {
-        // this two issues happen during early render
+      __renderMoreMenu (h, menuData) {
+        // these two issues happen during early render
         if (this.computedActions.length === 0) {
           return ''
         }
-        let keys = Object.keys(this.stateInfo)
-        if (keys.length === 0) {
+        if (this.hasStateInfo !== true) {
           return ''
         }
 
-        // get stateInfo for each menu item
-        let menuData = []
-        this.computedActions.map(key => {
-          if (this.stateInfo[key]) {
-            menuData.push({ ...this.stateInfo[key], key: key })
-          }
-        })
         // let user manipulate menu
         if (this.menuFunc) {
           this.menuFunc(menuData)
         }
 
-        // TODO: temp code
-        // menuData.splice(menuData.length - 1, 0, 'separator')
+        let style = {
+          zIndex: (this.isEmbedded === true) ? void 0 : this.computedZIndex + 1
+        }
 
         return h(QMenu, {
-          attrs: {
-            zIndex: this.isEmbedded === true ? void 0 : this.computedZIndex + 1
-          }
+          style: style
         }, [
           h(QList, {
             props: {
@@ -828,7 +983,7 @@ export default function (ssrContext) {
         ])
       },
 
-      __renderMoreButton (h) {
+      __renderMoreButton (h, menuData) {
         return h(QBtn, {
           staticClass: 'q-window__titlebar--action-item',
           props: {
@@ -838,7 +993,7 @@ export default function (ssrContext) {
             icon: 'more_vert'
           }
         }, [
-          this.__renderMoreMenu(h)
+          this.__renderMoreMenu(h, menuData)
         ])
       },
 
@@ -849,11 +1004,20 @@ export default function (ssrContext) {
       },
 
       __renderTitlebar (h) {
-        const titlebarSlot = this.$slots.titlebar
+        const titlebarSlot = this.$scopedSlots.titlebar
+
+        // get stateInfo for each menu item
+        let menuData = []
+        this.computedActions.map(key => {
+          if (this.stateInfo[key]) {
+            menuData.push({ ...this.stateInfo[key], key: key })
+          }
+        })
+
         return h('div', {
           staticClass: 'q-window__titlebar row justify-between items-center' +
             (this.dense === true ? ' q-window__titlebar--dense' : '') +
-            (this.isEmbedded !== true ? ' absolute' : ''),
+            (this.isEmbedded !== true && this.isMinimized !== true ? ' absolute' : ''),
           class: this.titlebarClass,
           style: this.tbStyle,
           attrs: {
@@ -861,16 +1025,17 @@ export default function (ssrContext) {
           }
         }, [
           titlebarSlot === void 0 ? this.__renderTitle(h) : '',
-          titlebarSlot === void 0 ? this.__renderMoreButton(h) : '',
-          titlebarSlot !== void 0 ? titlebarSlot : '',
-          (this.isEmbedded !== true && this.isPinned !== true && this.isFullscreen !== true) && this.__renderResizeHandle(h, 'q-window__resize-handle--titlebar', 44) // width of more button
+          titlebarSlot === void 0 ? this.__renderMoreButton(h, menuData) : '',
+          titlebarSlot !== void 0 ? titlebarSlot(menuData) : '',
+          (this.canDrag === true) &&
+            this.__renderResizeHandle(h, 'q-window__resize-handle--titlebar', 44) // width of more button
         ])
       },
 
       __renderResizeHandle (h, resizeHandle, actionsWidth) {
         let width = this.computedWidth
         let style = {}
-        if (actionsWidth && this.isEmbedded !== true) {
+        if (actionsWidth && this.canDrag === true) {
           width -= actionsWidth
           style.width = width + 'px'
         }
@@ -878,7 +1043,7 @@ export default function (ssrContext) {
           staticClass: 'q-window__resize-handle ' + resizeHandle,
           style: style,
           attrs: {
-            draggable: this.isEmbedded !== true && this.isPinned !== true
+            draggable: this.canDrag
           },
           on: {
             drag: (e) => this.onDrag(e, resizeHandle),
@@ -887,7 +1052,6 @@ export default function (ssrContext) {
             dragover: (e) => this.onDragOver(e, resizeHandle),
             dragleave: (e) => this.onDragLeave(e, resizeHandle),
             dragend: (e) => this.onDragEnd(e, resizeHandle),
-            // touchmove: (e) => {}
             touchstart: (e) => this.onTouchStart(e, resizeHandle),
             touchmove: (e) => this.onTouchMove(e, resizeHandle),
             touchend: (e) => this.onTouchEnd(e, resizeHandle)
@@ -913,18 +1077,14 @@ export default function (ssrContext) {
       },
 
       __render (h) {
-        // const isFocused = (document && document.activeElement === this.$el)
-        // console.log('isFocused:', isFocused)
-
         return h('div', {
           staticClass: 'q-window ' + this.classes,
           class: this.contentClass,
-          style: this.style,
-          attrs: this.attrs
+          style: this.style
         }, [
-          (this.isEmbedded !== true && this.isPinned !== true) && [...this.__renderResizeHandles(h)],
+          (this.canDrag === true) && [...this.__renderResizeHandles(h)],
           this.__renderTitlebar(h),
-          this.__renderBody(h)
+          this.isMinimized !== true && this.__renderBody(h)
         ])
       },
 
