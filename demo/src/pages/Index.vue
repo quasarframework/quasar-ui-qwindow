@@ -60,12 +60,12 @@ export default {
           key: 'bringtofront',
           state: false,
           on: {
-            label: 'Bring To Front',
+            label: 'Bring to Front',
             icon: '',
             func: this.bringToFront
           },
           off: {
-            label: 'Bring To Front',
+            label: 'Bring to Front',
             icon: '',
             func: this.bringToFront
           }
