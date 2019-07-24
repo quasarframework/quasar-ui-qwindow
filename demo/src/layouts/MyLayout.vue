@@ -151,14 +151,14 @@
               <q-page style="padding-top: 60px" class="q-pa-md">
                 <q-markdown>
 Some information about **QWindow**:
-1. It starts off embedded, but you can `unlock` it from the menu to make it `float`
+1. If starts off embedded, but you can `unlock` it from the menu to make it `float`
 2. If floating, you can `embed` it back again
 3. If floating, you can move it around (via caption), or resize it (via sides and corners)
 4. If a QWindow is embeddable, you can `close` it while in embedded or floating states. It is up to the developer to provide a way to bring it back (ex: via a QBtn - close this window and try it!)
 5. You can enter fullscreen mode (currently while floating)
 6. The menu can be manipulated in devland. Notice the "Bring to Front" and "Send to Back" functions (while floating)
 7. QWindow is embeddable anywhere like a normal HTML element. It displayes slotted content provided by the developer
-8. On any move or resize (while floatin), `position` is emitted with `{x, y, width, height }` values
+8. On any move or resize (while floating), `position` is emitted with `{x, y, width, height }` values
 9. If initial `startX`, `startY`, `width` and `height` are not given, defaults will be used. The algorithm always makes sure two windows do not completely overlap each other on initial render
 10. There is a special property `bring-to-front-after-drag` that ensures a dragged/resized window always remains on top
                 </q-markdown>
