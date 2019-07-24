@@ -1178,6 +1178,7 @@ export default function (ssrContext) {
       },
 
       __renderBody (h) {
+        const defaultScopedSlot = this.$scopedSlots.default
         const defaultSlot = this.$slots.default
         return h('div', {
           staticClass: 'q-window__body row',
@@ -1186,7 +1187,7 @@ export default function (ssrContext) {
             draggable: false
           }
         }, [
-          defaultSlot
+          defaultSlot || defaultScopedSlot({ zIndex: this.zIndex })
         ])
       },
 
