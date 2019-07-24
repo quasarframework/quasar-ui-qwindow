@@ -18,10 +18,12 @@ import {
   ClosePopup
 } from 'quasar'
 
+// the starting zIndex for floating windows
 const startingZIndex = 4000
-// -1 to allow for QMenu popup
-// const maxZIndex = 2147483647 - 1
-const maxZIndex = startingZIndex
+
+// maxZIndex is for fullscreen
+// 6000 is $z-fullscreen and $z-menu
+const maxZIndex = 6000 - 100
 
 let QWindowCount = 0
 let defaultX = 20
@@ -116,8 +118,8 @@ export default function (ssrContext) {
           zIndex: 4000,
           pinned: false,
           embedded: false,
-          maximixed: false,
-          minimized: false
+          maximize: false,
+          minimize: false
         },
         zIndex: 4000,
         mouseOffsetX: -1,
@@ -248,28 +250,36 @@ export default function (ssrContext) {
 
       // adjust initial user states
       if (this.visible === true) {
-        this.show()
+        this.__setStateInfo('visible', true)
       } else {
-        this.hide()
+        this.__setStateInfo('visible', false)
       }
       if (this.embedded === true) {
-        this.lock()
+        this.__setStateInfo('embedded', true)
       } else {
-        this.unlock()
+        this.__setStateInfo('embedded', false)
       }
       if (this.pinned === true) {
-        this.pin()
+        if (this.canDo('pinned', true)) {
+          this.__setStateInfo('pinned', true)
+        }
       } else {
-        this.unpin()
+        if (this.canDo('pinned', false)) {
+          this.__setStateInfo('pinned', false)
+        }
       }
       if (this.fullscreen === true) {
         this.fullscreenEnter()
+      }
+      if (this.maximize === true && this.__getStateInfo('fullscreen') !== true) {
+        this.__setStateInfo('maximize', true)
       } else {
-        if (this.maximize === true) {
-          this.maximize()
-        } else if (this.minimize === true) {
-          // this.minimize()
-        }
+        this.__setStateInfo('maximize', false)
+      }
+      if (this.minimize === true && this.__getStateInfo('fullscreen') !== true) {
+        this.__setStateInfo('minimize', true)
+      } else {
+        this.__setStateInfo('minimize', false)
       }
     },
 
@@ -340,32 +350,20 @@ export default function (ssrContext) {
       computedActions () {
         // sort and pick ones that are visible based on user selection and state
         let actions = []
-        if (this.actions.includes('embed')) {
+        if (this.actions.includes('embed') && (this.canDo('embedded', true) || this.canDo('embedded', false))) {
           actions.push('embedded')
         }
-        if (this.actions.includes('pin')) {
-          // cannot pin if in embedded, maximized or fullscreen
-          if (this.isEmbedded !== true && this.isMaximized !== true && this.isFullscreen !== true) {
-            actions.push('pinned')
-          }
+        if (this.actions.includes('pin') && (this.canDo('pinned', true) || this.canDo('pinned', false))) {
+          actions.push('pinned')
         }
-        if (this.actions.includes('fullscreen')) {
-          // can't go into fullscreen if embedded or maximized
-          if (this.isEmbedded !== true && this.isMaximized !== true) {
-            actions.push('fullscreen')
-          }
+        if (this.actions.includes('fullscreen') && (this.canDo('fullscreen', true) || this.canDo('fullscreen', false))) {
+          actions.push('fullscreen')
         }
-        if (this.actions.includes('maximize')) {
-          // cannot maximize if in fullscreen
-          if (this.isEmbedded !== true && this.isFullscreen !== true) {
-            actions.push('maximize')
-          }
+        if (this.actions.includes('maximize') && (this.canDo('maximize', true) || this.canDo('maximize', false))) {
+          actions.push('maximize')
         }
-        // if (this.actions.includes('minimize')) {
-        //   // cannot maximize if in fullscreen
-        //   if (this.isFullscreen !== true) {
-        //     actions.push('minimize')
-        //   }
+        // if (this.actions.includes('minimize') && (this.canDo('minimize', true) || this.canDo('minimize', false))) {
+        //   actions.push('maximize')
         // }
         if (this.actions.includes('close')) {
           actions.push('visible')
@@ -489,13 +487,21 @@ export default function (ssrContext) {
           })
         }
       },
-      'stateInfo.maximize.state' (val) {
-        if (!val) {
+      'stateInfo.maximize.state' (val, oldVal) {
+        if (oldVal === void 0) {
+          // during initialization
+          return
+        }
+        if (val === false) {
           this.__restorePosition()
         }
       },
-      'stateInfo.minimize.state' (val) {
-        if (!val) {
+      'stateInfo.minimize.state' (val, oldVal) {
+        if (oldVal === void 0) {
+          // during initialization
+          return
+        }
+        if (val === false) {
           this.__restorePosition()
         }
       },
@@ -532,88 +538,195 @@ export default function (ssrContext) {
       // public methods
       // ------------------------------
 
+      // function that returns true/false if
+      // passed in mode/state can be done
+      // where state = [true = 'on', false = 'off']
+      canDo (mode, state) {
+        switch (mode) {
+          case 'visible':
+            if (state === true) {
+              if (this.__getStateInfo('visible') !== true) {
+                return true
+              }
+            } else {
+              if (this.__getStateInfo('visible') === true) {
+                return true
+              }
+            }
+            return false
+
+          case 'embedded':
+            if (state === true) {
+              if (this.__getStateInfo('embedded') !== true) {
+                return true
+              }
+            } else {
+              if (this.__getStateInfo('embedded') === true) {
+                return true
+              }
+            }
+            return false
+          case 'pinned':
+            if (state === true) {
+              if (this.__getStateInfo('pinned') !== true &&
+                this.__getStateInfo('embedded') !== true &&
+                this.__getStateInfo('maximize') !== true &&
+                this.__getStateInfo('minimize') !== true &&
+                this.__getStateInfo('fullscreen') !== true) {
+                return true
+              }
+            } else {
+              if (this.__getStateInfo('pinned') === true &&
+                this.__getStateInfo('embedded') !== true &&
+                this.__getStateInfo('maximize') !== true &&
+                this.__getStateInfo('minimize') !== true &&
+                this.__getStateInfo('fullscreen') !== true) {
+                return true
+              }
+            }
+            return false
+          case 'maximize':
+            if (state === true) {
+              if (this.__getStateInfo('maximize') !== true &&
+                this.__getStateInfo('embedded') !== true &&
+                this.__getStateInfo('minimize') !== true &&
+                this.__getStateInfo('fullscreen') !== true) {
+                return true
+              }
+            } else {
+              if (this.__getStateInfo('maximize') === true &&
+                this.__getStateInfo('embedded') !== true &&
+                this.__getStateInfo('minimize') !== true &&
+                this.__getStateInfo('fullscreen') !== true) {
+                return true
+              }
+            }
+            return false
+          case 'minimize':
+            if (state === true) {
+              if (this.__getStateInfo('minimize') !== true &&
+                this.__getStateInfo('embedded') !== true &&
+                this.__getStateInfo('maximize') !== true &&
+                this.__getStateInfo('fullscreen') !== true) {
+                return true
+              }
+            } else {
+              if (this.__getStateInfo('minimize') === true &&
+                this.__getStateInfo('embedded') !== true &&
+                this.__getStateInfo('maximize') !== true &&
+                this.__getStateInfo('fullscreen') !== true) {
+                return true
+              }
+            }
+            return false
+          case 'fullscreen':
+            if (state === true) {
+              if (this.__getStateInfo('fullscreen') !== true &&
+                this.__getStateInfo('embedded') !== true &&
+                this.__getStateInfo('maximize') !== true &&
+                this.__getStateInfo('minimize') !== true) {
+                return true
+              }
+            } else {
+              if (this.__getStateInfo('fullscreen') === true &&
+                this.__getStateInfo('embedded') !== true &&
+                this.__getStateInfo('maximize') !== true &&
+                this.__getStateInfo('minimize') !== true) {
+                return true
+              }
+            }
+            return false
+        }
+        console.error(`Unknown mode: ${mode}`)
+      },
+
       // show the component
       show () {
-        this.__setStateInfo('visible', true)
-        this.$emit('visible', true)
+        if (this.canDo('visible', true)) {
+          this.__setStateInfo('visible', true)
+          this.$emit('visible', true)
+          return true
+        }
+        return false
       },
 
       // hide the component
       hide () {
-        this.__setStateInfo('visible', false)
-        this.$emit('visible', false)
+        if (this.canDo('visible', false)) {
+          this.__setStateInfo('visible', false)
+          this.$emit('visible', false)
+          return true
+        }
+        return false
       },
 
       // embedded
       lock () {
-        if (this.__getStateInfo('visible') !== true) {
-          // not allowed
-          return
+        if (this.canDo('embedded', true)) {
+          this.__setStateInfo('embedded', true)
+          this.$emit('embedded', true)
+          return true
         }
-        if (this.__getStateInfo('fullscreen') === true) {
-          this.fullscreenLeave()
-        }
-        this.__setStateInfo('embedded', true)
-        this.$emit('embedded', true)
+        return false
       },
 
       // floating
       unlock () {
-        if (this.__getStateInfo('visible') !== true) {
-          // not allowed
-          return
+        if (this.canDo('embedded', false)) {
+          this.__setStateInfo('embedded', false)
+          this.$emit('embedded', false)
+          return true
         }
-        this.__setStateInfo('embedded', false)
-        this.$emit('embedded', false)
+        return false
       },
 
       // pinned (can't move or re-size)
       pin () {
-        if (this.__getStateInfo('visible') !== true) {
-          // not allowed
-          return
+        if (this.canDo('pinned', true)) {
+          this.__setStateInfo('pinned', true)
+          this.$emit('pinned', true)
+          return true
         }
-        this.__setStateInfo('pinned', true)
-        this.$emit('pinned', true)
+        return false
       },
 
       // move and resize available, if not embedded
       unpin () {
-        if (this.__getStateInfo('visible') !== true) {
-          // not allowed
-          return
+        if (this.canDo('pinned', false)) {
+          this.__setStateInfo('pinned', false)
+          this.$emit('pinned', false)
+          return true
         }
-        this.__setStateInfo('pinned', false)
-        this.$emit('pinned', false)
+        return false
       },
 
       maximize () {
-        if (this.__getStateInfo('visible') !== true) {
-          // not allowed
-          return
-        }
-        this.__savePosition()
-        this.__setFullWindowPosition()
-        this.zIndex = maxZIndex
+        if (this.canDo('maximize', true)) {
+          this.bringToFront()
+          this.__savePosition()
+          this.__setFullWindowPosition()
 
-        this.__setStateInfo('embedded', false)
-        this.$nextTick(() => {
-          this.__setStateInfo('maximize', true)
-          this.$emit('maximize', true)
-        })
+          this.__setStateInfo('embedded', false)
+          this.$nextTick(() => {
+            this.__setStateInfo('maximize', true)
+            this.$emit('maximize', true)
+          })
+          return true
+        }
+        return false
       },
 
       minimize () {
-        if (this.__getStateInfo('visible') !== true) {
-          // not allowed
-          return
-        }
-        this.__savePosition()
-        this.__setMinimizePosition()
+        if (this.canDo('minimize', true)) {
+          this.__savePosition()
+          this.__setMinimizePosition()
 
-        this.__setStateInfo('embedded', true)
-        this.__setStateInfo('minimize', true)
-        this.$emit('minimize', true)
+          this.__setStateInfo('embedded', true)
+          this.__setStateInfo('minimize', true)
+          this.$emit('minimize', true)
+          return true
+        }
+        return false
       },
 
       restore () {
@@ -632,21 +745,21 @@ export default function (ssrContext) {
 
       // go into fullscreen mode
       fullscreenEnter () {
-        if (this.__getStateInfo('visible') !== true) {
-          // not allowed
-          return
+        if (this.canDo('fullscreen', true)) {
+          this.fullscreenInitiated = true
+          this.$q.fullscreen.request()
+          return true
         }
-        this.fullscreenInitiated = true
-        this.$q.fullscreen.request()
+        return false
       },
 
       // leave fullscreen mode
       fullscreenLeave () {
-        if (this.__getStateInfo('visible') !== true) {
-          // not allowed
-          return
+        if (this.canDo('fullscreen', false)) {
+          this.$q.fullscreen.exit()
+          return true
         }
-        this.$q.fullscreen.exit()
+        return false
       },
 
       // toggle fullscreen mode
@@ -719,7 +832,7 @@ export default function (ssrContext) {
         this.restoreState.zIndex = this.computedZIndex
         this.restoreState.pinned = this.__getStateInfo('pinned')
         this.restoreState.embedded = this.__getStateInfo('embedded')
-        this.restoreState.maximixe = this.__getStateInfo('maximize')
+        this.restoreState.maximize = this.__getStateInfo('maximize')
         this.restoreState.minimize = this.__getStateInfo('minimize')
       },
 
@@ -929,7 +1042,7 @@ export default function (ssrContext) {
             dense: true
           },
           on: {
-            click: () => (stateInfo.state ? stateInfo.off.func() : stateInfo.on.func())
+            click: () => (stateInfo.state === true ? stateInfo.off.func() : stateInfo.on.func())
           }
         }, [
           h(QItemSection, stateInfo.state ? stateInfo.off.label : stateInfo.on.label),
@@ -940,7 +1053,7 @@ export default function (ssrContext) {
           }, [
             h(QIcon, {
               props: {
-                name: stateInfo.state ? stateInfo.off.icon : stateInfo.on.icon
+                name: stateInfo.state === true ? stateInfo.off.icon : stateInfo.on.icon
               }
             })
           ])
