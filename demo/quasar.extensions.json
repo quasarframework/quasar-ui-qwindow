@@ -4,5 +4,6 @@
     "sort": true
   },
   "qwindow": {},
+  "@quasar/qribbon": {},
   "@quasar/qmarkdown": {}
 }
