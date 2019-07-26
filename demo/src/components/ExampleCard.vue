@@ -71,7 +71,7 @@ export default {
   components: {
     Basic: () => import('../examples/Basic'),
     Actions: () => import('../examples/Actions'),
-    FixedPosition: () => import('../examples/FixedPosition'),
+    ScrollWithWindow: () => import('../examples/ScrollWithWindow'),
     Color: () => import('../examples/Color'),
     Border: () => import('../examples/Border'),
     TitlebarStyle: () => import('../examples/TitlebarStyle'),

@@ -1,7 +1,8 @@
 <template>
   <div>
     <q-window
-      title="QWindow Fixed Position"
+      title="QWindow Scroll With Window"
+      scroll-with-window
       :height="150"
       :width="350"
       :actions="['embedded']"

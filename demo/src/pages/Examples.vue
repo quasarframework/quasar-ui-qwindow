@@ -2,7 +2,7 @@
   <hero>
     <div class="q-markdown">
       <q-markdown>
-QWindow allows for a floating, movable, resizable window above the regular HTML elements.
+**QWindow** allows for a floating, movable, resizable window above the regular HTML elements.
 
 It is quite possible to start a QWindow off as `floating`, but for these examples, the window must start off as `embedded` so there isn't a lot of windows popping up and knowing which example they come from.
 
@@ -26,16 +26,16 @@ When you move or resize a QWindow in `floating` mode, then `embed` it, if you ma
       <example-card title="Embedded/Floating" name="Basic" :tag-parts="getTagParts(require('!!raw-loader!../examples/Basic.vue').default)" />
 
       <q-markdown>
-You might have noticed on the previous example, when the QWindow is floating, that when you scroll the main window that the QWindow also scrolls.
+You might have noticed on the previous example, when the QWindow is floating, that when you scroll the document that the QWindow stays in-place.
 
-To prevent the scrolling, use the `fixed-position` property.
+To prevent the in-place and scroll with the document, use the `scroll-with-window` property.
 
-For the remaining examples on this page, the `fixed-position` property will be used in order to serve up a better UX.
+If you make this window `floating`, you will have to scroll up to see it. It's position is now relative to the document and not to the view port.
 
 Make sure to `embed` the `floating` window before moving on to the next example.
       </q-markdown>
 
-      <example-card title="Fixed Position" name="FixedPosition" :tag-parts="getTagParts(require('!!raw-loader!../examples/FixedPosition.vue').default)" />
+      <example-card title="Scroll With Window" name="ScrollWithWindow" :tag-parts="getTagParts(require('!!raw-loader!../examples/ScrollWithWindow.vue').default)" />
 
       <q-markdown>
 Actions allow the window to be in different states.
@@ -49,7 +49,7 @@ The available actions are:
 
 All of the actions are self-explanatory, except for `pinned`. When a QWindow is `pinned` this means it can no longer be moved or resized.
 
-In the example below, we will use all actions, except for `close` which will be discussed in the next example.
+In the example below, we will use all actions, except for `close` which will be discussed in a later example.
 
 `float` the example window to see the actions in the menu.
       </q-markdown>
@@ -60,7 +60,7 @@ In the example below, we will use all actions, except for `close` which will be 
       <example-card title="Titlebar Style" name="TitlebarStyle" :tag-parts="getTagParts(require('!!raw-loader!../examples/TitlebarStyle.vue').default)" />
 
       <q-markdown>
-If you don't like the **grippers** you can hide them with the `hide-grippers` property. In this case, there will be invisible bars running on the sides, as well as all corners that allow for resizing.
+If you don't like the **grippers** you can hide them with the `hide-grippers` property. In this case, there will be invisible bars running on the sides, as well as all corners that allow for resizing. Hover the mouse over these areas to see the cursor change.
       </q-markdown>
 
       <example-card title="Hide Grippers" name="GripperNone" :tag-parts="getTagParts(require('!!raw-loader!../examples/GripperNone.vue').default)" />
