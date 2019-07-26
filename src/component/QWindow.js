@@ -838,17 +838,46 @@ export default function (ssrContext) {
         this.zIndex = startingZIndex
       },
 
-      // ------------------------------
-      // private methods
-      // ------------------------------
+      centerWindow () {
+        const w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
+        const h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
+        const startX = w / 2 - this.computedWidth / 2
+        const startY = h / 2 - this.computedHeight / 2
+        this.setStartXY(startX, startY)
+      },
 
-      __disableScroll (val) {
-        if (val === true) {
-          // disable scrollbar
+      setStartX (x) {
+        const w = this.computedWidth
+        this.state.left = x
+        this.state.right = this.state.left + w
+      },
+
+      setStartY (y) {
+        const h = this.computedHeight
+        this.state.top = y
+        this.state.bottom = this.state.top + h
+      },
+
+      setStartXY (x, y) {
+        this.setStartX(x)
+        this.setStartY(y)
+      },
+
+      setWidth (width) {
+        this.state.right = this.state.left + width
+      },
+
+      setHeight (height) {
+        this.state.bottom = this.state.top + width
+      },
         } else {
           // enable scrollbar
         }
       },
+
+      // ------------------------------
+      // private methods
+      // ------------------------------
 
       __setStateInfo (id, val) {
         if (id in this.stateInfo) {
