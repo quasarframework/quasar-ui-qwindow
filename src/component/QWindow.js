@@ -483,7 +483,7 @@ export default function (ssrContext) {
       classes () {
         return '' +
           (this.isDisabled !== true ? ' q-focusable q-hoverable' : ' disabled') +
-          (this.isEmbedded !== true ? ' q-window__floating' : '') +
+          (this.isEmbedded !== true && this.isFullscreen !== true ? ' q-window__floating' : '') +
           (this.isFullscreen === true ? ' q-window__fullscreen' : '')
       }
     },
@@ -510,7 +510,7 @@ export default function (ssrContext) {
           return
         }
         if (val === false) {
-          this.__restorePosition()
+          this.__restorePositionAndState()
         }
       },
       'stateInfo.minimize.state' (val, oldVal) {
@@ -519,20 +519,18 @@ export default function (ssrContext) {
           return
         }
         if (val === false) {
-          this.__restorePosition()
+          this.__restorePositionAndState()
         }
       },
       'stateInfo.fullscreen.state' (val, oldVal) {
-        // debugger
         if (oldVal === void 0) {
           return
         }
         if (val === true) {
-          this.__savePosition()
-          this.__setFullWindowPosition()
+          this.__savePositionAndState()
           this.zIndex = maxZIndex
         } else {
-          this.__restorePosition()
+          this.__restorePositionAndState()
           this.fullscreenInitiated = val
         }
         this.$emit('fullscreen', val)
@@ -578,11 +576,13 @@ export default function (ssrContext) {
 
           case 'embedded':
             if (state === true) {
-              if (this.__getStateInfo('embedded') !== true) {
+              if (this.__getStateInfo('embedded') !== true &&
+                this.__getStateInfo('fullscreen') !== true) {
                 return true
               }
             } else {
-              if (this.__getStateInfo('embedded') === true) {
+              if (this.__getStateInfo('embedded') === true &&
+              this.__getStateInfo('fullscreen') !== true) {
                 return true
               }
             }
@@ -643,16 +643,12 @@ export default function (ssrContext) {
           case 'fullscreen':
             if (state === true) {
               if (this.__getStateInfo('fullscreen') !== true &&
-                this.__getStateInfo('embedded') !== true &&
-                this.__getStateInfo('maximize') !== true &&
-                this.__getStateInfo('minimize') !== true) {
+              this.__getStateInfo('embedded') !== true) {
                 return true
               }
             } else {
               if (this.__getStateInfo('fullscreen') === true &&
-                this.__getStateInfo('embedded') !== true &&
-                this.__getStateInfo('maximize') !== true &&
-                this.__getStateInfo('minimize') !== true) {
+                this.__getStateInfo('embedded') !== true) {
                 return true
               }
             }
@@ -733,7 +729,7 @@ export default function (ssrContext) {
       maximize () {
         if (this.canDo('maximize', true)) {
           this.bringToFront()
-          this.__savePosition()
+          this.__savePositionAndState()
           this.__setFullWindowPosition()
 
           this.__setStateInfo('embedded', false)
@@ -748,7 +744,7 @@ export default function (ssrContext) {
 
       minimize () {
         if (this.canDo('minimize', true)) {
-          this.__savePosition()
+          this.__savePositionAndState()
           this.__setMinimizePosition()
 
           this.__setStateInfo('embedded', true)
@@ -862,7 +858,7 @@ export default function (ssrContext) {
         }
       },
 
-      __savePosition () {
+      __savePositionAndState () {
         this.restoreState.top = this.state.top
         this.restoreState.left = this.state.left
         this.restoreState.bottom = this.state.bottom
@@ -874,7 +870,7 @@ export default function (ssrContext) {
         this.restoreState.minimize = this.__getStateInfo('minimize')
       },
 
-      __restorePosition () {
+      __restorePositionAndState () {
         this.state.top = this.restoreState.top
         this.state.left = this.restoreState.left
         this.state.bottom = this.restoreState.bottom
