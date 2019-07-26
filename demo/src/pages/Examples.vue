@@ -68,7 +68,7 @@ If you don't like the **grippers** you can hide them with the `hide-grippers` pr
 
       <example-title title="Advanced" />
       <q-markdown>
-You can provide the action `close` in the array of actions. This will add a **Close** option to the menu. Essentually, the window is really hidden. It is up to the developer to provide a way for the QWindow to be re-displayed.
+You can provide the action `close` in the array of actions. This will add a **Close** option to the menu. Essentually, the window is really hidden. It is up to the developer to provide a way for the QWindow to be re-displayed by setting the `visible` property.
       </q-markdown>
 
       <example-card title="Close Action" name="CloseAction" :tag-parts="getTagParts(require('!!raw-loader!../examples/CloseAction.vue').default)" />
