@@ -578,115 +578,6 @@ export default function (ssrContext) {
       // public methods
       // ------------------------------
 
-      // function that returns true/false if
-      // passed in mode/state can be done
-      // where state = [true = 'on', false = 'off']
-      canDo (mode, state) {
-        switch (mode) {
-          case 'visible':
-            if (state === true) {
-              if (this.__getStateInfo('visible') !== true) {
-                return true
-              }
-            } else {
-              if (this.__getStateInfo('visible') === true) {
-                return true
-              }
-            }
-            return false
-
-          case 'embedded':
-            if (state === true) {
-              if (this.__getStateInfo('embedded') !== true &&
-                this.__getStateInfo('fullscreen') !== true) {
-                return true
-              }
-            } else {
-              if (this.__getStateInfo('embedded') === true &&
-              this.__getStateInfo('fullscreen') !== true) {
-                return true
-              }
-            }
-            return false
-          case 'pinned':
-            if (state === true) {
-              if (this.__getStateInfo('pinned') !== true &&
-                this.__getStateInfo('embedded') !== true &&
-                this.__getStateInfo('maximize') !== true &&
-                this.__getStateInfo('minimize') !== true &&
-                this.__getStateInfo('fullscreen') !== true) {
-                return true
-              }
-            } else {
-              if (this.__getStateInfo('pinned') === true &&
-                this.__getStateInfo('embedded') !== true &&
-                this.__getStateInfo('maximize') !== true &&
-                this.__getStateInfo('minimize') !== true &&
-                this.__getStateInfo('fullscreen') !== true) {
-                return true
-              }
-            }
-            return false
-          case 'maximize':
-            if (state === true) {
-              if (this.__getStateInfo('maximize') !== true &&
-                this.__getStateInfo('embedded') !== true &&
-                this.__getStateInfo('minimize') !== true &&
-                this.__getStateInfo('fullscreen') !== true) {
-                return true
-              }
-            } else {
-              if (this.__getStateInfo('maximize') === true &&
-                this.__getStateInfo('embedded') !== true &&
-                this.__getStateInfo('minimize') !== true &&
-                this.__getStateInfo('fullscreen') !== true) {
-                return true
-              }
-            }
-            return false
-          case 'minimize':
-            if (state === true) {
-              if (this.__getStateInfo('minimize') !== true &&
-                this.__getStateInfo('embedded') !== true &&
-                this.__getStateInfo('maximize') !== true &&
-                this.__getStateInfo('fullscreen') !== true) {
-                return true
-              }
-            } else {
-              if (this.__getStateInfo('minimize') === true &&
-                this.__getStateInfo('embedded') !== true &&
-                this.__getStateInfo('maximize') !== true &&
-                this.__getStateInfo('fullscreen') !== true) {
-                return true
-              }
-            }
-            return false
-          case 'fullscreen':
-            if (state === true) {
-              if (this.__getStateInfo('fullscreen') !== true &&
-              this.__getStateInfo('embedded') !== true) {
-                return true
-              }
-            } else {
-              if (this.__getStateInfo('fullscreen') === true &&
-                this.__getStateInfo('embedded') !== true) {
-                return true
-              }
-            }
-            return false
-          case 'close':
-            if (state === true) {
-              if (this.__getStateInfo('embedded') !== true) {
-                return true
-              }
-            } else {
-              return true
-            }
-            return false
-        }
-        console.error(`Unknown mode: ${mode}`)
-      },
-
       // show the component
       show () {
         if (this.canDo('visible', true)) {
@@ -870,9 +761,114 @@ export default function (ssrContext) {
       setHeight (height) {
         this.state.bottom = this.state.top + width
       },
-        } else {
-          // enable scrollbar
+
+      // function that returns true/false if
+      // passed in mode/state can be done
+      // where state = [true = 'on', false = 'off']
+      canDo (mode, state) {
+        switch (mode) {
+          case 'visible':
+            if (state === true) {
+              if (this.__getStateInfo('visible') !== true) {
+                return true
+              }
+            } else {
+              if (this.__getStateInfo('visible') === true) {
+                return true
+              }
+            }
+            return false
+
+          case 'embedded':
+            if (state === true) {
+              if (this.__getStateInfo('embedded') !== true &&
+                this.__getStateInfo('fullscreen') !== true) {
+                return true
+              }
+            } else {
+              if (this.__getStateInfo('embedded') === true &&
+              this.__getStateInfo('fullscreen') !== true) {
+                return true
+              }
+            }
+            return false
+          case 'pinned':
+            if (state === true) {
+              if (this.__getStateInfo('pinned') !== true &&
+                this.__getStateInfo('embedded') !== true &&
+                this.__getStateInfo('maximize') !== true &&
+                this.__getStateInfo('minimize') !== true &&
+                this.__getStateInfo('fullscreen') !== true) {
+                return true
+              }
+            } else {
+              if (this.__getStateInfo('pinned') === true &&
+                this.__getStateInfo('embedded') !== true &&
+                this.__getStateInfo('maximize') !== true &&
+                this.__getStateInfo('minimize') !== true &&
+                this.__getStateInfo('fullscreen') !== true) {
+                return true
+              }
+            }
+            return false
+          case 'maximize':
+            if (state === true) {
+              if (this.__getStateInfo('maximize') !== true &&
+                this.__getStateInfo('embedded') !== true &&
+                this.__getStateInfo('minimize') !== true &&
+                this.__getStateInfo('fullscreen') !== true) {
+                return true
+              }
+            } else {
+              if (this.__getStateInfo('maximize') === true &&
+                this.__getStateInfo('embedded') !== true &&
+                this.__getStateInfo('minimize') !== true &&
+                this.__getStateInfo('fullscreen') !== true) {
+                return true
+              }
+            }
+            return false
+          case 'minimize':
+            if (state === true) {
+              if (this.__getStateInfo('minimize') !== true &&
+                this.__getStateInfo('embedded') !== true &&
+                this.__getStateInfo('maximize') !== true &&
+                this.__getStateInfo('fullscreen') !== true) {
+                return true
+              }
+            } else {
+              if (this.__getStateInfo('minimize') === true &&
+                this.__getStateInfo('embedded') !== true &&
+                this.__getStateInfo('maximize') !== true &&
+                this.__getStateInfo('fullscreen') !== true) {
+                return true
+              }
+            }
+            return false
+          case 'fullscreen':
+            if (state === true) {
+              if (this.__getStateInfo('fullscreen') !== true &&
+              this.__getStateInfo('embedded') !== true) {
+                return true
+              }
+            } else {
+              if (this.__getStateInfo('fullscreen') === true &&
+                this.__getStateInfo('embedded') !== true) {
+                return true
+              }
+            }
+            return false
+          case 'close':
+            if (state === true) {
+              if (this.__getStateInfo('embedded') !== true) {
+                return true
+              }
+            } else {
+              return true
+            }
+            return false
         }
+        console.error(`Unknown mode: ${mode}`)
       },
 
       // ------------------------------
