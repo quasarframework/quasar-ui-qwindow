@@ -1,9 +1,9 @@
 <template>
   <div>
     <q-window
-      v-if="visible === true"
       ref="window"
       title="QWindow Close Action"
+      :visible="visible"
       :height="150"
       :width="350"
       :actions="['embedded', 'pin', 'maximize', 'fullscreen', 'close']"

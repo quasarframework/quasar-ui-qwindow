@@ -298,10 +298,10 @@ export default function (ssrContext) {
 
     computed: {
       isVisible () {
-        return (this.stateInfo.visible && this.stateInfo.visible.state)
+        return (this.stateInfo.visible && this.stateInfo.visible.state === true)
       },
       isEmbedded () {
-        return (this.stateInfo.embedded && this.stateInfo.embedded.state)
+        return (this.stateInfo.embedded && this.stateInfo.embedded.state === true)
       },
       isPinned () {
         return (this.stateInfo.pinned && this.stateInfo.pinned.state)
@@ -338,7 +338,7 @@ export default function (ssrContext) {
       },
 
       computedVisibility () {
-        return this.visible === true ? 'visible' : 'hidden'
+        return this.isVisible === true ? 'visible' : 'hidden'
       },
 
       computedToolbarHeight () {
@@ -525,6 +525,9 @@ export default function (ssrContext) {
     },
 
     watch: {
+      visible (val) {
+        this.stateInfo.visible.state = val
+      },
       'stateInfo.embedded.state' (val) {
         if (val !== true) {
           this.__createPortal()
