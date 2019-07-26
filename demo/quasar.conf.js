@@ -32,7 +32,9 @@ module.exports = function (ctx) {
 
       components: [
         'QBtn',
+        'QCard',
         'QDrawer',
+        'QExpansionItem',
         'QFooter',
         'QHeader',
         'QIcon',
@@ -47,12 +49,18 @@ module.exports = function (ctx) {
         'QPageSticky',
         'QScrollArea',
         'QSeparator',
+        'QTab',
+        'QTabPanel',
+        'QTabPanels',
+        'QTabs',
         'QToolbar',
-        'QToolbarTitle'
+        'QToolbarTitle',
+        'QTooltip'
       ],
 
       directives: [
-        'Ripple'
+        'Ripple',
+        'Scroll'
       ],
 
       // Quasar plugins

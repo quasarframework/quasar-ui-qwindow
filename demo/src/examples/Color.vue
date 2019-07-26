@@ -1,0 +1,18 @@
+<template>
+  <div>
+    <q-window
+      title="QWindow Color"
+      color="yellow-2"
+      background-color="blue-grey-4"
+      :height="300"
+      :width="200"
+      fixed-position
+      :actions="['embedded', 'pin', 'maximize', 'fullscreen']"
+      embedded
+    >
+      <div class="q-ma-md">
+        This is the "default" slot content
+      </div>
+    </q-window>
+  </div>
+</template>

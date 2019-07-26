@@ -6,6 +6,7 @@ import './window.styl'
 // Utils
 import { prevent } from 'quasar/src/utils/event'
 import { getVm } from 'quasar/src/utils/vm.js'
+import { Colorize } from 'quasar-mixin-colorize'
 
 import {
   QBtn,
@@ -15,7 +16,8 @@ import {
   QItemSection,
   QIcon,
   QSeparator,
-  ClosePopup
+  ClosePopup,
+  Scroll
 } from 'quasar'
 
 // the starting zIndex for floating windows
@@ -35,8 +37,11 @@ export default function (ssrContext) {
     name: 'q-window',
 
     directives: {
-      ClosePopup
+      ClosePopup,
+      Scroll
     },
+
+    mixins: [Colorize],
 
     props: {
       title: String,
@@ -49,13 +54,12 @@ export default function (ssrContext) {
       fullscreen: Boolean,
       maximized: Boolean,
       minimized: Boolean,
+      fixedPosition: Boolean,
+
       disabled: Boolean,
       dense: Boolean,
+      hideToolbarDivider: Boolean,
 
-      color: {
-        type: String,
-        default: '#787878'
-      },
       backgroundColor: {
         type: String
       },
@@ -67,7 +71,6 @@ export default function (ssrContext) {
         type: String,
         default: 'solid'
       },
-      borderColor: String,
 
       startX: [Number, String],
       startY: [Number, String],
@@ -79,13 +82,12 @@ export default function (ssrContext) {
         type: [Number, String],
         default: 400
       },
-      layer: [Number, String],
       actions: {
         type: Array,
-        default: () => (['pin', 'close', 'fullscreen']),
+        default: () => (['pin', 'embedded', 'close', 'fullscreen']),
         validator: (v) => v.some(action => [
           'pin',
-          'embed',
+          'embedded',
           'minimize',
           'maximize',
           'close',
@@ -124,6 +126,8 @@ export default function (ssrContext) {
         zIndex: 4000,
         mouseOffsetX: -1,
         mouseOffsetY: -1,
+        scrollX: 0,
+        scrollY: 0,
         fullscreenInitiated: false,
         handles: [
           'q-window__resize-handle--top',
@@ -145,6 +149,7 @@ export default function (ssrContext) {
     },
 
     beforeDestroy () {
+      document.removeEventListener('scroll', this.onScroll, { passive: true })
       this.__destroyPortal()
     },
 
@@ -281,26 +286,29 @@ export default function (ssrContext) {
       } else {
         this.__setStateInfo('minimize', false)
       }
+
+      // set up scroll handler
+      document.addEventListener('scroll', this.onScroll, { passive: true })
     },
 
     computed: {
       isVisible () {
-        return this.visible === true || (this.stateInfo.visible && this.stateInfo.visible.state)
+        return (this.stateInfo.visible && this.stateInfo.visible.state)
       },
       isEmbedded () {
-        return this.embedded === true || (this.stateInfo.embedded && this.stateInfo.embedded.state)
+        return (this.stateInfo.embedded && this.stateInfo.embedded.state)
       },
       isPinned () {
-        return this.pinned === true || (this.stateInfo.pinned && this.stateInfo.pinned.state)
+        return (this.stateInfo.pinned && this.stateInfo.pinned.state)
       },
       isFullscreen () {
-        return this.fullscreen === true || (this.stateInfo.fullscreen && this.stateInfo.fullscreen.state === true)
+        return (this.stateInfo.fullscreen && this.stateInfo.fullscreen.state === true)
       },
       isMaximized () {
-        return this.maximized === true || (this.stateInfo.maximize && this.stateInfo.maximize.state === true)
+        return (this.stateInfo.maximize && this.stateInfo.maximize.state === true)
       },
       isMinimized () {
-        return this.minimized === true || (this.stateInfo.minimize && this.stateInfo.minimize.state === true)
+        return (this.stateInfo.minimize && this.stateInfo.minimize.state === true)
       },
 
       isDisabled () {
@@ -350,7 +358,7 @@ export default function (ssrContext) {
       computedActions () {
         // sort and pick ones that are visible based on user selection and state
         let actions = []
-        if (this.actions.includes('embed') && (this.canDo('embedded', true) || this.canDo('embedded', false))) {
+        if (this.actions.includes('embedded') && (this.canDo('embedded', true) || this.canDo('embedded', false))) {
           actions.push('embedded')
         }
         if (this.actions.includes('pin') && (this.canDo('pinned', true) || this.canDo('pinned', false))) {
@@ -365,7 +373,7 @@ export default function (ssrContext) {
         // if (this.actions.includes('minimize') && (this.canDo('minimize', true) || this.canDo('minimize', false))) {
         //   actions.push('maximize')
         // }
-        if (this.actions.includes('close')) {
+        if (this.actions.includes('close') && this.canDo('close', true)) {
           actions.push('visible')
         }
 
@@ -395,41 +403,54 @@ export default function (ssrContext) {
             height: this.computedToolbarHeight + 'px',
             borderWidth: '1px',
             borderStyle: 'solid',
-            color: '#787878',
+            color: this.color,
+            backgroundColor: this.backgroundColor,
             minWidth: '100px'
           }
         } else if (this.isEmbedded === true) {
           style = {
             position: 'relative',
             visibility: this.computedVisibility,
+            borderWidth: this.borderWidth,
+            borderStyle: this.borderStyle,
             width: '100%',
             height: '100%'
           }
         } else {
+          let top = this.state.top + (this.fixedPosition === true ? this.scrollY : 0)
+          let left = this.state.left + (this.fixedPosition === true ? this.scrollX : 0)
           style = {
             position: 'absolute',
             display: 'inline-block',
             borderWidth: this.borderWidth,
             borderStyle: this.borderStyle,
-            color: this.color,
-            backgroundColor: this.backgroundColor,
             width: this.computedWidth + 'px',
             height: this.computedHeight + 'px',
             padding: 0,
             visibility: this.computedVisibility,
             minWidth: '90px',
             minHeight: '50px',
-            top: this.state.top + 'px',
-            left: this.state.left + 'px',
+            top: top + 'px',
+            left: left + 'px',
             zIndex: this.computedZIndex
           }
         }
         return style
       },
 
+      tbStaticClass () {
+        const staticClass = 'q-window__titlebar' +
+          (this.hideToolbarDivider !== true ? ' q-window__titlebar--divider' : '') +
+          (this.dense === true ? ' q-window__titlebar--dense' : '') +
+          (this.isEmbedded !== true && this.isMinimized !== true ? ' absolute' : '') +
+          ' row justify-between items-center'
+        return staticClass
+      },
+
       tbStyle () {
         let titleHeight = `${this.computedToolbarHeight}px`
         let style = { height: titleHeight }
+
         if (this.titlebarStyle) {
           if (typeof this.titlebarStyle === 'object') {
             style = Object.assign(this.titlebarStyle, { height: titleHeight })
@@ -446,7 +467,7 @@ export default function (ssrContext) {
       bodyStyle () {
         if (this.isEmbedded) {
           return {
-            height: `calc(100% - ${this.computedToolbarHeight}px)`
+            height: (this.height - this.computedToolbarHeight) + 'px'
           }
         }
         return {
@@ -464,20 +485,21 @@ export default function (ssrContext) {
     },
 
     watch: {
-      visible (val) {
-        this.__setStateInfo('visible', val === true)
-      },
-      embedded (val) {
-        this.__setStateInfo('embedded', val === true)
-      },
-      pinned (val) {
-        this.__setStateInfo('pinned', val === true)
-      },
+      // visible (val) {
+      //   this.__setStateInfo('visible', val === true)
+      // },
+      // embedded (val) {
+      //   this.__setStateInfo('embedded', val === true)
+      // },
+      // pinned (val) {
+      //   this.__setStateInfo('pinned', val === true)
+      // },
       'stateInfo.embedded.state' (val) {
         if (val !== true) {
           this.__createPortal()
           this.$nextTick(() => {
             this.__showPortal()
+            this.$forceUpdate()
           })
         } else {
           this.__hidePortal()
@@ -634,6 +656,15 @@ export default function (ssrContext) {
                 this.__getStateInfo('minimize') !== true) {
                 return true
               }
+            }
+            return false
+          case 'close':
+            if (state === true) {
+              if (this.__getStateInfo('embedded') !== true) {
+                return true
+              }
+            } else {
+              return true
             }
             return false
         }
@@ -846,6 +877,11 @@ export default function (ssrContext) {
         this.__setStateInfo('embedded', this.restoreState.embedded)
         this.__setStateInfo('maximize', this.restoreState.maximixe)
         this.__setStateInfo('minimize', this.restoreState.minimize)
+      },
+
+      onScroll (e) {
+        this.scrollY = e.srcElement.scrollingElement.scrollTop
+        this.scrollX = e.srcElement.scrollingElement.scrollLeft
       },
 
       // internal functions
@@ -1083,7 +1119,7 @@ export default function (ssrContext) {
         }
 
         return h(QMenu, [
-          h(QList, {
+          h(QList, this.setBothColors(this.color, this.backgroundColor, {
             props: {
               highlight: true,
               dense: true
@@ -1091,7 +1127,7 @@ export default function (ssrContext) {
             style: {
               zIndex: (this.isEmbedded === true) ? void 0 : this.computedZIndex + 1
             }
-          }, [
+          }), [
             ...this.__renderMoreItems(h, menuData)
           ])
         ])
@@ -1117,21 +1153,11 @@ export default function (ssrContext) {
         }, this.title)
       },
 
-      __renderTitlebar (h) {
+      __renderTitlebar (h, menuData) {
         const titlebarSlot = this.$scopedSlots.titlebar
 
-        // get stateInfo for each menu item
-        let menuData = []
-        this.computedActions.map(key => {
-          if (this.stateInfo[key]) {
-            menuData.push({ ...this.stateInfo[key], key: key })
-          }
-        })
-
         return h('div', {
-          staticClass: 'q-window__titlebar row justify-between items-center' +
-            (this.dense === true ? ' q-window__titlebar--dense' : '') +
-            (this.isEmbedded !== true && this.isMinimized !== true ? ' absolute' : ''),
+          staticClass: this.tbStaticClass,
           class: this.titlebarClass,
           style: this.tbStyle,
           attrs: {
@@ -1187,18 +1213,31 @@ export default function (ssrContext) {
             draggable: false
           }
         }, [
-          defaultSlot || defaultScopedSlot({ zIndex: this.zIndex })
+          defaultSlot || defaultScopedSlot ? defaultScopedSlot({ zIndex: this.zIndex }) : ''
         ])
       },
 
       __render (h) {
-        return h('div', {
+        // check visibility
+        if (this.isVisible !== true) {
+          return ''
+        }
+
+        // get stateInfo for each menu item
+        let menuData = []
+        this.computedActions.map(key => {
+          if (this.stateInfo[key]) {
+            menuData.push({ ...this.stateInfo[key], key: key })
+          }
+        })
+
+        return h('div', this.setBothColors(this.color, this.backgroundColor, {
           staticClass: 'q-window ' + this.classes,
           class: this.contentClass,
           style: this.style
-        }, [
+        }), [
           (this.canDrag === true) && [...this.__renderResizeHandles(h)],
-          this.__renderTitlebar(h),
+          this.__renderTitlebar(h, menuData),
           this.isMinimized !== true && this.__renderBody(h)
         ])
       },

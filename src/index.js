@@ -18,6 +18,8 @@ const extendConf = function (conf) {
   conf.framework.plugins.push('Platform')
   conf.framework.plugins.push('Screen')
 
+  conf.framework.directives.push('Scroll')
+
   // make sure qwindow css goes through webpack to avoid ssr issues
   conf.css.push('~quasar-app-extension-qwindow/src/component/window.styl')
   console.log(` App Extension (qwindow) Info: 'Adding window.styl css reference to your quasar.conf.js'`)
