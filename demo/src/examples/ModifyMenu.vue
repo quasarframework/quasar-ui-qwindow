@@ -83,9 +83,25 @@ export default {
             func: this.bringToFront1
           }
         }
+        let centerWindow = {
+          key: 'centerwindow',
+          state: false,
+          on: {
+            label: 'Center Window',
+            icon: '',
+            func: this.centerWindow1
+          },
+          off: {
+            label: 'Center Window',
+            icon: '',
+            func: this.centerWindow1
+          }
+        }
         menuItems.splice(menuItems.length, 0, 'separator')
         menuItems.splice(menuItems.length, 0, sendToBack)
         menuItems.splice(menuItems.length, 0, bringToFront)
+        menuItems.splice(menuItems.length, 0, 'separator')
+        menuItems.splice(menuItems.length, 0, centerWindow)
       }
     },
     bringToFront1 () {
@@ -93,6 +109,9 @@ export default {
     },
     sendToBack1 () {
       this.$refs.window1.sendToBack()
+    },
+    centerWindow1 () {
+      this.$refs.window1.centerWindow()
     },
     updateMenu2 (menuItems) {
       if (this.$refs.window2.isEmbedded !== true && this.$refs.window2.isFullscreen !== true) {
@@ -127,9 +146,25 @@ export default {
             func: this.bringToFront2
           }
         }
+        let centerWindow = {
+          key: 'centerwindow',
+          state: false,
+          on: {
+            label: 'Center Window',
+            icon: '',
+            func: this.centerWindow2
+          },
+          off: {
+            label: 'Center Window',
+            icon: '',
+            func: this.centerWindow2
+          }
+        }
         menuItems.splice(menuItems.length, 0, 'separator')
         menuItems.splice(menuItems.length, 0, sendToBack)
         menuItems.splice(menuItems.length, 0, bringToFront)
+        menuItems.splice(menuItems.length, 0, 'separator')
+        menuItems.splice(menuItems.length, 0, centerWindow)
       }
     },
     bringToFront2 () {
@@ -137,6 +172,9 @@ export default {
     },
     sendToBack2 () {
       this.$refs.window2.sendToBack()
+    },
+    centerWindow2 () {
+      this.$refs.window2.centerWindow()
     }
   }
 }
