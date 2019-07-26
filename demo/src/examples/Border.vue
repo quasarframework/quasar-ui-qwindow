@@ -7,7 +7,7 @@
       color="#C4C27A"
       background-color="#BB714F"
       :height="150"
-      :width="200"
+      :width="350"
       :actions="['embedded', 'pin', 'maximize', 'fullscreen']"
       embedded
     >

@@ -3,7 +3,7 @@
     <q-window
       title="QWindow Fixed Position"
       :height="150"
-      :width="200"
+      :width="350"
       :actions="['embedded']"
       embedded
       contentClass="bg-grey-1"

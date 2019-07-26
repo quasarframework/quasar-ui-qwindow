@@ -27,7 +27,7 @@
 
             <q-drawer
               v-model="drawerLeft"
-              :width="200"
+              :width="350"
               :breakpoint="700"
               bordered
               content-class="bg-grey-3"
@@ -44,7 +44,7 @@
               side="right"
               v-model="drawerRight"
               bordered
-              :width="200"
+              :width="350"
               :breakpoint="500"
               content-class="bg-grey-3"
               :style="{ zIndex: zIndex + 1 }"

@@ -5,7 +5,7 @@
       ref="window"
       title="QWindow Close Action"
       :height="150"
-      :width="200"
+      :width="350"
       :actions="['embedded', 'pin', 'maximize', 'fullscreen', 'close']"
       embedded
       contentClass="bg-grey-1"

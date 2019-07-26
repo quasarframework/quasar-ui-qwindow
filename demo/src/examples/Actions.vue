@@ -3,7 +3,7 @@
     <q-window
       title="QWindow Actions"
       :height="150"
-      :width="200"
+      :width="350"
       :actions="['embedded', 'pin', 'maximize', 'fullscreen']"
       embedded
       contentClass="bg-grey-1"
