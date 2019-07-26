@@ -2,7 +2,7 @@
   <div>
     <q-window
       title="QWindow Actions"
-      :height="300"
+      :height="150"
       :width="200"
       :actions="['embedded', 'pin', 'maximize', 'fullscreen']"
       embedded

@@ -4,7 +4,7 @@
       title="QWindow Color"
       color="yellow-2"
       background-color="blue-grey-4"
-      :height="300"
+      :height="150"
       :width="200"
       :actions="['embedded', 'pin', 'maximize', 'fullscreen']"
       embedded

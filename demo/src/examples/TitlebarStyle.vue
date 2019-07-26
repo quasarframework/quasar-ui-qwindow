@@ -8,7 +8,7 @@
       border-style="solid"
       color="#BB714F"
       background-color="#C4C27A"
-      :height="300"
+      :height="150"
       :width="200"
       :actions="['embedded', 'pin', 'maximize', 'fullscreen']"
       embedded

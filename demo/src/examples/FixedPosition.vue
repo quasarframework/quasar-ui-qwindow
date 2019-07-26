@@ -2,7 +2,7 @@
   <div>
     <q-window
       title="QWindow Fixed Position"
-      :height="300"
+      :height="150"
       :width="200"
       :actions="['embedded']"
       embedded

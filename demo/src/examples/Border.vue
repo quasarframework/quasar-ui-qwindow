@@ -4,13 +4,12 @@
       title="QWindow Border"
       border-width="3px"
       border-style="dashed"
-      color="#363641"
+      color="#C4C27A"
       background-color="#BB714F"
-      :height="300"
+      :height="150"
       :width="200"
       :actions="['embedded', 'pin', 'maximize', 'fullscreen']"
       embedded
-      contentClass="bg-grey-1"
     >
       <div class="q-ma-md">
         This is the "default" slot content

@@ -4,7 +4,7 @@
       v-if="visible === true"
       ref="window"
       title="QWindow Close Action"
-      :height="300"
+      :height="150"
       :width="200"
       :actions="['embedded', 'pin', 'maximize', 'fullscreen', 'close']"
       embedded
