@@ -338,7 +338,6 @@ export default function (ssrContext) {
       },
 
       computedVisibility () {
-        // TODO: when action close is initiated
         return this.visible === true ? 'visible' : 'hidden'
       },
 
@@ -346,16 +345,32 @@ export default function (ssrContext) {
         return this.dense ? 28 : 40
       },
 
+      computedLeft () {
+        return this.state.left
+      },
+
+      computedTop () {
+        return this.state.top
+      },
+
+      computedRight () {
+        return this.state.right
+      },
+
+      computedBottom () {
+        return this.state.bottom
+      },
+
       computedHeight () {
-        return this.state.bottom - this.state.top
+        return this.computedBottom - this.computedTop
       },
 
       computedWidth () {
-        return this.state.right - this.state.left
+        return this.computedRight - this.computedLeft
       },
 
       computedScrollX () {
-        return this.state.left + (this.scrollWithWindow === false ? this.scrollX : 0)
+        return this.computedLeft + (this.scrollWithWindow === false ? this.scrollX : 0)
       },
 
       computedScrollY () {
@@ -933,11 +948,6 @@ export default function (ssrContext) {
         this.scrollX = e.srcElement.scrollingElement.scrollLeft
       },
 
-      // internal functions
-      isFocused () {
-        // const el = document.activeElement
-      },
-
       onDrag (e, resizeHandle) {
         if (this.$q.platform.is.mobile !== true) {
           if (e.clientX === 0 || e.clientY === 0) {
@@ -1295,9 +1305,9 @@ export default function (ssrContext) {
 
       __render (h) {
         // check visibility
-        if (this.isVisible !== true) {
-          return ''
-        }
+        // if (this.isVisible !== true) {
+        //   return ''
+        // }
 
         // get stateInfo for each menu item
         let menuData = []
