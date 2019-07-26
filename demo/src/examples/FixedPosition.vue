@@ -4,7 +4,6 @@
       title="QWindow Fixed Position"
       :height="300"
       :width="200"
-      fixed-position
       :actions="['embedded']"
       embedded
       contentClass="bg-grey-1"

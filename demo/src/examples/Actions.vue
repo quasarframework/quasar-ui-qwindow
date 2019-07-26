@@ -4,7 +4,6 @@
       title="QWindow Actions"
       :height="300"
       :width="200"
-      fixed-position
       :actions="['embedded', 'pin', 'maximize', 'fullscreen']"
       embedded
       contentClass="bg-grey-1"

@@ -6,7 +6,6 @@
       background-color="blue-grey-4"
       :height="300"
       :width="200"
-      fixed-position
       :actions="['embedded', 'pin', 'maximize', 'fullscreen']"
       embedded
     >

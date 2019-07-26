@@ -3,7 +3,6 @@
     title="QWindow Scroll Area"
     :height="500"
     :width="600"
-    fixed-position
     :actions="['embedded', 'pin', 'maximize', 'fullscreen']"
     embedded
     contentClass="bg-grey-1"

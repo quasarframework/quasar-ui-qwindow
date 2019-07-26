@@ -9,7 +9,6 @@
       background-color="#C4C27A"
       :height="300"
       :width="200"
-      fixed-position
       :actions="['embedded', 'pin', 'maximize', 'fullscreen']"
       embedded
     >

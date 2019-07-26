@@ -5,7 +5,6 @@
       :height="500"
       :width="600"
       bring-to-front-after-drag
-      fixed-position
       :actions="['embedded', 'pin', 'maximize', 'fullscreen']"
       embedded
       contentClass="bg-grey-1"
@@ -24,7 +23,6 @@
       :height="500"
       :width="600"
       bring-to-front-after-drag
-      fixed-position
       :actions="['embedded', 'pin', 'maximize', 'fullscreen']"
       embedded
       contentClass="bg-grey-1"
