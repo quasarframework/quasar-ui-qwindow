@@ -354,6 +354,14 @@ export default function (ssrContext) {
         return this.state.right - this.state.left
       },
 
+      computedScrollX () {
+        return this.state.left + (this.scrollWithWindow === false ? this.scrollX : 0)
+      },
+
+      computedScrollY () {
+        return this.state.top + (this.scrollWithWindow === false ? this.scrollY : 0)
+      },
+
       computedZIndex () {
         let extra = 0
         if (this.isDragging) extra = 100
@@ -366,8 +374,8 @@ export default function (ssrContext) {
           top: this.state.top,
           width: this.computedWidth,
           height: this.computedHeight,
-          scrollX: this.state.left + (this.scrollWithWindow === false ? this.scrollX : 0),
-          scrollY: this.state.top + (this.scrollWithWindow === false ? this.scrollY : 0)
+          scrollX: this.computedScrollX,
+          scrollY: this.computedScrollY
         }
       },
 
