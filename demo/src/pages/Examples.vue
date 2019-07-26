@@ -2,7 +2,7 @@
   <hero>
     <div class="q-markdown">
       <q-markdown>
-QWindow allows for a floating window above the regular HTML elements.
+QWindow allows for a floating, movable, resizable window above the regular HTML elements.
 
 It is quite possible to start a QWindow off as `floating`, but for these examples, the window must start off as `embedded` so there isn't a lot of windows popping up and knowing which example they come from.
 
@@ -11,7 +11,11 @@ This means, you must access the menu content to make it `floating`.
 Once a window is `floating`, unless restricted, you can move it (via the titlebar) or resize it (via sides and corners).
 
 :::tip
-If you `float` the QWindow in the first example and can't see it, try scrolling up until you do.
+All QWindows are initially relative to the browser's view. This means, even if you scroll, it will stay in-place. If you want the QWindow to scroll with the document, then set the `scroll-with-window` to `true`.
+:::
+
+:::tip
+Using the mouse to scroll will cause the QWindow to be a bit "jerky". This is because a mouse does not cause a pixel-by-pixel scroll, but causes a "jump" in the scroll position. Try scrolling with the scrollbar to see the difference.
 :::
 
 :::info

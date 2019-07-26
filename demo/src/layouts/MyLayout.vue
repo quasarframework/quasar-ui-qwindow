@@ -154,7 +154,7 @@
                 <q-page style="padding-top: 60px" class="q-pa-md">
                   <q-markdown>
   Some information about **QWindow**:
-  1. If starts off embedded, but you can `unlock` it from the menu to make it `float`
+  1. If it starts off embedded, but you can `unlock` it from the menu to make it `float`
   2. If floating, you can `embed` it back again
   3. If floating, you can move it around (via caption), or resize it (via sides and corners)
   4. If a QWindow is embeddable, you can `close` it while in embedded or floating states. It is up to the developer to provide a way to bring it back (ex: via a QBtn - close this window and try it!)
