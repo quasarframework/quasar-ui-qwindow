@@ -54,7 +54,10 @@ export default function (ssrContext) {
       fullscreen: Boolean,
       maximized: Boolean,
       minimized: Boolean,
-      fixedPosition: Boolean,
+      scrollWithWindow: {
+        type: Boolean,
+        default: false
+      },
 
       disabled: Boolean,
       dense: Boolean,
@@ -417,8 +420,8 @@ export default function (ssrContext) {
             height: '100%'
           }
         } else {
-          let top = this.state.top + (this.fixedPosition === true ? this.scrollY : 0)
-          let left = this.state.left + (this.fixedPosition === true ? this.scrollX : 0)
+          let top = this.state.top + (this.scrollWithWindow === false ? this.scrollY : 0)
+          let left = this.state.left + (this.scrollWithWindow === false ? this.scrollX : 0)
           style = {
             position: 'absolute',
             display: 'inline-block',
@@ -485,15 +488,6 @@ export default function (ssrContext) {
     },
 
     watch: {
-      // visible (val) {
-      //   this.__setStateInfo('visible', val === true)
-      // },
-      // embedded (val) {
-      //   this.__setStateInfo('embedded', val === true)
-      // },
-      // pinned (val) {
-      //   this.__setStateInfo('pinned', val === true)
-      // },
       'stateInfo.embedded.state' (val) {
         if (val !== true) {
           this.__createPortal()
