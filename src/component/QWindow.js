@@ -360,6 +360,17 @@ export default function (ssrContext) {
         return this.zIndex + extra
       },
 
+      computedPosition () {
+        return {
+          left: this.state.left,
+          top: this.state.top,
+          width: this.computedWidth,
+          height: this.computedHeight,
+          scrollX: this.state.left + (this.scrollWithWindow === false ? this.scrollX : 0),
+          scrollY: this.state.top + (this.scrollWithWindow === false ? this.scrollY : 0)
+        }
+      },
+
       computedActions () {
         // sort and pick ones that are visible based on user selection and state
         let actions = []
@@ -1044,12 +1055,7 @@ export default function (ssrContext) {
         this.mouseOffsetX = -1
         this.mouseOffsetY = -1
         this.state.dragging = false
-        this.$emit('position', {
-          left: this.state.left,
-          top: this.state.top,
-          width: this.computedWidth,
-          height: this.computedHeight
-        })
+        this.$emit('position', this.computedPosition)
         if (this.bringToFrontAfterDrag === true) {
           this.bringToFront()
         }
