@@ -483,7 +483,8 @@ export default function (ssrContext) {
       classes () {
         return '' +
           (this.isDisabled !== true ? ' q-focusable q-hoverable' : ' disabled') +
-          (this.isEmbedded !== true ? ' q-window__floating' : '')
+          (this.isEmbedded !== true ? ' q-window__floating' : '') +
+          (this.isFullscreen === true ? ' q-window__fullscreen' : '')
       }
     },
 
@@ -521,20 +522,24 @@ export default function (ssrContext) {
           this.__restorePosition()
         }
       },
+      'stateInfo.fullscreen.state' (val, oldVal) {
+        // debugger
+        if (oldVal === void 0) {
+          return
+        }
+        if (val === true) {
+          this.__savePosition()
+          this.__setFullWindowPosition()
+          this.zIndex = maxZIndex
+        } else {
+          this.__restorePosition()
+          this.fullscreenInitiated = val
+        }
+        this.$emit('fullscreen', val)
+      },
       '$q.fullscreen.isActive' (val) {
         if (this.fullscreenInitiated === true) {
           this.__setStateInfo('fullscreen', val)
-          this.$emit('fullscreen', val)
-          if (val === true) {
-            this.__savePosition()
-            this.__setFullWindowPosition()
-            this.zIndex = maxZIndex
-          } else {
-            this.__restorePosition()
-          }
-        }
-        if (val === false) {
-          this.fullscreenInitiated = val
         }
       },
       '$q.screen.height' (val) {
@@ -819,6 +824,14 @@ export default function (ssrContext) {
       // ------------------------------
       // private methods
       // ------------------------------
+
+      __disableScroll (val) {
+        if (val === true) {
+          // disable scrollbar
+        } else {
+          // enable scrollbar
+        }
+      },
 
       __setStateInfo (id, val) {
         if (id in this.stateInfo) {
