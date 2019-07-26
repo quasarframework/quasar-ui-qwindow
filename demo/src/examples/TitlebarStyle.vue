@@ -2,9 +2,10 @@
   <div>
     <q-window
       title="QWindow Titlebar Style"
-      :titlebarStyle="{ borderBottom: '3px dashed #C4C27A', fontStyle: 'italic', fontSize: '2em' }"
-      border-width="3px"
-      border-style="dashed"
+      :titlebarStyle="{ borderBottom: '1px solid #BB714F', fontStyle: 'italic', fontSize: '2em' }"
+      :contentStyle="{ border: '1px solid #BB714F' }"
+      border-width="1px"
+      border-style="solid"
       color="#BB714F"
       background-color="#C4C27A"
       :height="300"
