@@ -59,6 +59,13 @@ In the example below, we will use all actions, except for `close` which will be 
       <example-card title="Border" name="Border" :tag-parts="getTagParts(require('!!raw-loader!../examples/Border.vue').default)" />
       <example-card title="Titlebar Style" name="TitlebarStyle" :tag-parts="getTagParts(require('!!raw-loader!../examples/TitlebarStyle.vue').default)" />
 
+      <q-markdown>
+If you don't like the **grippers** you can hide them with the `hide-grippers` property. In this case, there will be invisible bars running on the sides, as well as all corners that allow for resizing.
+      </q-markdown>
+
+      <example-card title="Hide Grippers" name="GripperNone" :tag-parts="getTagParts(require('!!raw-loader!../examples/GripperNone.vue').default)" />
+      <example-card title="Round Grippers" name="GripperRound" :tag-parts="getTagParts(require('!!raw-loader!../examples/GripperRound.vue').default)" />
+
       <example-title title="Advanced" />
       <q-markdown>
 You can provide the action `close` in the array of actions. This will add a **Close** option to the menu. Essentually, the window is really hidden. It is up to the developer to provide a way for the QWindow to be re-displayed.
@@ -147,6 +154,8 @@ export default {
     this.addToToc('Color', 2)
     this.addToToc('Border', 2)
     this.addToToc('Titlebar Style', 2)
+    this.addToToc('Hide Grippers', 2)
+    this.addToToc('Round Grippers', 2)
 
     this.addToToc('Advanced')
     this.addToToc('Close Action', 2)

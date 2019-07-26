@@ -132,3 +132,48 @@ body
         width 100%
         height 100%
         cursor move
+
+.gripper
+  position absolute
+  width 10px
+  height 10px
+  background-color #ffffff
+  border 1px solid #000000
+  &-round
+    border-radius 50%
+  &-top
+    top -6px
+    left 50%
+    margin-left -6px
+    cursor n-resize
+    &-left
+      top -6px
+      left -6px
+      cursor nw-resize
+    &-right
+      top -6px
+      right -6px
+      cursor ne-resize
+  &-left
+    left -6px
+    top 50%
+    margin-top -6px
+    cursor w-resize
+  &-right
+    right -6px
+    top 50%
+    margin-top -6px
+    cursor e-resize
+  &-bottom
+    bottom -6px
+    left 50%
+    margin-left -6px
+    cursor s-resize
+    &-left
+      bottom -6px
+      left -6px
+      cursor sw-resize
+    &-right
+      bottom -6px
+      right -6px
+      cursor se-resize

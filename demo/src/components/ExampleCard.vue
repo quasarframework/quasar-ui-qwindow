@@ -75,6 +75,8 @@ export default {
     Color: () => import('../examples/Color'),
     Border: () => import('../examples/Border'),
     TitlebarStyle: () => import('../examples/TitlebarStyle'),
+    GripperNone: () => import('../examples/GripperNone'),
+    GripperRound: () => import('../examples/GripperRound'),
     CloseAction: () => import('../examples/CloseAction'),
     ScrollArea: () => import('../examples/ScrollArea'),
     BringToFrontAfterDrag: () => import('../examples/BringToFrontAfterDrag'),

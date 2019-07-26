@@ -62,6 +62,8 @@ export default function (ssrContext) {
       disabled: Boolean,
       dense: Boolean,
       hideToolbarDivider: Boolean,
+      hideGrippers: Boolean,
+      roundGrippers: Boolean,
 
       backgroundColor: {
         type: String
@@ -133,14 +135,14 @@ export default function (ssrContext) {
         scrollY: 0,
         fullscreenInitiated: false,
         handles: [
-          'q-window__resize-handle--top',
-          'q-window__resize-handle--left',
-          'q-window__resize-handle--right',
-          'q-window__resize-handle--bottom',
-          'q-window__resize-handle--top-left',
-          'q-window__resize-handle--top-right',
-          'q-window__resize-handle--bottom-left',
-          'q-window__resize-handle--bottom-right'
+          'top',
+          'left',
+          'right',
+          'bottom',
+          'top-left',
+          'top-right',
+          'bottom-left',
+          'bottom-right'
         ],
         stateInfo: {} // filled in mounted
       }
@@ -912,7 +914,7 @@ export default function (ssrContext) {
         const grandparent = e.currentTarget.parentElement.parentElement.parentElement
 
         switch (resizeHandle) {
-          case 'q-window__resize-handle--top':
+          case 'top':
             if (this.$q.platform.is.mobile === true) {
               this.state.top = e.touches[0].clientY - parent.offsetTop
             } else {
@@ -922,7 +924,7 @@ export default function (ssrContext) {
               this.state.top = tmpBottom - this.state.minHeight
             }
             break
-          case 'q-window__resize-handle--left':
+          case 'left':
             if (this.$q.platform.is.mobile === true) {
               this.state.left = e.touches[0].clientX - parent.offsetLeft
             } else {
@@ -932,7 +934,7 @@ export default function (ssrContext) {
               this.state.left = tmpRight - this.state.minWidth
             }
             break
-          case 'q-window__resize-handle--right':
+          case 'right':
             if (this.$q.platform.is.mobile === true) {
               this.state.right = e.touches[0].clientX - parent.offsetLeft
             } else {
@@ -942,7 +944,7 @@ export default function (ssrContext) {
               this.state.right = tmpLeft - this.state.minWidth
             }
             break
-          case 'q-window__resize-handle--bottom':
+          case 'bottom':
             if (this.$q.platform.is.mobile === true) {
               this.state.bottom = e.touches[0].clientY - parent.offsetTop
             } else {
@@ -952,23 +954,23 @@ export default function (ssrContext) {
               this.state.bottom = tmpTop - this.state.minHeight
             }
             break
-          case 'q-window__resize-handle--top-left':
-            this.onDrag(e, 'q-window__resize-handle--top')
-            this.onDrag(e, 'q-window__resize-handle--left')
+          case 'top-left':
+            this.onDrag(e, 'top')
+            this.onDrag(e, 'left')
             break
-          case 'q-window__resize-handle--top-right':
-            this.onDrag(e, 'q-window__resize-handle--top')
-            this.onDrag(e, 'q-window__resize-handle--right')
+          case 'top-right':
+            this.onDrag(e, 'top')
+            this.onDrag(e, 'right')
             break
-          case 'q-window__resize-handle--bottom-left':
-            this.onDrag(e, 'q-window__resize-handle--bottom')
-            this.onDrag(e, 'q-window__resize-handle--left')
+          case 'bottom-left':
+            this.onDrag(e, 'bottom')
+            this.onDrag(e, 'left')
             break
-          case 'q-window__resize-handle--bottom-right':
-            this.onDrag(e, 'q-window__resize-handle--bottom')
-            this.onDrag(e, 'q-window__resize-handle--right')
+          case 'bottom-right':
+            this.onDrag(e, 'bottom')
+            this.onDrag(e, 'right')
             break
-          case 'q-window__resize-handle--titlebar':
+          case 'titlebar':
             if (this.$q.platform.is.mobile === true) {
               this.state.top = e.touches[0].clientY - grandparent.offsetTop - this.mouseOffsetY
               this.state.left = e.touches[0].clientX - grandparent.offsetLeft - this.mouseOffsetX
@@ -1171,11 +1173,33 @@ export default function (ssrContext) {
           titlebarSlot === void 0 ? this.__renderMoreButton(h, menuData) : '',
           titlebarSlot !== void 0 ? titlebarSlot(menuData) : '',
           (this.canDrag === true) &&
-            this.__renderResizeHandle(h, 'q-window__resize-handle--titlebar', 44) // width of more button
+            this.__renderResizeHandle(h, 'titlebar', 44) // width of more button
         ])
       },
 
+      __renderGripper (h, resizeHandle) {
+        let staticClass = 'gripper gripper-' + resizeHandle + (this.roundGrippers === true ? ' gripper-round' : '')
+        return h('div', this.setBothColors(this.color, this.backgroundColor, {
+          staticClass: staticClass,
+          attrs: {
+            draggable: this.canDrag
+          },
+          on: {
+            drag: (e) => this.onDrag(e, resizeHandle),
+            dragenter: (e) => this.onDragEnter(e, resizeHandle),
+            dragstart: (e) => this.onDragStart(e, resizeHandle),
+            dragover: (e) => this.onDragOver(e, resizeHandle),
+            dragleave: (e) => this.onDragLeave(e, resizeHandle),
+            dragend: (e) => this.onDragEnd(e, resizeHandle),
+            touchstart: (e) => this.onTouchStart(e, resizeHandle),
+            touchmove: (e) => this.onTouchMove(e, resizeHandle),
+            touchend: (e) => this.onTouchEnd(e, resizeHandle)
+          }
+        }))
+      },
+
       __renderResizeHandle (h, resizeHandle, actionsWidth) {
+        let staticClass = 'q-window__resize-handle ' + 'q-window__resize-handle--' + resizeHandle
         let width = this.computedWidth
         let style = {}
         if (actionsWidth && this.canDrag === true) {
@@ -1183,7 +1207,7 @@ export default function (ssrContext) {
           style.width = width + 'px'
         }
         return h('div', {
-          staticClass: 'q-window__resize-handle ' + resizeHandle,
+          staticClass: staticClass,
           style: style,
           attrs: {
             draggable: this.canDrag
@@ -1202,7 +1226,17 @@ export default function (ssrContext) {
         })
       },
 
+      __renderGrippers (h) {
+        if (this.hideGrippers === true) {
+          return ''
+        }
+        return this.handles.map(resizeHandle => this.__renderGripper(h, resizeHandle))
+      },
+
       __renderResizeHandles (h) {
+        if (this.hideGrippers !== true) {
+          return ''
+        }
         return this.handles.map(resizeHandle => this.__renderResizeHandle(h, resizeHandle))
       },
 
@@ -1240,6 +1274,7 @@ export default function (ssrContext) {
           style: this.style
         }), [
           (this.canDrag === true) && [...this.__renderResizeHandles(h)],
+          (this.canDrag === true) && [...this.__renderGrippers(h)],
           this.__renderTitlebar(h, menuData),
           this.isMinimized !== true && this.__renderBody(h)
         ])
