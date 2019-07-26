@@ -1,3 +1,15 @@
+:fullscreen
+  overflow hidden !important
+
+:-ms-fullscreen
+  overflow hidden !important
+
+:-webkit-full-screen
+  overflow hidden !important
+
+:-moz-full-screen
+  overflow hidden !important
+
 body
   overscroll-behavior-y: contain
 
@@ -6,6 +18,13 @@ body
 
   &__floating
     box-shadow 1px 1px 7px 1px rgba(0,0,0,.2)
+
+  &__fullscreen
+    position fixed !important
+    top 0 !important
+    left 0 !important
+    bottom 0 !important
+    right 0 !important
 
   &__titlebar
     top 0
@@ -48,9 +67,6 @@ body
   &__focused
     border-color rgba(0,0,0,.2)
     box-shadow 1px 1px 7px 1px rgba(0,0,0,.2)
-
-  &__border
-    border-color #dbdbdb
 
   &__resize
     &-handle

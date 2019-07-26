@@ -851,8 +851,8 @@ export default function (ssrContext) {
       __setFullWindowPosition () {
         this.state.top = 0
         this.state.left = 0
-        this.state.bottom = this.$q.screen.height - 1
-        this.state.right = this.$q.screen.width - 1
+        this.state.bottom = this.$q.screen.height
+        this.state.right = this.$q.screen.width
       },
 
       __setMinimizePosition () {
