@@ -1036,7 +1036,6 @@ export default function (ssrContext) {
             this.state.right = this.state.left + tmpWidth
             break
         }
-        // console.log('state:', JSON.stringify(this.state))
       },
 
       onTouchMove (e, resizeHandle) {
