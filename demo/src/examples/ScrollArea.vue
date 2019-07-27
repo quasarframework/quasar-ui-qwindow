@@ -1,5 +1,6 @@
 <template>
   <q-window
+    v-model="visible"
     title="QWindow Scroll Area"
     :height="500"
     :width="600"
@@ -17,3 +18,13 @@
     </div>
   </q-window>
 </template>
+
+<script>
+export default {
+  data () {
+    return {
+      visible: true
+    }
+  }
+}
+</script>
