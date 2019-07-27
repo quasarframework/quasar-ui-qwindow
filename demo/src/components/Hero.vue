@@ -6,7 +6,7 @@
       <q-btn type="a" href="https://github.com/hawkeye64/app-extension-qwindow" target="_blank" class="btn" label="View on GitHub" no-caps flat/>
       <q-btn to="/docs" class="btn" label="Docs" no-caps flat/>
       <q-btn to="/examples" class="btn" label="Examples" no-caps flat/>
-      <q-btn to="/demo" class="btn" label="Interactive Demo" no-caps flat/>
+      <!-- <q-btn to="/demo" class="btn" label="Interactive Demo" no-caps flat/> -->
       <q-btn type="a" href="https://donate.quasar.dev" target="_blank" class="btn" label="Donate" no-caps flat/>
     </section>
     <main class="flex flex-start justify-center inset-shadow">
