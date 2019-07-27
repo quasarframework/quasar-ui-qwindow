@@ -86,7 +86,7 @@ In the example below, you will need to float both QWindows to see this in action
       <example-card title="Bring to Front After Drag" name="BringToFrontAfterDrag" :tag-parts="getTagParts(require('!!raw-loader!../examples/BringToFrontAfterDrag.vue').default)" />
 
       <q-markdown>
-There is opportunity to modify the displayed menu just before it is displayed. In the example below, two functionns are added: `Bring to Front` and `send to Back` where appropriate functionality will be called.
+There is opportunity to modify the displayed menu just before it is displayed. In the example below, two functions are added: `Bring to Front` and `Send to Back` where the appropriate functionality will be called.
 
 You can add to the menu the text `separator` which will put a separator between items. Other than that, the rest of the items must be objects that look like this:
 ```js
@@ -108,6 +108,8 @@ let sendToBack = {
 When `state` is `true`, then the `on` object will be used, otherwise the `off` object.
 
 In the example below, menu items are added only if the QWindow is floating. Use the menu to change the `z-order` manually.
+
+Additionally, one other menu item is being added that you can try out: `Center Window`.
       </q-markdown>
       <example-card title="Modify Menu" name="ModifyMenu" :tag-parts="getTagParts(require('!!raw-loader!../examples/ModifyMenu.vue').default)" />
 
