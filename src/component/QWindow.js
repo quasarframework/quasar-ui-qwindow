@@ -419,6 +419,17 @@ export default function (ssrContext) {
         return actions
       },
 
+      computedMenuData () {
+        // get stateInfo for each menu item
+        let menuData = []
+        this.computedActions.map(key => {
+          if (this.stateInfo[key]) {
+            menuData.push({ ...this.stateInfo[key], key: key })
+          }
+        })
+        return menuData
+      },
+
       computedSortedLayers () {
         let sortedLayers = []
         let keys = Object.keys(layers)
@@ -1313,18 +1324,8 @@ export default function (ssrContext) {
       },
 
       __render (h) {
-        // check visibility
-        // if (this.isVisible !== true) {
-        //   return ''
-        // }
-
         // get stateInfo for each menu item
-        let menuData = []
-        this.computedActions.map(key => {
-          if (this.stateInfo[key]) {
-            menuData.push({ ...this.stateInfo[key], key: key })
-          }
-        })
+        let menuData = this.computedMenuData
 
         return h('div', this.setBothColors(this.color, this.backgroundColor, {
           staticClass: 'q-window ' + this.classes,
