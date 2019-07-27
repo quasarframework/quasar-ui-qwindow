@@ -504,9 +504,16 @@ export default function (ssrContext) {
       },
 
       bodyStyle () {
-        if (this.isEmbedded) {
+        if (this.isEmbedded === true) {
           return {
             height: (this.height - this.computedToolbarHeight) + 'px'
+          }
+        }
+        if (this.isFullscreen === true) {
+          return {
+            position: 'fixed',
+            height: `calc(100% - ${this.computedToolbarHeight}px`,
+            top: this.computedToolbarHeight + 'px'
           }
         }
         return {
