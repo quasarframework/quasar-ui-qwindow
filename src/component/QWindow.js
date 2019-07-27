@@ -782,7 +782,7 @@ export default function (ssrContext) {
         const h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
         const startX = w / 2 - this.computedWidth / 2
         const startY = h / 2 - this.computedHeight / 2
-        this.setStartXY(startX, startY)
+        this.setXY(startX, startY)
       },
 
       setX (x) {
@@ -798,8 +798,8 @@ export default function (ssrContext) {
       },
 
       setXY (x, y) {
-        this.setStartX(x)
-        this.setStartY(y)
+        this.setX(x)
+        this.setY(y)
       },
 
       setWidth (width) {
