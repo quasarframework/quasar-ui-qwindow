@@ -61,6 +61,8 @@ export default function (ssrContext) {
       hideToolbarDivider: Boolean,
       hideGrippers: Boolean,
       roundGrippers: Boolean,
+      headless: Boolean,
+      iconSet: Object,
 
       backgroundColor: {
         type: String
@@ -141,7 +143,59 @@ export default function (ssrContext) {
           'bottom-left',
           'bottom-right'
         ],
-        stateInfo: {} // filled in mounted
+        stateInfo: {}, // filled in mounted
+        iconSetTemplate: { // uses material design icons
+          visible: {
+            on: {
+              icon: 'close',
+              label: 'Show'
+            },
+            off: {
+              icon: 'close',
+              label: 'Hide'
+            }
+          },
+          embedded: {
+            on: {
+              icon: 'lock_outline',
+              label: 'Embed'
+            },
+            off: {
+              icon: 'lock_open',
+              label: 'Float'
+            }
+          },
+          pinned: {
+            on: {
+              icon: 'location_searching',
+              label: 'Pin'
+            },
+            off: {
+              icon: 'gps_fixed',
+              label: 'Unpin'
+            }
+          },
+          maximize: {
+            on: {
+              icon: 'arrow_upward',
+              label: 'Maximize'
+            },
+            off: {
+              icon: 'restore',
+              label: 'Restore'
+            }
+          },
+          fullscreen: {
+            on: {
+              icon: 'fullscreen',
+              label: 'Enter fullscreen'
+            },
+            off: {
+              icon: 'fullscreen_exit',
+              label: 'Leave fullscreen'
+            }
+          }
+        }
       }
     },
 
@@ -156,6 +210,8 @@ export default function (ssrContext) {
     },
 
     mounted () {
+      this.__updateStateInfo()
+
       // calculate left starting position
       if (this.startX) {
         this.state.left = this.startX
@@ -173,87 +229,6 @@ export default function (ssrContext) {
       // calculate right and bottom starting positions
       this.state.right = this.state.left + this.width
       this.state.bottom = this.state.top + this.height
-
-      this.stateInfo = {
-        visible: {
-          state: true,
-          on: {
-            label: '',
-            icon: 'close',
-            func: this.show
-          },
-          off: {
-            label: 'Close',
-            icon: 'close',
-            func: this.hide
-          }
-        },
-        embedded: {
-          state: true,
-          on: {
-            label: 'Embed',
-            icon: 'lock_outline',
-            func: this.lock
-          },
-          off: {
-            label: 'Float',
-            icon: 'lock_open',
-            func: this.unlock
-          }
-        },
-        pinned: {
-          state: false,
-          on: {
-            label: 'Pin',
-            icon: 'location_searching',
-            func: this.pin
-          },
-          off: {
-            label: 'Unpin',
-            icon: 'gps_fixed',
-            func: this.unpin
-          }
-        },
-        maximize: {
-          state: false,
-          on: {
-            label: 'Maximize',
-            icon: 'arrow_upward',
-            func: this.maximize
-          },
-          off: {
-            label: 'Restore',
-            icon: 'restore',
-            func: this.restore
-          }
-        },
-        minimize: {
-          state: false,
-          on: {
-            label: 'Minimize',
-            icon: 'arrow_downward',
-            func: this.minimize
-          },
-          off: {
-            label: 'Restore',
-            icon: 'restore',
-            func: this.restore
-          }
-        },
-        fullscreen: {
-          state: false,
-          on: {
-            label: 'Enter Fullscreen',
-            icon: 'fullscreen',
-            func: this.fullscreenEnter
-          },
-          off: {
-            label: 'Exit Fullscreen',
-            icon: 'fullscreen_exit',
-            func: this.fullscreenLeave
-          }
-        }
-      }
 
       // adjust initial user states
       if (this.value !== void 0) {
@@ -923,6 +898,91 @@ export default function (ssrContext) {
       // private methods
       // ------------------------------
 
+      __updateStateInfo () {
+        let stateInfo = {
+          visible: {
+            state: this.stateInfo.visible !== void 0 && this.stateInfo.visible.state !== void 0 ? this.stateInfo.visible.state : true,
+            on: {
+              label: this.iconSet !== void 0 && this.iconSet.visible !== void 0 && this.iconSet.visible.on !== void 0 && this.iconSet.visible.on.label !== void 0 ? this.iconSet.visible.on.label : this.iconSetTemplate.visible.on.label,
+              icon: this.iconSet !== void 0 && this.iconSet.visible !== void 0 && this.iconSet.visible.on !== void 0 && this.iconSet.visible.on.icon !== void 0 ? this.iconSet.visible.on.icon : this.iconSetTemplate.visible.on.icon,
+              func: this.show
+            },
+            off: {
+              label: this.iconSet !== void 0 && this.iconSet.visible !== void 0 && this.iconSet.visible.off !== void 0 && this.iconSet.visible.off.label !== void 0 ? this.iconSet.visible.off.label : this.iconSetTemplate.visible.off.label,
+              icon: this.iconSet !== void 0 && this.iconSet.visible !== void 0 && this.iconSet.visible.off !== void 0 && this.iconSet.visible.off.icon !== void 0 ? this.iconSet.visible.off.icon : this.iconSetTemplate.visible.off.icon,
+              func: this.hide
+            }
+          },
+          embedded: {
+            state: this.stateInfo.embedded !== void 0 && this.stateInfo.embedded.state !== void 0 ? this.stateInfo.embedded.state : true,
+            on: {
+              label: this.iconSet !== void 0 && this.iconSet.embedded !== void 0 && this.iconSet.embedded.on !== void 0 && this.iconSet.embedded.on.label !== void 0 ? this.iconSet.embedded.on.label : this.iconSetTemplate.embedded.on.label,
+              icon: this.iconSet !== void 0 && this.iconSet.embedded !== void 0 && this.iconSet.embedded.on !== void 0 && this.iconSet.embedded.on.icon !== void 0 ? this.iconSet.embedded.on.icon : this.iconSetTemplate.embedded.on.icon,
+              func: this.lock
+            },
+            off: {
+              label: this.iconSet !== void 0 && this.iconSet.embedded !== void 0 && this.iconSet.embedded.off !== void 0 && this.iconSet.embedded.off.label !== void 0 ? this.iconSet.embedded.off.label : this.iconSetTemplate.embedded.off.label,
+              icon: this.iconSet !== void 0 && this.iconSet.embedded !== void 0 && this.iconSet.embedded.off !== void 0 && this.iconSet.embedded.off.icon !== void 0 ? this.iconSet.embedded.off.icon : this.iconSetTemplate.embedded.off.icon,
+              func: this.unlock
+            }
+          },
+          pinned: {
+            state: this.stateInfo.pinned !== void 0 && this.stateInfo.pinned.state !== void 0 ? this.stateInfo.pinned.state : false,
+            on: {
+              label: this.iconSet !== void 0 && this.iconSet.pinned !== void 0 && this.iconSet.pinned.on !== void 0 && this.iconSet.pinned.on.label !== void 0 ? this.iconSet.pinned.on.label : this.iconSetTemplate.pinned.on.label,
+              icon: this.iconSet !== void 0 && this.iconSet.pinned !== void 0 && this.iconSet.pinned.on !== void 0 && this.iconSet.pinned.on.icon !== void 0 ? this.iconSet.pinned.on.icon : this.iconSetTemplate.pinned.on.icon,
+              func: this.pin
+            },
+            off: {
+              label: this.iconSet !== void 0 && this.iconSet.pinned !== void 0 && this.iconSet.pinned.off !== void 0 && this.iconSet.pinned.off.label !== void 0 ? this.iconSet.pinned.off.label : this.iconSetTemplate.pinned.off.label,
+              icon: this.iconSet !== void 0 && this.iconSet.pinned !== void 0 && this.iconSet.pinned.off !== void 0 && this.iconSet.pinned.off.icon !== void 0 ? this.iconSet.pinned.off.icon : this.iconSetTemplate.pinned.off.icon,
+              func: this.unpin
+            }
+          },
+          maximize: {
+            state: this.stateInfo.maximize !== void 0 && this.stateInfo.maximize.state !== void 0 ? this.stateInfo.maximize.state : false,
+            on: {
+              label: this.iconSet !== void 0 && this.iconSet.maximize !== void 0 && this.iconSet.maximize.on !== void 0 && this.iconSet.maximize.on.label !== void 0 ? this.iconSet.maximize.on.label : this.iconSetTemplate.maximize.on.label,
+              icon: this.iconSet !== void 0 && this.iconSet.maximize !== void 0 && this.iconSet.maximize.on !== void 0 && this.iconSet.maximize.on.icon !== void 0 ? this.iconSet.maximize.on.icon : this.iconSetTemplate.maximize.on.icon,
+              func: this.maximize
+            },
+            off: {
+              label: this.iconSet !== void 0 && this.iconSet.maximize !== void 0 && this.iconSet.maximize.off !== void 0 && this.iconSet.maximize.off.label !== void 0 ? this.iconSet.maximize.off.label : this.iconSetTemplate.maximize.off.label,
+              icon: this.iconSet !== void 0 && this.iconSet.maximize !== void 0 && this.iconSet.maximize.off !== void 0 && this.iconSet.maximize.off.icon !== void 0 ? this.iconSet.maximize.off.icon : this.iconSetTemplate.maximize.off.icon,
+              func: this.restore
+            }
+          },
+          // TODO: commenting out until minimize functionality is completed
+          // minimize: {
+          //   state: this.stateInfo.minimize !== void 0 && this.stateInfo.minimize.state !== void 0 ? this.stateInfo.minimize.state : false,
+          //   on: {
+          //     label: this.iconSet !== void 0 && this.iconSet.minimize !== void 0 && this.iconSet.minimize.on !== void 0 && this.iconSet.minimize.on.label !== void 0 ? this.iconSet.minimize.on.label : this.iconSetTemplate.minimize.on.label,
+          //     icon: this.iconSet !== void 0 && this.iconSet.minimize !== void 0 && this.iconSet.minimize.on !== void 0 && this.iconSet.minimize.on.icon !== void 0 ? this.iconSet.minimize.on.icon : this.iconSetTemplate.minimize.on.icon,
+          //     func: this.minimize
+          //   },
+          //   off: {
+          //     label: this.iconSet !== void 0 && this.iconSet.minimize !== void 0 && this.iconSet.minimize.off !== void 0 && this.iconSet.minimize.off.label !== void 0 ? this.iconSet.minimize.off.label : this.iconSetTemplate.minimize.off.label,
+          //     icon: this.iconSet !== void 0 && this.iconSet.minimize !== void 0 && this.iconSet.minimize.off !== void 0 && this.iconSet.minimize.off.icon !== void 0 ? this.iconSet.minimize.off.icon : this.iconSetTemplate.minimize.off.icon,
+          //     func: this.restore
+          //   }
+          // },
+          fullscreen: {
+            state: this.stateInfo.fullscreen !== void 0 && this.stateInfo.fullscreen.state !== void 0 ? this.stateInfo.fullscreen.state : false,
+            on: {
+              label: this.iconSet !== void 0 && this.iconSet.fullscreen !== void 0 && this.iconSet.fullscreen.on !== void 0 && this.iconSet.fullscreen.on.label !== void 0 ? this.iconSet.fullscreen.on.label : this.iconSetTemplate.fullscreen.on.label,
+              icon: this.iconSet !== void 0 && this.iconSet.fullscreen !== void 0 && this.iconSet.fullscreen.on !== void 0 && this.iconSet.fullscreen.on.icon !== void 0 ? this.iconSet.fullscreen.on.icon : this.iconSetTemplate.fullscreen.on.icon,
+              func: this.fullscreenEnter
+            },
+            off: {
+              label: this.iconSet !== void 0 && this.iconSet.fullscreen !== void 0 && this.iconSet.fullscreen.off !== void 0 && this.iconSet.fullscreen.off.label !== void 0 ? this.iconSet.fullscreen.off.label : this.iconSetTemplate.fullscreen.off.label,
+              icon: this.iconSet !== void 0 && this.iconSet.fullscreen !== void 0 && this.iconSet.fullscreen.off !== void 0 && this.iconSet.fullscreen.off.icon !== void 0 ? this.iconSet.fullscreen.off.icon : this.iconSetTemplate.fullscreen.off.icon,
+              func: this.fullscreenLeave
+            }
+          }
+        }
+        this.stateInfo = stateInfo
+      },
+
       __setStateInfo (id, val) {
         if (id in this.stateInfo) {
           this.stateInfo[id].state = val
@@ -1240,6 +1300,10 @@ export default function (ssrContext) {
       },
 
       __renderTitlebar (h, menuData) {
+        if (this.headless === true) {
+          return ''
+        }
+
         const titlebarSlot = this.$scopedSlots.titlebar
 
         return h('div', {

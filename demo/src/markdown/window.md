@@ -91,6 +91,10 @@ Using the mouse to scroll will cause the QWindow to be a bit "jerky". This is be
 :::
 
 ## Modifying the Menu
+TBD
+
+## Changing Icons and Language
+TBD
 
 # QWindow API
 
@@ -111,6 +115,7 @@ Using the mouse to scroll will cause the QWindow to be a bit "jerky". This is be
 | bring-to-front-after-drag | Boolean | Change z-index after drag/resize |
 | menu-func | Function | Allows the menu to me modified before being displayed |
 | title | String | The title for the titlebar |
+| icon-set | Object | Allows icons and language to be changed. See below for details |
 | hide-toolbar-divider | Boolean | Controls if the titlebar separator should be displayed |
 | hide-grippers | Boolean | Controls if the grippers should be displayed |
 | round-grippers | Boolean | Use round grippers instead of square |
@@ -122,6 +127,69 @@ Using the mouse to scroll will cause the QWindow to be a bit "jerky". This is be
 | titlebar-class | [String, Object, Array] | |
 | content-style | [String, Object, Array] | |
 | content-class | [String, Object, Array] | |
+
+QWindow supports `Material Design` icons and English. If you wish to change either of these, you can use the `icon-set` property.
+
+It looks like this:
+
+```js
+{
+  visible: {
+    on: {
+      icon: 'close',
+      label: 'Show'
+    },
+    off: {
+      icon: 'close',
+      label: 'Hide'
+    }
+  },
+  embedded: {
+    on: {
+      icon: 'lock_outline',
+      label: 'Embed'
+    },
+    off: {
+      icon: 'lock_open',
+      label: 'Float'
+    }
+  },
+  pinned: {
+    on: {
+      icon: 'location_searching',
+      label: 'Pin'
+    },
+    off: {
+      icon: 'gps_fixed',
+      label: 'Unpin'
+    }
+  },
+  maximize: {
+    on: {
+      icon: 'arrow_upward',
+      label: 'Maximize'
+    },
+    off: {
+      icon: 'restore',
+      label: 'Restore'
+    }
+  },
+  fullscreen: {
+    on: {
+      icon: 'fullscreen',
+      label: 'Enter fullscreen'
+    },
+    off: {
+      icon: 'fullscreen_exit',
+      label: 'Leave fullscreen'
+    }
+  }
+}
+```
+Each key within the whole of this structure is optional. You can replace a part of it or all of it. If you have Material Design icons turned off in your `quasar.conf.js`, then you need to set all the icons.
+You do not need to include the `label` property unless you are:
+1. Changing the wording, or
+2. Using a different language
 
 ## Vue Events
 | Vue Event | Args | Description |

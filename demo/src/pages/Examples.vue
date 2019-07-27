@@ -21,6 +21,11 @@ Using the mouse to scroll will cause the QWindow to be a bit "jerky". This is be
 :::info
 When you move or resize a QWindow in `floating` mode, then `embed` it, if you make it `floating` again, it's last position is retained.
 :::
+
+:::warning
+Floating windows use a Vue Portal and while developing, the HMR is unable to re-create this portal which may cause issues. Just refresh the page if this happens to you during development.
+:::
+
       </q-markdown>
       <example-title title="Basic" />
       <example-card title="Embedded/Floating" name="Basic" :tag-parts="getTagParts(require('!!raw-loader!../examples/Basic.vue').default)" />
@@ -92,7 +97,7 @@ You can add to the menu the text `separator` which will put a separator between 
 ```js
 let sendToBack = {
   key: 'sendtoback',
-  state: false,
+  state: true,
   on: {
     label: 'Send to Back',
     icon: '',
@@ -105,7 +110,7 @@ let sendToBack = {
   }
 }
 ```
-When `state` is `true`, then the `on` object will be used, otherwise the `off` object.
+When `state` is `true`, then the `on` object will be used, otherwise the `off` object will be used. If the state will always be `true` or `false` then you only need to provide the `on` or `off` object, respectively.
 
 In the example below, menu items are added only if the QWindow is floating. Use the menu to change the `z-order` manually.
 
@@ -118,6 +123,77 @@ The example below is using the default scoped slot. When this is done, data (an 
       </q-markdown>
 
       <example-card title="Complex Slot" name="ComplexSlot" :tag-parts="getTagParts(require('!!raw-loader!../examples/ComplexSlot.vue').default)" />
+
+      <q-markdown>
+QWindow supports `Material Design` icons and English. If you wish to change either of these, you can use the `icon-set` property.
+
+It looks like this:
+
+```js
+{
+  visible: {
+    on: {
+      icon: 'close',
+      label: 'Show'
+    },
+    off: {
+      icon: 'close',
+      label: 'Hide'
+    }
+  },
+  embedded: {
+    on: {
+      icon: 'lock_outline',
+      label: 'Embed'
+    },
+    off: {
+      icon: 'lock_open',
+      label: 'Float'
+    }
+  },
+  pinned: {
+    on: {
+      icon: 'location_searching',
+      label: 'Pin'
+    },
+    off: {
+      icon: 'gps_fixed',
+      label: 'Unpin'
+    }
+  },
+  maximize: {
+    on: {
+      icon: 'arrow_upward',
+      label: 'Maximize'
+    },
+    off: {
+      icon: 'restore',
+      label: 'Restore'
+    }
+  },
+  fullscreen: {
+    on: {
+      icon: 'fullscreen',
+      label: 'Enter fullscreen'
+    },
+    off: {
+      icon: 'fullscreen_exit',
+      label: 'Leave fullscreen'
+    }
+  }
+}
+```
+Each key within the whole of this structure is optional. You can replace a part of it or all of it. If you have Material Design icons turned off in your `quasar.conf.js`, then you need to set all the icons.
+You do not need to include the `label` property unless you are:
+1. Changing the wording, or
+2. Using a different language
+
+The example below uses the `icon-set` property to change the icons to use `Fontawesome-v5` and also changes all the text (still in English, but you get the point).
+
+It is also using the `start-x` and `start-y` properties.
+      </q-markdown>
+
+      <example-card title="Icons and Language" name="IconsAndLanguage" :tag-parts="getTagParts(require('!!raw-loader!../examples/IconsAndLanguage.vue').default)" />
 
     </div>
   </hero>
@@ -165,6 +241,7 @@ export default {
     this.addToToc('Bring to Front After Drag', 2)
     this.addToToc('Modify Menu', 2)
     this.addToToc('Complex Slot', 2)
+    this.addToToc('Icons and Language', 2)
 
     this.toc = this.tempToc
   },

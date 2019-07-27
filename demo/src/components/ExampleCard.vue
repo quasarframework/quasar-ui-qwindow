@@ -81,7 +81,8 @@ export default {
     ScrollArea: () => import('../examples/ScrollArea'),
     BringToFrontAfterDrag: () => import('../examples/BringToFrontAfterDrag'),
     ModifyMenu: () => import('../examples/ModifyMenu'),
-    ComplexSlot: () => import('../examples/ComplexSlot')
+    ComplexSlot: () => import('../examples/ComplexSlot'),
+    IconsAndLanguage: () => import('../examples/IconsAndLanguage')
   },
 
   props: {
