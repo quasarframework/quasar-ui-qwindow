@@ -773,19 +773,19 @@ export default function (ssrContext) {
         this.setStartXY(startX, startY)
       },
 
-      setStartX (x) {
+      setX (x) {
         const w = this.computedWidth
         this.state.left = x
         this.state.right = this.state.left + w
       },
 
-      setStartY (y) {
+      setY (y) {
         const h = this.computedHeight
         this.state.top = y
         this.state.bottom = this.state.top + h
       },
 
-      setStartXY (x, y) {
+      setXY (x, y) {
         this.setStartX(x)
         this.setStartY(y)
       },
@@ -795,7 +795,7 @@ export default function (ssrContext) {
       },
 
       setHeight (height) {
-        this.state.bottom = this.state.top + width
+        this.state.bottom = this.state.top + height
       },
 
       // function that returns true/false if
