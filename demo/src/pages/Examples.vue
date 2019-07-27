@@ -125,7 +125,7 @@ The example below is using the default scoped slot. When this is done, data (an 
       <example-card title="Complex Slot" name="ComplexSlot" :tag-parts="getTagParts(require('!!raw-loader!../examples/ComplexSlot.vue').default)" />
 
       <q-markdown>
-QWindow supports `Material Design` icons and English. If you wish to change either of these, you can use the `icon-set` property.
+QWindow uses `Material Design` icons and the English language as defaults. If you wish to change either of these, you can use the `icon-set` property.
 
 It looks like this:
 
@@ -183,7 +183,7 @@ It looks like this:
   }
 }
 ```
-Each key within the whole of this structure is optional. You can replace a part of it or all of it. If you have Material Design icons turned off in your `quasar.conf.js`, then you need to set all the icons.
+Each key within the whole of this structure is optional. You can replace a part of it or all of it. If you have `Material Design` icons turned off in your `quasar.conf.js`, then you need to set all the icons.
 You do not need to include the `label` property unless you are:
 1. Changing the wording, or
 2. Using a different language
@@ -194,6 +194,8 @@ It is also using the `start-x` and `start-y` properties.
       </q-markdown>
 
       <example-card title="Icons and Language" name="IconsAndLanguage" :tag-parts="getTagParts(require('!!raw-loader!../examples/IconsAndLanguage.vue').default)" />
+
+      <example-card title="Headless" name="Headless" :tag-parts="getTagParts(require('!!raw-loader!../examples/Headless.vue').default)" />
 
     </div>
   </hero>
@@ -242,6 +244,7 @@ export default {
     this.addToToc('Modify Menu', 2)
     this.addToToc('Complex Slot', 2)
     this.addToToc('Icons and Language', 2)
+    this.addToToc('Headless', 2)
 
     this.toc = this.tempToc
   },
