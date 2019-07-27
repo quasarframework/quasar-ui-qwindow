@@ -196,7 +196,7 @@ It is also using the `start-x` and `start-y` properties.
       <example-card title="Icons and Language" name="IconsAndLanguage" :tag-parts="getTagParts(require('!!raw-loader!../examples/IconsAndLanguage.vue').default)" />
 
       <q-markdown>
-Using the `headless` property means there will be no menu drawn, which means you have to provide the functionality yourself.
+Using the `headless` property means the titlebar will not be drawn, therefore there will be no menu drawn, which means you have to provide the functionality yourself.
 
 In the example below, we are using a button that when clicked retrieves the `computedMenuData` from QWindow so it can be displayed. We have to do this before the QMenu is displayed, so we control that via the `showMenu` data attribute.
 
