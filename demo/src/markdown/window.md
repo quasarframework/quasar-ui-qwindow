@@ -128,7 +128,7 @@ TBD
 | content-style | [String, Object, Array] | |
 | content-class | [String, Object, Array] | |
 
-QWindow supports `Material Design` icons and English. If you wish to change either of these, you can use the `icon-set` property.
+QWindow uses `Material Design` icons and the English language as defaults. If you wish to change either of these, you can use the `icon-set` property.
 
 It looks like this:
 
@@ -186,7 +186,7 @@ It looks like this:
   }
 }
 ```
-Each key within the whole of this structure is optional. You can replace a part of it or all of it. If you have Material Design icons turned off in your `quasar.conf.js`, then you need to set all the icons.
+Each key within the whole of this structure is optional. You can replace a part of it or all of it. If you have `Material Design` icons turned off in your `quasar.conf.js`, then you need to set all the icons.
 You do not need to include the `label` property unless you are:
 1. Changing the wording, or
 2. Using a different language
