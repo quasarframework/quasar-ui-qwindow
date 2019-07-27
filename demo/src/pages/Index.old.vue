@@ -8,7 +8,7 @@
       :actions="actions"
       bring-to-front-after-drag
       :menu-func="updateMenu"
-      contentClass="bg-grey-1"
+      content-class="bg-grey-1"
     >
       <div class="q-pa-md fit scroll">
         <q-scroll-area style="width: 100%; height: 100%">
