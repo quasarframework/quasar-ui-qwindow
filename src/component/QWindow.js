@@ -44,11 +44,8 @@ export default function (ssrContext) {
     mixins: [Colorize],
 
     props: {
+      value: Boolean,
       title: String,
-      visible: {
-        type: Boolean,
-        default: true
-      },
       embedded: Boolean,
       pinned: Boolean,
       fullscreen: Boolean,
@@ -259,37 +256,49 @@ export default function (ssrContext) {
       }
 
       // adjust initial user states
-      if (this.visible === true) {
-        this.__setStateInfo('visible', true)
-      } else {
-        this.__setStateInfo('visible', false)
-      }
-      if (this.embedded === true) {
-        this.__setStateInfo('embedded', true)
-      } else {
-        this.__setStateInfo('embedded', false)
-      }
-      if (this.pinned === true) {
-        if (this.canDo('pinned', true)) {
-          this.__setStateInfo('pinned', true)
-        }
-      } else {
-        if (this.canDo('pinned', false)) {
-          this.__setStateInfo('pinned', false)
+      if (this.value !== void 0) {
+        if (this.value === true) {
+          this.__setStateInfo('visible', true)
+        } else {
+          this.__setStateInfo('visible', false)
         }
       }
-      if (this.fullscreen === true) {
-        this.fullscreenEnter()
+      if (this.embedded !== void 0) {
+        if (this.embedded === true) {
+          this.__setStateInfo('embedded', true)
+        } else {
+          this.__setStateInfo('embedded', false)
+        }
       }
-      if (this.maximize === true && this.__getStateInfo('fullscreen') !== true) {
-        this.__setStateInfo('maximize', true)
-      } else {
-        this.__setStateInfo('maximize', false)
+      if (this.pinned !== void 0) {
+        if (this.pinned === true) {
+          if (this.canDo('pinned', true)) {
+            this.__setStateInfo('pinned', true)
+          }
+        } else {
+          if (this.canDo('pinned', false)) {
+            this.__setStateInfo('pinned', false)
+          }
+        }
       }
-      if (this.minimize === true && this.__getStateInfo('fullscreen') !== true) {
-        this.__setStateInfo('minimize', true)
-      } else {
-        this.__setStateInfo('minimize', false)
+      if (this.fullscreen !== void 0) {
+        if (this.fullscreen === true) {
+          this.fullscreenEnter()
+        }
+      }
+      if (this.maximize !== void 0) {
+        if (this.maximize === true && this.__getStateInfo('fullscreen') !== true) {
+          this.__setStateInfo('maximize', true)
+        } else {
+          this.__setStateInfo('maximize', false)
+        }
+      }
+      if (this.minimize !== void 0) {
+        if (this.minimize === true && this.__getStateInfo('fullscreen') !== true) {
+          this.__setStateInfo('minimize', true)
+        } else {
+          this.__setStateInfo('minimize', false)
+        }
       }
 
       // set up scroll handler
@@ -543,8 +552,11 @@ export default function (ssrContext) {
     },
 
     watch: {
-      visible (val) {
+      value (val) {
         this.stateInfo.visible.state = val
+      },
+      'stateInfo.visible.state' (val) {
+        this.$emit('input', val)
       },
       'stateInfo.embedded.state' (val) {
         if (val !== true) {
@@ -618,7 +630,7 @@ export default function (ssrContext) {
       show () {
         if (this.canDo('visible', true)) {
           this.__setStateInfo('visible', true)
-          this.$emit('visible', true)
+          this.$emit('input', true)
           return true
         }
         return false
@@ -628,7 +640,7 @@ export default function (ssrContext) {
       hide () {
         if (this.canDo('visible', false)) {
           this.__setStateInfo('visible', false)
-          this.$emit('visible', false)
+          this.$emit('input', false)
           return true
         }
         return false
