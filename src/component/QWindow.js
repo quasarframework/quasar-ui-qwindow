@@ -89,7 +89,7 @@ export default function (ssrContext) {
       },
       actions: {
         type: Array,
-        default: () => (['pin', 'embedded', 'close', 'fullscreen']),
+        default: () => (['pin', 'embedded', 'close']),
         validator: (v) => v.some(action => [
           'pin',
           'embedded',
