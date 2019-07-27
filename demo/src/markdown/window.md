@@ -212,7 +212,8 @@ When the menu is built, it uses `state` to determine whether to use the `off` ob
 | Vue Slot | Args | Description |
 | --- | --- | --- |
 | default | Object | This is the default slotted content<br>An object is returned with a key `zIndex`. Using this value is useful to set the slotted content to `zIndex + 1` if z order is a concern (like QDrawer) |
-| titlebar | Object |
+| titlebar | Array | See `computedMenuData` above |
+
 
 # Donate
 If you appreciate the work that went into this App Extension, please consider [donating to Quasar](https://donate.quasar.dev).
