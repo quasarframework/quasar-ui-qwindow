@@ -116,6 +116,7 @@ TBD
 | menu-func | Function | Allows the menu to me modified before being displayed |
 | title | String | The title for the titlebar |
 | icon-set | Object | Allows icons and language to be changed. See below for details |
+| headless | Boolean | Prevent titlebar from being drawn (see Headless example) |
 | hide-toolbar-divider | Boolean | Controls if the titlebar separator should be displayed |
 | hide-grippers | Boolean | Controls if the grippers should be displayed |
 | round-grippers | Boolean | Use round grippers instead of square |
