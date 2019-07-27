@@ -6,7 +6,7 @@
       :width="400"
       :actions="['embedded', 'pin', 'maximize', 'fullscreen']"
       embedded
-      contentClass="bg-grey-1"
+      content-class="bg-grey-1"
     >
       <template #default="{ zIndex }">
         <div class="fit">

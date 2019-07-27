@@ -97,7 +97,7 @@
         :pinned="pinned"
         bring-to-front-after-drag
         :menu-func="updateMenu"
-        contentClass="bg-grey-1"
+        content-class="bg-grey-1"
         @embedded="(v) => embedded = v"
         @visible="(v) => visible = v"
         @pinned="(v) => pinned = v"

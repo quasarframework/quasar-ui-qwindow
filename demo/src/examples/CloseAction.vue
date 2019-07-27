@@ -8,7 +8,7 @@
       :width="350"
       :actions="['embedded', 'pin', 'maximize', 'fullscreen', 'close']"
       embedded
-      contentClass="bg-grey-1"
+      content-class="bg-grey-1"
       @visible="(v) => visible = v"
     >
       <div class="q-ma-md">
