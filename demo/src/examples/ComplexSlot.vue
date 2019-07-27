@@ -1,6 +1,7 @@
 <template>
   <div>
     <q-window
+      v-model="visible"
       title="QWindow Complex Slot"
       :height="600"
       :width="400"
@@ -96,9 +97,9 @@ export default {
   name: 'MyLayout',
   data () {
     return {
-      leftDrawerOpen: this.$q.platform.is.desktop,
+      visible: true,
       drawerLeft: false,
-      drawerRight: true
+      drawerRight: false
     }
   }
 }

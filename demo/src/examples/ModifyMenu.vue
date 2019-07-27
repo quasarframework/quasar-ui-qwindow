@@ -2,6 +2,7 @@
   <div>
     <q-window
       ref="window1"
+      v-model="visible1"
       title="QWindow Modify Menu 1"
       :startX="50"
       :startY="50"
@@ -24,6 +25,7 @@
     </q-window>
     <q-window
       ref="window2"
+      v-model="visible2"
       title="QWindow Modify Menu 2"
       :startX="100"
       :startY="100"
@@ -49,6 +51,12 @@
 
 <script>
 export default {
+  data () {
+    return {
+      visible1: true,
+      visible2: true
+    }
+  },
   methods: {
     updateMenu1 (menuItems) {
       if (this.$refs.window1.isEmbedded !== true && this.$refs.window1.isFullscreen !== true) {

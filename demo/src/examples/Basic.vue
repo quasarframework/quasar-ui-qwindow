@@ -1,6 +1,7 @@
 <template>
   <div>
     <q-window
+      v-model="visible"
       title="QWindow Basic"
       :height="150"
       :width="350"
@@ -14,3 +15,13 @@
     </q-window>
   </div>
 </template>
+
+<script>
+export default {
+  data () {
+    return {
+      visible: true
+    }
+  }
+}
+</script>

@@ -1,6 +1,7 @@
 <template>
   <div>
     <q-window
+      v-model="visible1"
       title="QWindow Bring to Front After Drag 1"
       :height="500"
       :width="600"
@@ -19,6 +20,7 @@
       </div>
     </q-window>
     <q-window
+      v-model="visible2"
       title="QWindow Bring to Front After Drag 2"
       :height="500"
       :width="600"
@@ -38,3 +40,14 @@
     </q-window>
   </div>
 </template>
+
+<script>
+export default {
+  data () {
+    return {
+      visible1: true,
+      visible2: true
+    }
+  }
+}
+</script>

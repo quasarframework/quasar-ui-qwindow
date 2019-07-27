@@ -1,6 +1,7 @@
 <template>
   <div>
     <q-window
+      v-model="visible"
       title="QWindow Titlebar Style"
       :titlebarStyle="{ borderBottom: '1px solid #BB714F', fontStyle: 'italic', fontSize: '2em' }"
       :contentStyle="{ border: '1px solid #BB714F' }"
@@ -19,3 +20,13 @@
     </q-window>
   </div>
 </template>
+
+<script>
+export default {
+  data () {
+    return {
+      visible: true
+    }
+  }
+}
+</script>

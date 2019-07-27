@@ -1,6 +1,7 @@
 <template>
   <div>
     <q-window
+      v-model="visible"
       title="QWindow Scroll With Window"
       scroll-with-window
       :height="150"
@@ -15,3 +16,13 @@
     </q-window>
   </div>
 </template>
+
+<script>
+export default {
+  data () {
+    return {
+      visible: true
+    }
+  }
+}
+</script>

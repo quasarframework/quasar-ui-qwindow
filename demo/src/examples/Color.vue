@@ -1,6 +1,7 @@
 <template>
   <div>
     <q-window
+      v-model="visible"
       title="QWindow Color"
       color="yellow-2"
       background-color="blue-grey-4"
@@ -15,3 +16,13 @@
     </q-window>
   </div>
 </template>
+
+<script>
+export default {
+  data () {
+    return {
+      visible: true
+    }
+  }
+}
+</script>

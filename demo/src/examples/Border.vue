@@ -1,6 +1,7 @@
 <template>
   <div>
     <q-window
+      v-model="visible"
       title="QWindow Border"
       border-width="3px"
       border-style="dashed"
@@ -17,3 +18,13 @@
     </q-window>
   </div>
 </template>
+
+<script>
+export default {
+  data () {
+    return {
+      visible: true
+    }
+  }
+}
+</script>
