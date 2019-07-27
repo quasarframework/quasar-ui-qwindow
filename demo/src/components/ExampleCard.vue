@@ -82,7 +82,8 @@ export default {
     BringToFrontAfterDrag: () => import('../examples/BringToFrontAfterDrag'),
     ModifyMenu: () => import('../examples/ModifyMenu'),
     ComplexSlot: () => import('../examples/ComplexSlot'),
-    IconsAndLanguage: () => import('../examples/IconsAndLanguage')
+    IconsAndLanguage: () => import('../examples/IconsAndLanguage'),
+    Headless: () => import('../examples/Headless')
   },
 
   props: {

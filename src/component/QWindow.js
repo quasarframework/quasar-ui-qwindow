@@ -326,7 +326,7 @@ export default function (ssrContext) {
       },
 
       computedToolbarHeight () {
-        return this.dense ? 28 : 40
+        return this.headless === true ? 0 : this.dense === true ? 28 : 40
       },
 
       computedLeft () {

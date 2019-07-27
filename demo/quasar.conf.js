@@ -43,6 +43,7 @@ module.exports = function (ctx) {
         'QItemSection',
         'QLayout',
         'QList',
+        'QMenu',
         'QPage',
         'QPageContainer',
         'QPageScroller',
@@ -59,6 +60,7 @@ module.exports = function (ctx) {
       ],
 
       directives: [
+        'ClosePopup',
         'Ripple',
         'Scroll'
       ],

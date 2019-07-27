@@ -195,6 +195,16 @@ It is also using the `start-x` and `start-y` properties.
 
       <example-card title="Icons and Language" name="IconsAndLanguage" :tag-parts="getTagParts(require('!!raw-loader!../examples/IconsAndLanguage.vue').default)" />
 
+      <q-markdown>
+Using the `headless` property means there will be no menu drawn, which means you have to provide the functionality yourself.
+
+In the example below, we are using a button that when clicked retrieves the `computedMenuData` from QWindow so it can be displayed. We have to do this before the QMenu is displayed, so we control that via the `showMenu` data attribute.
+
+Just to re-iterate, all state handling must be driven from outside of QWindow, but QWindow makes it very easy for you by providing all the necessary data and functions to do so.
+
+Be aware, that for `headless` you probably don't wants to add actions that may impede the user, like `maximize` or `fullscreen`. In the example below, `fullscreen` is still being allowed because most browsers have a hotkey (F11 in Chrome) to toggle fullscreen or by pressing the ESC key.
+      </q-markdown>
+
       <example-card title="Headless" name="Headless" :tag-parts="getTagParts(require('!!raw-loader!../examples/Headless.vue').default)" />
 
     </div>
