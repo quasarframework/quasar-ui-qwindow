@@ -1053,7 +1053,7 @@ export default function (ssrContext) {
           }
         }
 
-        // save existing state
+        // save existing position information
         const tmpTop = this.state.top
         const tmpLeft = this.state.left
         const tmpRight = this.state.right
@@ -1065,43 +1065,43 @@ export default function (ssrContext) {
         const parent = e.currentTarget.parentElement.parentElement
         const grandparent = e.currentTarget.parentElement.parentElement.parentElement
 
+        const offsetTop = parent.offsetTop
+        const offsetLeft = parent.offsetLeft
+        const grandOffsetTop = grandparent.offsetTop
+        const grandOffsetLeft = grandparent.offsetLeft
+
+        let clientY = ''
+        let clientX = ''
+
+        if (this.$q.platform.is.mobile === true) {
+          clientY = e.touches[0].clientY
+          clientX = e.touches[0].clientX
+        } else {
+          clientY = e.clientY
+          clientX = e.clientX
+        }
+
         switch (resizeHandle) {
           case 'top':
-            if (this.$q.platform.is.mobile === true) {
-              this.state.top = e.touches[0].clientY - parent.offsetTop
-            } else {
-              this.state.top = e.clientY - parent.offsetTop
-            }
+            this.state.top = clientY - offsetTop
             if (this.computedHeight < this.state.minHeight) {
               this.state.top = tmpBottom - this.state.minHeight
             }
             break
           case 'left':
-            if (this.$q.platform.is.mobile === true) {
-              this.state.left = e.touches[0].clientX - parent.offsetLeft
-            } else {
-              this.state.left = e.clientX - parent.offsetLeft
-            }
+            this.state.left = clientX - offsetLeft
             if (this.computedWidth < this.state.minWidth) {
               this.state.left = tmpRight - this.state.minWidth
             }
             break
           case 'right':
-            if (this.$q.platform.is.mobile === true) {
-              this.state.right = e.touches[0].clientX - parent.offsetLeft
-            } else {
-              this.state.right = e.clientX - parent.offsetLeft
-            }
+            this.state.right = clientX - offsetLeft
             if (this.computedWidth < this.state.minWidth) {
               this.state.right = tmpLeft - this.state.minWidth
             }
             break
           case 'bottom':
-            if (this.$q.platform.is.mobile === true) {
-              this.state.bottom = e.touches[0].clientY - parent.offsetTop
-            } else {
-              this.state.bottom = e.clientY - parent.offsetTop
-            }
+            this.state.bottom = clientY - offsetTop
             if (this.computedHeight < this.state.minHeight) {
               this.state.bottom = tmpTop - this.state.minHeight
             }
@@ -1123,13 +1123,8 @@ export default function (ssrContext) {
             this.onDrag(e, 'right')
             break
           case 'titlebar':
-            if (this.$q.platform.is.mobile === true) {
-              this.state.top = e.touches[0].clientY - grandparent.offsetTop - this.mouseOffsetY
-              this.state.left = e.touches[0].clientX - grandparent.offsetLeft - this.mouseOffsetX
-            } else {
-              this.state.top = e.clientY - grandparent.offsetTop - this.mouseOffsetY
-              this.state.left = e.clientX - grandparent.offsetLeft - this.mouseOffsetX
-            }
+            this.state.top = clientY - grandOffsetTop - this.mouseOffsetY
+            this.state.left = clientX - grandOffsetLeft - this.mouseOffsetX
             this.state.bottom = this.state.top + tmpHeight
             this.state.right = this.state.left + tmpWidth
             break
