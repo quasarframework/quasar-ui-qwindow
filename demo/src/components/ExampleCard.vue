@@ -70,8 +70,9 @@ export default {
 
   components: {
     Basic: () => import('../examples/Basic'),
-    Actions: () => import('../examples/Actions'),
     ScrollWithWindow: () => import('../examples/ScrollWithWindow'),
+    Dense: () => import('../examples/Dense'),
+    Actions: () => import('../examples/Actions'),
     Color: () => import('../examples/Color'),
     Border: () => import('../examples/Border'),
     TitlebarStyle: () => import('../examples/TitlebarStyle'),

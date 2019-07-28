@@ -102,6 +102,7 @@ TBD
 | Vue Property | Type | Description |
 | --- | --- | --- |
 | value | Boolean | v-model; controls visibility<br>Default: true |
+| dense | Boolean | Makes the titlebar height more dense |
 | embedded | Boolean | If the QWindow should be initially embedded |
 | pinned | Boolean | If the QWindow should be initially pinned |
 | maximized | Boolean | If the QWindow should be initially maximized |

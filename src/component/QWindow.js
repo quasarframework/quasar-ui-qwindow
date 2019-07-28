@@ -482,12 +482,12 @@ export default function (ssrContext) {
       },
 
       tbStyle () {
-        let titleHeight = `${this.computedToolbarHeight}px`
+        const titleHeight = `${this.computedToolbarHeight}px`
         let style = { height: titleHeight }
 
         if (this.titlebarStyle) {
           if (typeof this.titlebarStyle === 'object') {
-            style = Object.assign(this.titlebarStyle, { height: titleHeight })
+            style = Object.assign(this.titlebarStyle, style)
           } else if (typeof this.titlebarStyle === 'string') {
             style = this.titlebarStyle + '; height:' + titleHeight
           } if (Array.isArray(this.titlebarStyle)) {

@@ -4,7 +4,7 @@
       <q-markdown>
 **QWindow** allows for a floating, movable, resizable window above the regular HTML elements.
 
-It is quite possible to start a QWindow off as `floating`, but for these examples, the window must start off as `embedded` so there isn't a lot of windows popping up and knowing which example they come from.
+It is quite possible to start a QWindow off as `floating`, but for these examples, the window must start off as `embedded` so there isn't a lot of windows popping up and then knowing which example they come from.
 
 This means, you must access the menu content to make it `floating`.
 
@@ -15,7 +15,7 @@ All QWindows are initially relative to the browser's view. This means, even if y
 :::
 
 :::tip
-Using the mouse to scroll will cause the QWindow to be a bit "jerky". This is because a mouse does not cause a pixel-by-pixel scroll, but causes a "jump" in the scroll position. Try scrolling with the scrollbar to see the difference.
+Using the mouse or keyboard to scroll will cause the QWindow to be a bit "jerky". These devices do not do a pixel-by-pixel scroll, but causes a "jump" in the pixels to a new scroll position. Try scrolling with the scrollbar to see the difference.
 :::
 
 :::info
@@ -41,6 +41,8 @@ Make sure to `embed` the `floating` window before moving on to the next example.
       </q-markdown>
 
       <example-card title="Scroll With Window" name="ScrollWithWindow" :tag-parts="getTagParts(require('!!raw-loader!../examples/ScrollWithWindow.vue').default)" />
+
+      <example-card title="Dense" name="Dense" :tag-parts="getTagParts(require('!!raw-loader!../examples/Dense.vue').default)" />
 
       <q-markdown>
 Actions allow the window to be in different states.
@@ -240,6 +242,7 @@ export default {
     this.addToToc('Basic')
     this.addToToc('Embedded/Floating', 2)
     this.addToToc('Fixed Position', 2)
+    this.addToToc('Dense', 2)
     this.addToToc('Actions', 2)
     this.addToToc('Color', 2)
     this.addToToc('Border', 2)
