@@ -1070,6 +1070,9 @@ export default function (ssrContext) {
       onScroll (e) {
         this.scrollY = e.srcElement.scrollingElement.scrollTop
         this.scrollX = e.srcElement.scrollingElement.scrollLeft
+        this.$nextTick(() => {
+          this.$emit('position', this.computedPosition)
+        })
       },
 
       onDrag (e, resizeHandle) {

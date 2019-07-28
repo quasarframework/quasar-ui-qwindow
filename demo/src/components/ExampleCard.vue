@@ -80,6 +80,7 @@ export default {
     GripperRound: () => import('../examples/GripperRound'),
     NoMove: () => import('../examples/NoMove'),
     Resizable: () => import('../examples/Resizable'),
+    Messages: () => import('../examples/Messages'),
     CloseAction: () => import('../examples/CloseAction'),
     ScrollArea: () => import('../examples/ScrollArea'),
     BringToFrontAfterDrag: () => import('../examples/BringToFrontAfterDrag'),

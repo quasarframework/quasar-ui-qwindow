@@ -31,7 +31,7 @@ Floating windows use a Vue Portal and while developing, the HMR is unable to re-
       <example-card title="Embedded/Floating" name="Basic" :tag-parts="getTagParts(require('!!raw-loader!../examples/Basic.vue').default)" />
 
       <q-markdown>
-You might have noticed on the previous example, when the QWindow is floating, that when you scroll the document that the QWindow stays in-place.
+You might have noticed on the previous example, when the QWindow is floating, when you scroll the document, the QWindow stays in-place.
 
 To prevent the in-place and scroll with the document, use the `scroll-with-window` property.
 
@@ -83,6 +83,11 @@ The `resizable` property allows you to turn on/off various resize handles. The a
 See the code in the examples below for details.
       </q-markdown>
       <example-card title="Resizable" name="Resizable" :tag-parts="getTagParts(require('!!raw-loader!../examples/Resizable.vue').default)" />
+
+      <q-markdown>
+In the example below, you can play with the QWindow and get feedback on the messages that are emitted. The `position` message is always for a non-embedded window and will emit when a QWindow is moved, resized or the document is scrolled.
+      </q-markdown>
+      <example-card title="Messages" name="Messages" :tag-parts="getTagParts(require('!!raw-loader!../examples/Messages.vue').default)" />
 
       <example-title title="Advanced" />
       <q-markdown>
@@ -262,6 +267,7 @@ export default {
     this.addToToc('Round Grippers', 2)
     this.addToToc('No Move', 2)
     this.addToToc('Resizable', 2)
+    this.addToToc('Messages', 2)
 
     this.addToToc('Advanced')
     this.addToToc('Close Action', 2)
