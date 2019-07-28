@@ -458,8 +458,6 @@ export default function (ssrContext) {
             display: 'inline-block',
             borderWidth: this.borderWidth,
             borderStyle: this.borderStyle,
-            width: this.computedWidth + 'px',
-            height: this.computedHeight + 'px',
             padding: 0,
             visibility: this.computedVisibility,
             minWidth: '90px',
@@ -467,6 +465,13 @@ export default function (ssrContext) {
             top: top + 'px',
             left: left + 'px',
             zIndex: this.computedZIndex
+          }
+          if (this.isMaximized) {
+            style.width = '100%'
+            style.height = '100%'
+          } else {
+            style.width = this.computedWidth + 'px'
+            style.height = this.computedHeight + 'px'
           }
         }
         return style
