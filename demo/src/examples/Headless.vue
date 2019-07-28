@@ -40,7 +40,7 @@
       embedded
       content-class="bg-grey-1"
     >
-      <div class="q-ma-md">
+      <div class="q-pa-md fit">
         This is the "default" slot content
       </div>
     </q-window>

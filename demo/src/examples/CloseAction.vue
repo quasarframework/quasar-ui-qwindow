@@ -11,7 +11,7 @@
       content-class="bg-grey-1"
       @visible="(v) => visible = v"
     >
-      <div class="q-ma-md">
+      <div class="q-pa-md fit">
         This is the "default" slot content
       </div>
     </q-window>

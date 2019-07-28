@@ -12,7 +12,7 @@
       :actions="['embedded', 'pin', 'maximize', 'fullscreen']"
       embedded
     >
-      <div class="q-ma-md">
+      <div class="q-pa-md fit">
         This is the "default" slot content
       </div>
     </q-window>
