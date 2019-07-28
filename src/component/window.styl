@@ -1,3 +1,5 @@
+@import './window-variables'
+
 :fullscreen
   overflow hidden !important
 
@@ -53,7 +55,6 @@ body
       flex 1
       justify-content left
       font-size 1rem
-      padding 4px
 
     &--actions
       color currentColor
@@ -136,8 +137,8 @@ body
 
 .gripper
   position absolute
-  width 10px
-  height 10px
+  width $gripper-size
+  height $gripper-size
   background-color #ffffff
   border 1px solid #000000
   &:hover
@@ -145,38 +146,38 @@ body
   &-round
     border-radius 50%
   &-top
-    top -6px
+    top -($gripper-size)
     left 50%
-    margin-left -6px
+    margin-left -($gripper-size)
     cursor n-resize
     &-left
-      top -6px
-      left -6px
+      top -($gripper-size)
+      left -($gripper-size)
       cursor nw-resize
     &-right
-      top -6px
-      right -6px
+      top -($gripper-size)
+      right -($gripper-size)
       cursor ne-resize
   &-left
-    left -6px
+    left -($gripper-size)
     top 50%
-    margin-top -6px
+    margin-top -($gripper-size)
     cursor w-resize
   &-right
-    right -6px
+    right -($gripper-size)
     top 50%
-    margin-top -6px
+    margin-top -($gripper-size)
     cursor e-resize
   &-bottom
-    bottom -6px
+    bottom -($gripper-size)
     left 50%
-    margin-left -6px
+    margin-left -($gripper-size)
     cursor s-resize
     &-left
-      bottom -6px
-      left -6px
+      bottom -($gripper-size)
+      left -($gripper-size)
       cursor sw-resize
     &-right
-      bottom -6px
-      right -6px
+      bottom -($gripper-size)
+      right -($gripper-size)
       cursor se-resize
