@@ -1079,6 +1079,10 @@ export default function (ssrContext) {
           }
         }
 
+        if (e.dataTransfer && e.dataTransfer.effectAllowed) {
+          e.dataTransfer.effectAllowed = 'none'
+        }
+
         // save existing position information
         const tmpTop = this.state.top
         const tmpLeft = this.state.left
