@@ -535,7 +535,7 @@ export default function (ssrContext) {
       value (val) {
         this.stateInfo.visible.state = val
       },
-      'iconSet': {
+      iconSet: {
         handler () {
           this.__updateStateInfo()
         },
