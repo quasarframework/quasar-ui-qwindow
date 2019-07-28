@@ -535,6 +535,12 @@ export default function (ssrContext) {
       value (val) {
         this.stateInfo.visible.state = val
       },
+      'iconSet': {
+        handler () {
+          this.__updateStateInfo()
+        },
+        deep: true
+      },
       'stateInfo.visible.state' (val) {
         this.$emit('input', val)
       },
