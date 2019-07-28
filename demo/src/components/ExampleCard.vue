@@ -87,6 +87,7 @@ export default {
     ModifyMenu: () => import('../examples/ModifyMenu'),
     ComplexSlot: () => import('../examples/ComplexSlot'),
     IconsAndLanguage: () => import('../examples/IconsAndLanguage'),
+    NoMenu: () => import('../examples/NoMenu'),
     Headless: () => import('../examples/Headless')
   },
 

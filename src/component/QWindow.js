@@ -51,6 +51,7 @@ export default function (ssrContext) {
       fullscreen: Boolean,
       maximized: Boolean,
       minimized: Boolean,
+      noMenu: Boolean,
       noMove: Boolean,
       noResize: Boolean,
       resizable: {
@@ -1313,6 +1314,10 @@ export default function (ssrContext) {
       },
 
       __renderMoreButton (h, menuData) {
+        if (this.noMenu === true) {
+          return ''
+        }
+
         return h(QBtn, {
           staticClass: 'q-window__titlebar--action-item',
           props: {
@@ -1351,7 +1356,7 @@ export default function (ssrContext) {
           titlebarSlot === void 0 ? this.__renderMoreButton(h, menuData) : '',
           titlebarSlot !== void 0 ? titlebarSlot(menuData) : '',
           (this.canDrag === true) &&
-            this.__renderResizeHandle(h, 'titlebar', 44) // width of more button
+            this.__renderResizeHandle(h, 'titlebar', this.noMenu ? 0 : 44) // width of more button
         ])
       },
 
@@ -1437,7 +1442,10 @@ export default function (ssrContext) {
             draggable: false
           }
         }, [
-          defaultSlot || defaultScopedSlot ? defaultScopedSlot({ zIndex: this.zIndex }) : ''
+          defaultSlot || defaultScopedSlot ? defaultScopedSlot({ zIndex: this.zIndex }) : '',
+          (this.headless === true && this.canDrag === true) &&
+            this.__renderResizeHandle(h, 'titlebar', this.noMenu ? 0 : 44) // width of more button
+
         ])
       },
 
