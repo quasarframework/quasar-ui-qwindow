@@ -78,6 +78,8 @@ export default {
     TitlebarStyle: () => import('../examples/TitlebarStyle'),
     GripperNone: () => import('../examples/GripperNone'),
     GripperRound: () => import('../examples/GripperRound'),
+    NoMove: () => import('../examples/NoMove'),
+    Resizable: () => import('../examples/Resizable'),
     CloseAction: () => import('../examples/CloseAction'),
     ScrollArea: () => import('../examples/ScrollArea'),
     BringToFrontAfterDrag: () => import('../examples/BringToFrontAfterDrag'),

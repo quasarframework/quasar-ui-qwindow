@@ -112,6 +112,8 @@ TBD
 | width | [Number, String] | The starting width |
 | height | [Number, String] | The starting height |
 | actions | Array | The actions that can be applied to the QWindow<br>Values: ['pin', 'embedded', 'maximize', 'close', 'fullscreen']<br>Default:['pin', 'embedded', 'close']
+| no-move | Boolean | Restricts the ability to 'move' the QWindow. Moving can still be accomplished by resizing unless you restrict using the `resizable` property |
+| resizable | Array | Contains and array of resize handle names that are allowed<br>Default: [ 'top', 'left', 'right', 'bottom', 'top-left', 'top-right', 'bottom-left', 'bottom-right'] |
 | scroll-with-window | Boolean | When the document body is scrolled, the QWindow will scroll with it. Normal behavior is to "stay-in-place".<br>Default: false |
 | bring-to-front-after-drag | Boolean | Change z-index after drag/resize |
 | menu-func | Function | Allows the menu to me modified before being displayed |

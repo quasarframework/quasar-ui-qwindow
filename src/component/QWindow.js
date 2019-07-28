@@ -51,6 +51,21 @@ export default function (ssrContext) {
       fullscreen: Boolean,
       maximized: Boolean,
       minimized: Boolean,
+      noMove: Boolean,
+      noResize: Boolean,
+      resizable: {
+        type: Array,
+        default: () => [
+          'top',
+          'left',
+          'right',
+          'bottom',
+          'top-left',
+          'top-right',
+          'bottom-left',
+          'bottom-right'
+        ]
+      },
       scrollWithWindow: {
         type: Boolean,
         default: false
@@ -905,6 +920,11 @@ export default function (ssrContext) {
         console.error(`Unknown mode: ${mode}`)
       },
 
+      canResize (resizeHandle) {
+        const missing = this.handles.filter(handle => !this.resizable.includes(handle))
+        return missing.includes(resizeHandle) !== true
+      },
+
       // ------------------------------
       // private methods
       // ------------------------------
@@ -1329,6 +1349,9 @@ export default function (ssrContext) {
       },
 
       __renderGripper (h, resizeHandle) {
+        if (this.canResize(resizeHandle) === false) {
+          return ''
+        }
         let staticClass = 'gripper gripper-' + resizeHandle + (this.roundGrippers === true ? ' gripper-round' : '')
         return h('div', this.setBothColors(this.color, this.backgroundColor, {
           staticClass: staticClass,
@@ -1350,6 +1373,12 @@ export default function (ssrContext) {
       },
 
       __renderResizeHandle (h, resizeHandle, actionsWidth) {
+        if (this.noMove && resizeHandle === 'titlebar') {
+          return ''
+        }
+        if (resizeHandle !== 'titlebar' && this.canResize(resizeHandle) === false) {
+          return ''
+        }
         let staticClass = 'q-window__resize-handle ' + 'q-window__resize-handle--' + resizeHandle
         let width = this.computedWidth
         let style = {}

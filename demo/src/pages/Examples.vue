@@ -73,6 +73,17 @@ If you don't like the **grippers** you can hide them with the `hide-grippers` pr
       <example-card title="Hide Grippers" name="GripperNone" :tag-parts="getTagParts(require('!!raw-loader!../examples/GripperNone.vue').default)" />
       <example-card title="Round Grippers" name="GripperRound" :tag-parts="getTagParts(require('!!raw-loader!../examples/GripperRound.vue').default)" />
 
+      <example-card title="No Move" name="NoMove" :tag-parts="getTagParts(require('!!raw-loader!../examples/NoMove.vue').default)" />
+
+      <q-markdown>
+The `resizable` property allows you to turn on/off various resize handles. The acceptable array items are:
+```js
+[ 'top', 'left', 'right', 'bottom', 'top-left', 'top-right', 'bottom-left', 'bottom-right']
+```
+See the code in the examples below for details.
+      </q-markdown>
+      <example-card title="Resizable" name="Resizable" :tag-parts="getTagParts(require('!!raw-loader!../examples/Resizable.vue').default)" />
+
       <example-title title="Advanced" />
       <q-markdown>
 You can provide the action `close` in the array of actions. This will add a **Close** option to the menu. Essentually, the window is really hidden. It is up to the developer to provide a way for the QWindow to be re-displayed by setting the `v-model` (value) property.
@@ -241,7 +252,7 @@ export default {
 
     this.addToToc('Basic')
     this.addToToc('Embedded/Floating', 2)
-    this.addToToc('Fixed Position', 2)
+    this.addToToc('Scroll With Window', 2)
     this.addToToc('Dense', 2)
     this.addToToc('Actions', 2)
     this.addToToc('Color', 2)
@@ -249,6 +260,8 @@ export default {
     this.addToToc('Titlebar Style', 2)
     this.addToToc('Hide Grippers', 2)
     this.addToToc('Round Grippers', 2)
+    this.addToToc('No Move', 2)
+    this.addToToc('Resizable', 2)
 
     this.addToToc('Advanced')
     this.addToToc('Close Action', 2)
