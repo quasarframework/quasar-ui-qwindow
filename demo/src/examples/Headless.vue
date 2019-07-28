@@ -34,6 +34,8 @@
       v-model="visible"
       headless
       title="QWindow Actions"
+      :startX="100"
+      :startY="100"
       :height="150"
       :width="350"
       :actions="['embedded', 'pin', 'fullscreen']"
