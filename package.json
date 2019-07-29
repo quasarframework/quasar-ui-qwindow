@@ -35,6 +35,6 @@
     "path": "^0.12.7"
   },
   "dependencies": {
-    "quasar-mixin-colorize": "^1.0.0-alpha.5"
+    "quasar-mixin-colorize": "^1.0.0-alpha.6"
   }
 }
