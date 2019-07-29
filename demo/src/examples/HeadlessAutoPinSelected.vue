@@ -34,7 +34,7 @@
       v-model="visible"
       headless
       auto-pin
-      title="QWindow Wrap Up"
+      title="QWindow Headless/AutoPin Selected Styles"
       :startX="200"
       :startY="200"
       :height="150"
