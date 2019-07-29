@@ -248,6 +248,13 @@ Be aware, that for `headless` you probably don't wants to add actions that may i
 
       <example-card title="Headless" name="Headless" :tag-parts="getTagParts(require('!!raw-loader!../examples/Headless.vue').default)" />
 
+      <example-card title="Headless With AutoPin" name="HeadlessAutoPin" :tag-parts="getTagParts(require('!!raw-loader!../examples/HeadlessAutoPin.vue').default)" />
+
+      <q-markdown>
+The example below is **not** using any slot content. Try clicking on the window and then off the window while embedded and then when floating.
+      </q-markdown>
+
+      <example-card title="Headless/AutoPin Selected Styles" name="HeadlessAutoPinSelected" :tag-parts="getTagParts(require('!!raw-loader!../examples/HeadlessAutoPinSelected.vue').default)" />
     </div>
   </hero>
 </template>
@@ -303,6 +310,8 @@ export default {
     this.addToToc('Icons and Language', 2)
     this.addToToc('No Menu', 2)
     this.addToToc('Headless', 2)
+    this.addToToc('Headless With AutoPin', 2)
+    this.addToToc('Headless/AutoPin Selected Styles', 2)
 
     this.toc = this.tempToc
   },

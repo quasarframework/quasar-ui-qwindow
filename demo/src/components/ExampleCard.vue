@@ -90,7 +90,9 @@ export default {
     ComplexSlot: () => import('../examples/ComplexSlot'),
     IconsAndLanguage: () => import('../examples/IconsAndLanguage'),
     NoMenu: () => import('../examples/NoMenu'),
-    Headless: () => import('../examples/Headless')
+    Headless: () => import('../examples/Headless'),
+    HeadlessAutoPin: () => import('../examples/HeadlessAutoPin'),
+    HeadlessAutoPinSelected: () => import('../examples/HeadlessAutoPinSelected')
   },
 
   props: {
