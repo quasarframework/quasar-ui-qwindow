@@ -16,7 +16,7 @@
     </q-window>
     <q-window
       v-model="visible"
-      :resizable="['bottom-right', 'top', 'bottom', 'top-right', right]"
+      :resizable="['bottom-right', 'top', 'bottom', 'top-right', 'right']"
       title="QWindow No Resize Left"
       :height="150"
       :width="350"
