@@ -90,6 +90,17 @@ In the example below, you can play with the QWindow and get feedback on the mess
       </q-markdown>
       <example-card title="Messages" name="Messages" :tag-parts="getTagParts(require('!!raw-loader!../examples/Messages.vue').default)" />
 
+      <q-markdown>
+The `auto-pin` property allows you to automatically pin/unpin a floating QWindow depending on it's selected state.
+
+:::warning
+Clicking the menu on an unselected QWindow, the QWindow becomes selected and the menu will have to be clicked a second time.
+
+It is recommended to use `auto-pin` along with the `headless` property.
+:::
+      </q-markdown>
+      <example-card title="Auto Pin" name="AutoPin" :tag-parts="getTagParts(require('!!raw-loader!../examples/AutoPin.vue').default)" />
+
       <example-title title="Advanced" />
       <q-markdown>
 You can provide the action `close` in the array of actions. This will add a **Close** option to the menu. Essentually, the window is really hidden. It is up to the developer to provide a way for the QWindow to be re-displayed by setting the `v-model` (value) property.
@@ -281,6 +292,7 @@ export default {
     this.addToToc('No Move', 2)
     this.addToToc('Resizable', 2)
     this.addToToc('Messages', 2)
+    this.addToToc('Auto Pin', 2)
 
     this.addToToc('Advanced')
     this.addToToc('Close Action', 2)

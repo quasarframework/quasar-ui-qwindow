@@ -82,6 +82,7 @@ export default {
     NoMove: () => import('../examples/NoMove'),
     Resizable: () => import('../examples/Resizable'),
     Messages: () => import('../examples/Messages'),
+    AutoPin: () => import('../examples/AutoPin'),
     CloseAction: () => import('../examples/CloseAction'),
     ScrollArea: () => import('../examples/ScrollArea'),
     BringToFrontAfterDrag: () => import('../examples/BringToFrontAfterDrag'),

@@ -32,6 +32,13 @@ let defaultX = 20
 let defaultY = 20
 let layers = {}
 
+const getMousePosition = function (e, type = 'x') {
+  if (type === 'x') {
+    return e.pageX
+  }
+  return e.pageY
+}
+
 export default function (ssrContext) {
   return Vue.extend({
     name: 'q-window',
@@ -71,6 +78,7 @@ export default function (ssrContext) {
         type: Boolean,
         default: false
       },
+      autoPin: Boolean,
 
       disabled: Boolean,
       dense: Boolean,
@@ -154,6 +162,7 @@ export default function (ssrContext) {
         mouseOffsetY: -1,
         scrollX: 0,
         scrollY: 0,
+        selected: false,
         fullscreenInitiated: false,
         handles: [
           'top',
@@ -227,7 +236,12 @@ export default function (ssrContext) {
     },
 
     beforeDestroy () {
+      // just in case
+      this.fullscreenLeave()
+
       document.removeEventListener('scroll', this.onScroll, { passive: true })
+      document.body.removeEventListener('mousedown', this.onMouseDown, { passive: true })
+
       this.__destroyPortal()
     },
 
@@ -300,6 +314,7 @@ export default function (ssrContext) {
 
       // set up scroll handler
       document.addEventListener('scroll', this.onScroll, { passive: true })
+      document.body.addEventListener('mousedown', this.onMouseDown, { passive: true })
     },
 
     computed: {
@@ -308,6 +323,9 @@ export default function (ssrContext) {
       },
       isEmbedded () {
         return (this.stateInfo.embedded && this.stateInfo.embedded.state === true)
+      },
+      isFloating () {
+        return this.isEmbedded === false
       },
       isPinned () {
         return (this.stateInfo.pinned && this.stateInfo.pinned.state)
@@ -326,8 +344,16 @@ export default function (ssrContext) {
         return this.disabled === true
       },
 
+      isEnabled () {
+        return this.isDisabled === false
+      },
+
       isDragging () {
         return this.state.dragging === true
+      },
+
+      isSelected () {
+        return this.selected === true
       },
 
       canDrag () {
@@ -547,9 +573,11 @@ export default function (ssrContext) {
 
       classes () {
         return '' +
-          (this.isDisabled !== true ? ' q-focusable q-hoverable' : ' disabled') +
-          (this.isEmbedded !== true && this.isFullscreen !== true ? ' q-window__floating' : '') +
-          (this.isFullscreen === true ? ' q-window__fullscreen' : '')
+          (this.isEnabled === true ? ' q-focusable q-hoverable' : ' disabled') +
+          (this.isFloating === true && this.isFullscreen !== true ? ' q-window__floating' : '') +
+          (this.isFullscreen === true ? ' q-window__fullscreen' : '') +
+          (this.isSelected === true && this.isEmbedded !== true && this.isFullscreen !== true ? ' q-window__selected' : '') +
+          (this.isDragging === true ? ' q-window__dragging' : '')
       }
     },
 
@@ -562,6 +590,15 @@ export default function (ssrContext) {
           this.__updateStateInfo()
         },
         deep: true
+      },
+      selected (val) {
+        if (this.autoPin === true) {
+          if (val === true) {
+            this.unpin()
+          } else {
+            this.pin()
+          }
+        }
       },
       'stateInfo.visible.state' (val) {
         this.$emit('input', val)
@@ -1080,6 +1117,50 @@ export default function (ssrContext) {
         this.$nextTick(() => {
           this.$emit('position', this.computedPosition)
         })
+      },
+
+      onMouseDown (e) {
+        // we need to make sure if user clicks on grippers
+        // that the window does not become deselected
+        const gripperSize = 10 // from stylus
+
+        const oldSelected = this.selected
+        const x = getMousePosition(e, 'x')
+        const y = getMousePosition(e, 'y')
+        let left, top, width, height
+        // embedded
+        if (this.$el && this.$el.offsetParent) {
+          // determine if mousedown is within the bounds of this component
+          left = this.$el.offsetParent.offsetLeft + this.$el.offsetLeft
+          top = this.$el.offsetParent.offsetTop + this.$el.offsetTop
+          width = this.$el.offsetWidth
+          height = this.$el.offsetHeight
+        } else {
+          if (this.isEmbedded === false) {
+            const position = this.computedPosition
+            left = position.scrollX
+            top = position.scrollY
+            width = position.width
+            height = position.height
+          }
+        }
+        if (width <= 0 || height <= 0) return
+        if (this.noResize !== true) {
+          left -= gripperSize
+          top -= gripperSize
+          width += (gripperSize * 2)
+          height += (gripperSize * 2)
+        }
+        if (x >= left && x < left + width && y >= top && y < top + height) {
+          this.selected = true
+        } else {
+          this.selected = false
+        }
+        // emit 'selected' if it has changed
+        if (oldSelected !== this.selected) {
+          // console.log('selected', this.selected)
+          this.$emit('selected', this.selected)
+        }
       },
 
       onDrag (e, resizeHandle) {

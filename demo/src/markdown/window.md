@@ -114,6 +114,7 @@ TBD
 | actions | Array | The actions that can be applied to the QWindow<br>Values: ['pin', 'embedded', 'maximize', 'close', 'fullscreen']<br>Default:['pin', 'embedded', 'close'] |
 | no-move | Boolean | Restricts the ability to 'move' the QWindow. Moving can still be accomplished by resizing unless you restrict using the `resizable` property |
 | resizable | Array | Contains and array of resize handle names that are allowed<br>Default: [ 'top', 'left', 'right', 'bottom', 'top-left', 'top-right', 'bottom-left', 'bottom-right'] |
+| auto-pin | Boolean | QWindow will manage grippers depending on selected state |
 | scroll-with-window | Boolean | When the document body is scrolled, the QWindow will scroll with it. Normal behavior is to "stay-in-place".<br>Default: false |
 | bring-to-front-after-drag | Boolean | Change z-index after drag/resize |
 | menu-func | Function | Allows the menu to me modified before being displayed |
@@ -200,11 +201,12 @@ You do not need to include the `label` property unless you are:
 ## Vue Events
 | Vue Event | Args | Description |
 | --- | --- | --- |
-| @visible | Boolean | When the QWindow is displayed or hidden |
+| @input | Boolean | v-model; When the QWindow is displayed or hidden |
 | @embedded | Boolean | When the QWindow enters or leaves the embedded state |
 | @pinned | Boolean | When the QWindow enters or leaves the pinned state |
 | @maximize | Boolean | When the QWindow enters or leaves the maximize state |
 | @fullscreen | Boolean | When the QWindow enters or leaves the fullscreen state |
+| @selected | Boolean | When the QWindow is selected or not |
 | @position | Object | When the QWindow is moved or resized.<br>{ left, top, width, height, scrollX, scrollY } |
 
 
@@ -213,9 +215,11 @@ You do not need to include the `label` property unless you are:
 | --- | --- | --- |
 | isVisible | Boolean | true if the QWindow is currently visible, otherwise false |
 | isEmbedded | Boolean | true if the QWindow is currently embedded, otherwise false |
+| isFloating | Boolean | true if the QWindow is currently floating, otherwise false |
 | isPinned | Boolean | true if the QWindow is currently pinned, otherwise false |
 | isMaximized | Boolean | true if the QWindow is currently maximized, otherwise false |
 | isFullscreen | Boolean | true if the QWindow is currently fullscreen, otherwise false |
+| isSelected | Boolean | true if the QWindow is currently selected, otherwise false |
 | isDragging | Boolean | true if the QWindow is currently being moved or resized, otherwise false |
 | canDrag | Boolean | true if all criteria aligns that make the QWindow movable/resizable |
 | computedToolbarHeight | Number | The toolbar height |
