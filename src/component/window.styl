@@ -85,55 +85,64 @@ body
         left 0
         width 100%
         height 6px
-        cursor n-resize
+        &:hover
+          cursor n-resize
         &-left
           top -3px
           left -3px
           width 6px
           height 6px
-          cursor nw-resize
+          &:hover
+            cursor nw-resize
         &-right
           top -3px
           right -3px
           width 6px
           height 6px
-          cursor ne-resize
+          &:hover
+            cursor ne-resize
       &--right
         top 0
         right -3px
         width 6px
         height 100%
-        cursor e-resize
+        &:hover
+          cursor e-resize
       &--bottom
         bottom -3px
         left 0
         width 100%
         height 6px
-        cursor s-resize
+        &:hover
+          cursor s-resize
         &-left
           bottom -3px
           left -3px
           width 6px
           height 6px
-          cursor sw-resize
+          &:hover
+            cursor sw-resize
         &-right
           bottom -3px
           right -3px
           width 6px
           height 6px
-          cursor se-resize
+          &:hover
+            cursor se-resize
       &--left
           top 0
           left -3px
           width 6px
           height 100%
-          cursor w-resize
+          &:hover
+            cursor w-resize
       &--titlebar
         top 0
         left 0
         width 100%
         height 100%
-        cursor move
+        &:hover
+          cursor move
 
 .gripper
   position absolute
@@ -149,35 +158,43 @@ body
     top -($gripper-size)
     left 50%
     margin-left -($gripper-size)
-    cursor n-resize
+    &:hover
+      cursor n-resize
     &-left
       top -($gripper-size)
       left -($gripper-size)
-      cursor nw-resize
+      &:hover
+        cursor nw-resize
     &-right
       top -($gripper-size)
       right -($gripper-size)
-      cursor ne-resize
+      &:hover
+        cursor ne-resize
   &-left
     left -($gripper-size)
     top 50%
     margin-top -($gripper-size)
-    cursor w-resize
+    &:hover
+      cursor w-resize
   &-right
     right -($gripper-size)
     top 50%
     margin-top -($gripper-size)
-    cursor e-resize
+    &:hover
+      cursor e-resize
   &-bottom
     bottom -($gripper-size)
     left 50%
     margin-left -($gripper-size)
-    cursor s-resize
+    &:hover
+      cursor s-resize
     &-left
       bottom -($gripper-size)
       left -($gripper-size)
-      cursor sw-resize
+      &:hover
+        cursor sw-resize
     &-right
       bottom -($gripper-size)
       right -($gripper-size)
-      cursor se-resize
+      &:hover
+        cursor se-resize
