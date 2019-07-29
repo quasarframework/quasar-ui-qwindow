@@ -126,7 +126,8 @@ TBD
 | round-grippers | Boolean | Use round grippers instead of square |
 | color | String | This can be any CSS color value or Quasar color |
 | background-color | String | This can be any CSS color value or Quasar color |
-| border-width | String | This can be any CSS unit<br>Default: 1px |
+| gripper-color | This can be any CSS color value or Quasar color |
+| gripper-background-color | String | This can be any CSS color value | border-width | String | This can be any CSS unit<br>Default: 1px |
 | border-style | String | This can be any CSS border style<br>Default: solid |
 | titlebar-style | [String, Object, Array] | |
 | titlebar-class | [String, Object, Array] | |

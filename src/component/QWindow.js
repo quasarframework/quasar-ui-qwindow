@@ -83,6 +83,12 @@ export default function (ssrContext) {
       backgroundColor: {
         type: String
       },
+      gripperColor: {
+        type: String
+      },
+      gripperBackgroundColor: {
+        type: String
+      },
       borderWidth: {
         type: String,
         default: '1px'
@@ -1181,17 +1187,11 @@ export default function (ssrContext) {
       },
 
       onDragStart (e, resizeHandle) {
-        if (this.$q.platform.is.mobile !== true) {
-          // needed for desktops
-          // prevent(e)
-        }
         if (e.dataTransfer && e.dataTransfer.effectAllowed) {
           e.dataTransfer.effectAllowed = 'none'
         }
 
         if (this.$q.platform.is.mobile === true) {
-          // pull-to-refresh happens when the document's
-          // Y offset is zero
           this.lastTouchY = e.touches[0].clientY
 
           this.mouseOffsetX = e.touches[0].clientX - this.state.left
@@ -1365,7 +1365,7 @@ export default function (ssrContext) {
           return ''
         }
         let staticClass = 'gripper gripper-' + resizeHandle + (this.roundGrippers === true ? ' gripper-round' : '')
-        return h('div', this.setBothColors(this.color, this.backgroundColor, {
+        return h('div', this.setBothColors(this.gripperColor, this.gripperBackgroundColor, {
           staticClass: staticClass,
           attrs: {
             draggable: this.canDrag
@@ -1394,7 +1394,7 @@ export default function (ssrContext) {
         let staticClass = 'q-window__resize-handle ' + 'q-window__resize-handle--' + resizeHandle
         let width = this.computedWidth
         let style = {}
-        if (actionsWidth && this.canDrag === true) {
+        if (actionsWidth && actionsWidth > 0 && this.canDrag === true) {
           width -= actionsWidth
           style.width = width + 'px'
         }

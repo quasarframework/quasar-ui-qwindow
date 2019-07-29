@@ -72,6 +72,7 @@ If you don't like the **grippers** you can hide them with the `hide-grippers` pr
 
       <example-card title="Hide Grippers" name="GripperNone" :tag-parts="getTagParts(require('!!raw-loader!../examples/GripperNone.vue').default)" />
       <example-card title="Round Grippers" name="GripperRound" :tag-parts="getTagParts(require('!!raw-loader!../examples/GripperRound.vue').default)" />
+      <example-card title="Colored Grippers" name="GripperColored" :tag-parts="getTagParts(require('!!raw-loader!../examples/GripperColored.vue').default)" />
 
       <example-card title="No Move" name="NoMove" :tag-parts="getTagParts(require('!!raw-loader!../examples/NoMove.vue').default)" />
 
@@ -276,6 +277,7 @@ export default {
     this.addToToc('Titlebar Style', 2)
     this.addToToc('Hide Grippers', 2)
     this.addToToc('Round Grippers', 2)
+    this.addToToc('Colored Grippers', 2)
     this.addToToc('No Move', 2)
     this.addToToc('Resizable', 2)
     this.addToToc('Messages', 2)
