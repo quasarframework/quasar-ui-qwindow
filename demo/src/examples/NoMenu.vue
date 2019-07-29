@@ -33,7 +33,7 @@
       ref="window"
       v-model="visible"
       no-menu
-      title="QWindow Actions"
+      title="QWindow No Menu"
       :startX="100"
       :startY="100"
       :height="150"

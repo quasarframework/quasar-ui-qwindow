@@ -33,7 +33,7 @@
       ref="window"
       v-model="visible"
       headless
-      title="QWindow Actions"
+      title="QWindow Headless"
       :startX="100"
       :startY="100"
       :height="150"

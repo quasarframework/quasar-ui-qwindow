@@ -2,7 +2,9 @@
   <div>
     <q-window
       v-model="visible"
-      title="QWindow Actions"
+      title="QWindow Messages"
+      :startX="100"
+      :startY="100"
       :height="150"
       :width="350"
       :actions="['embedded', 'pin', 'maximize', 'fullscreen']"
@@ -13,6 +15,7 @@
       @pinned="v => messages.unshift(`pinned(${v})`)"
       @maximize="v => messages.unshift(`maximize(${v})`)"
       @fullscreen="v => messages.unshift(`fullscreen(${v})`)"
+      @selected="v => messages.unshift(`selected(${v})`)"
       @position="v => messages.unshift(`position(${JSON.stringify(v)})`)"
     >
       <div class="q-pa-md fit">

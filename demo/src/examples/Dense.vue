@@ -2,7 +2,7 @@
   <div>
     <q-window
       v-model="visible"
-      title="QWindow Basic"
+      title="QWindow Dense"
       dense
       :height="150"
       :width="350"
