@@ -1,8 +1,8 @@
 {
-  "name": "demo",
+  "name": "quasar-app-extension-qwindow",
   "version": "0.0.1",
   "description": "QWindow App Extension for Quasar",
-  "productName": "QWindow docs/demo",
+  "productName": "QWindow docs, examples and demo site",
   "cordovaId": "org.cordova.quasar.app",
   "author": "Jeff Galbraith <jeff@quasar.dev>",
   "private": true,

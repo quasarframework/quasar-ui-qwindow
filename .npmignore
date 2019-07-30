@@ -6,5 +6,8 @@ yarn-debug.log*
 yarn-error.log*
 .editorconfig
 .eslintrc.js
+.eslintignore
+_redirects
+.github
 yarn.lock
 _redirects
