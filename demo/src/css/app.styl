@@ -1,4 +1,8 @@
 // app global css
+
+$fgColor ?= #272F59
+$bgColor ?= #B49FBF
+
 .qribbon__container
   position relative
 
@@ -82,8 +86,8 @@ a
 .page-header
   color #fff
   text-align center
-  background-color #B49FBF
-  background-image linear-gradient(120deg, #B49FBF, #272F59)
+  background-color $bgColor
+  background-image linear-gradient(120deg, $bgColor, $fgColor)
 
 @media screen and (min-width 64em)
   .page-header
