@@ -406,7 +406,7 @@ export default function (ssrContext) {
       },
 
       computedScrollY () {
-        return this.state.top + (this.scrollWithWindow === false ? this.scrollY : 0)
+        return this.computedTop + (this.scrollWithWindow === false ? this.scrollY : 0)
       },
 
       computedZIndex () {
@@ -1078,6 +1078,9 @@ export default function (ssrContext) {
         this.state.left = 0
         this.state.bottom = this.$q.screen.height
         this.state.right = this.$q.screen.width
+        this.$nextTick(() => {
+          this.$emit('position', this.computedPosition)
+        })
       },
 
       __setMinimizePosition () {
@@ -1109,6 +1112,9 @@ export default function (ssrContext) {
         this.__setStateInfo('embedded', this.restoreState.embedded)
         this.__setStateInfo('maximize', this.restoreState.maximixe)
         this.__setStateInfo('minimize', this.restoreState.minimize)
+        this.$nextTick(() => {
+          this.$emit('position', this.computedPosition)
+        })
       },
 
       onScroll (e) {
@@ -1205,27 +1211,35 @@ export default function (ssrContext) {
         switch (resizeHandle) {
           case 'top':
             this.state.top = clientY - offsetTop
-            if (this.computedHeight < this.state.minHeight) {
-              this.state.top = tmpBottom - this.state.minHeight
-            }
+            this.$nextTick(() => {
+              if (this.computedHeight < this.state.minHeight) {
+                this.state.top = tmpBottom - this.state.minHeight
+              }
+            })
             break
           case 'left':
             this.state.left = clientX - offsetLeft
-            if (this.computedWidth < this.state.minWidth) {
-              this.state.left = tmpRight - this.state.minWidth
-            }
+            this.$nextTick(() => {
+              if (this.computedWidth < this.state.minWidth) {
+                this.state.left = tmpRight - this.state.minWidth
+              }
+            })
             break
           case 'right':
             this.state.right = clientX - offsetLeft
-            if (this.computedWidth < this.state.minWidth) {
-              this.state.right = tmpLeft - this.state.minWidth
-            }
+            this.$nextTick(() => {
+              if (this.computedWidth < this.state.minWidth) {
+                this.state.right = tmpLeft - this.state.minWidth
+              }
+            })
             break
           case 'bottom':
             this.state.bottom = clientY - offsetTop
-            if (this.computedHeight < this.state.minHeight) {
-              this.state.bottom = tmpTop - this.state.minHeight
-            }
+            this.$nextTick(() => {
+              if (this.computedHeight < this.state.minHeight) {
+                this.state.bottom = tmpTop - this.state.minHeight
+              }
+            })
             break
           case 'top-left':
             this.onDrag(e, 'top')
