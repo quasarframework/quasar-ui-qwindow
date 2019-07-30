@@ -30,7 +30,8 @@ Floating windows use a Vue Portal and while developing, the HMR is unable to re-
       <example-title title="Basic" />
       <example-card title="Embedded/Floating" name="Basic" :tag-parts="getTagParts(require('!!raw-loader!../examples/Basic.vue').default)" />
 
-      <q-markdown>
+      <example-card title="Scroll With Window" name="ScrollWithWindow" :tag-parts="getTagParts(require('!!raw-loader!../examples/ScrollWithWindow.vue').default)">
+        <q-markdown>
 You might have noticed on the previous example, when the QWindow is floating, when you scroll the document, the QWindow stays in-place.
 
 To prevent the in-place and scroll with the document, use the `scroll-with-window` property.
@@ -38,13 +39,13 @@ To prevent the in-place and scroll with the document, use the `scroll-with-windo
 If you make this window `floating`, you will have to scroll up to see it. It's position is now relative to the document and not to the view port.
 
 Make sure to `embed` the `floating` window before moving on to the next example.
-      </q-markdown>
-
-      <example-card title="Scroll With Window" name="ScrollWithWindow" :tag-parts="getTagParts(require('!!raw-loader!../examples/ScrollWithWindow.vue').default)" />
+        </q-markdown>
+      </example-card>
 
       <example-card title="Dense" name="Dense" :tag-parts="getTagParts(require('!!raw-loader!../examples/Dense.vue').default)" />
 
-      <q-markdown>
+      <example-card title="Actions" name="Actions" :tag-parts="getTagParts(require('!!raw-loader!../examples/Actions.vue').default)">
+        <q-markdown>
 Actions allow the window to be in different states.
 
 The available actions are:
@@ -59,38 +60,42 @@ All of the actions are self-explanatory, except for `pinned`. When a QWindow is 
 In the example below, we will use all actions, except for `close` which will be discussed in a later example.
 
 `float` the example window to see the actions in the menu.
-      </q-markdown>
+        </q-markdown>
+      </example-card>
 
-      <example-card title="Actions" name="Actions" :tag-parts="getTagParts(require('!!raw-loader!../examples/Actions.vue').default)" />
       <example-card title="Color" name="Color" :tag-parts="getTagParts(require('!!raw-loader!../examples/Color.vue').default)" />
       <example-card title="Border" name="Border" :tag-parts="getTagParts(require('!!raw-loader!../examples/Border.vue').default)" />
       <example-card title="Titlebar Style" name="TitlebarStyle" :tag-parts="getTagParts(require('!!raw-loader!../examples/TitlebarStyle.vue').default)" />
 
-      <q-markdown>
+      <example-card title="Hide Grippers" name="GripperNone" :tag-parts="getTagParts(require('!!raw-loader!../examples/GripperNone.vue').default)">
+        <q-markdown>
 If you don't like the **grippers** you can hide them with the `hide-grippers` property. In this case, there will be invisible bars running on the sides, as well as all corners that allow for resizing. Hover the mouse over these areas to see the cursor change.
-      </q-markdown>
+        </q-markdown>
+      </example-card>
 
-      <example-card title="Hide Grippers" name="GripperNone" :tag-parts="getTagParts(require('!!raw-loader!../examples/GripperNone.vue').default)" />
       <example-card title="Round Grippers" name="GripperRound" :tag-parts="getTagParts(require('!!raw-loader!../examples/GripperRound.vue').default)" />
       <example-card title="Colored Grippers" name="GripperColored" :tag-parts="getTagParts(require('!!raw-loader!../examples/GripperColored.vue').default)" />
 
       <example-card title="No Move" name="NoMove" :tag-parts="getTagParts(require('!!raw-loader!../examples/NoMove.vue').default)" />
 
-      <q-markdown>
+      <example-card title="Resizable" name="Resizable" :tag-parts="getTagParts(require('!!raw-loader!../examples/Resizable.vue').default)">
+        <q-markdown>
 The `resizable` property allows you to turn on/off various resize handles. The acceptable array items are:
 ```js
 [ 'top', 'left', 'right', 'bottom', 'top-left', 'top-right', 'bottom-left', 'bottom-right']
 ```
 See the code in the examples below for details.
-      </q-markdown>
-      <example-card title="Resizable" name="Resizable" :tag-parts="getTagParts(require('!!raw-loader!../examples/Resizable.vue').default)" />
+        </q-markdown>
+      </example-card>
 
-      <q-markdown>
-In the example below, you can play with the QWindow and get feedback on the messages that are emitted. The `position` message is always for a non-embedded window and will emit when a QWindow is moved, resized or the document is scrolled.
-      </q-markdown>
-      <example-card title="Messages" name="Messages" :tag-parts="getTagParts(require('!!raw-loader!../examples/Messages.vue').default)" />
+      <example-card title="Messages" name="Messages" :tag-parts="getTagParts(require('!!raw-loader!../examples/Messages.vue').default)">
+        <q-markdown>
+You can play with the QWindow and get feedback on the messages that are emitted. The `position` message is always for a non-embedded window and will emit when a QWindow is moved, resized or the document is scrolled.
+        </q-markdown>
+      </example-card>
 
-      <q-markdown>
+      <example-card title="Auto Pin" name="AutoPin" :tag-parts="getTagParts(require('!!raw-loader!../examples/AutoPin.vue').default)">
+        <q-markdown>
 The `auto-pin` property allows you to automatically pin/unpin a floating QWindow depending on it's selected state.
 
 :::warning
@@ -98,29 +103,33 @@ Clicking the menu on an unselected QWindow, the QWindow becomes selected and the
 
 It is recommended to use `auto-pin` along with the `headless` property.
 :::
-      </q-markdown>
-      <example-card title="Auto Pin" name="AutoPin" :tag-parts="getTagParts(require('!!raw-loader!../examples/AutoPin.vue').default)" />
+        </q-markdown>
+      </example-card>
 
       <example-title title="Advanced" />
-      <q-markdown>
+
+      <example-card title="Close Action" name="CloseAction" :tag-parts="getTagParts(require('!!raw-loader!../examples/CloseAction.vue').default)">
+        <q-markdown>
 You can provide the action `close` in the array of actions. This will add a **Close** option to the menu. Essentually, the window is really hidden. It is up to the developer to provide a way for the QWindow to be re-displayed by setting the `v-model` (value) property.
-      </q-markdown>
+        </q-markdown>
+      </example-card>
 
-      <example-card title="Close Action" name="CloseAction" :tag-parts="getTagParts(require('!!raw-loader!../examples/CloseAction.vue').default)" />
-
-      <q-markdown>
+      <example-card title="Scroll Area" name="ScrollArea" :tag-parts="getTagParts(require('!!raw-loader!../examples/ScrollArea.vue').default)">
+        <q-markdown>
 The example below is just showing more content in the default slot.
-      </q-markdown>
+        </q-markdown>
+      </example-card>
 
-      <example-card title="Scroll Area" name="ScrollArea" :tag-parts="getTagParts(require('!!raw-loader!../examples/ScrollArea.vue').default)" />
-      <q-markdown>
+      <example-card title="Bring to Front After Drag" name="BringToFrontAfterDrag" :tag-parts="getTagParts(require('!!raw-loader!../examples/BringToFrontAfterDrag.vue').default)">
+        <q-markdown>
 One situation you may run into is when there is more than one QWindow components being displayed and they overlap each other. In this case, there may be no way easy to change their `z-index`. To resolve this, you can use the `bring-to-front-after-drag` property. The QWindow that is last dragged (or resized) will be moved to the top.
 
 In the example below, you will need to float both QWindows to see this in action.
-      </q-markdown>
-      <example-card title="Bring to Front After Drag" name="BringToFrontAfterDrag" :tag-parts="getTagParts(require('!!raw-loader!../examples/BringToFrontAfterDrag.vue').default)" />
+        </q-markdown>
+      </example-card>
 
-      <q-markdown>
+      <example-card title="Modify Menu" name="ModifyMenu" :tag-parts="getTagParts(require('!!raw-loader!../examples/ModifyMenu.vue').default)">
+        <q-markdown>
 There is opportunity to modify the displayed menu just before it is displayed. In the example below, two functions are added: `Bring to Front` and `Send to Back` where the appropriate functionality will be called.
 
 You can add to the menu the text `separator` which will put a separator between items. Other than that, the rest of the items must be objects that look like this:
@@ -145,16 +154,17 @@ When `state` is `true`, then the `on` object will be used, otherwise the `off` o
 In the example below, menu items are added only if the QWindow is floating. Use the menu to change the `z-order` manually.
 
 Additionally, one other menu item is being added that you can try out: `Center Window`.
-      </q-markdown>
-      <example-card title="Modify Menu" name="ModifyMenu" :tag-parts="getTagParts(require('!!raw-loader!../examples/ModifyMenu.vue').default)" />
+        </q-markdown>
+      </example-card>
 
-      <q-markdown>
+      <example-card title="Complex Slot" name="ComplexSlot" :tag-parts="getTagParts(require('!!raw-loader!../examples/ComplexSlot.vue').default)">
+        <q-markdown>
 The example below is using the default scoped slot. When this is done, data (an object) is passed into the scoped slot that contains the current `zIndex`. Usining this information, it is used to control the `z-order` of the `QDrawer` components, so when in fullscreen mode, they are properly displayed.
-      </q-markdown>
+        </q-markdown>
+      </example-card>
 
-      <example-card title="Complex Slot" name="ComplexSlot" :tag-parts="getTagParts(require('!!raw-loader!../examples/ComplexSlot.vue').default)" />
-
-      <q-markdown>
+      <example-card title="Icons and Language" name="IconsAndLanguage" :tag-parts="getTagParts(require('!!raw-loader!../examples/IconsAndLanguage.vue').default)">
+        <q-markdown>
 QWindow uses `Material Design` icons and the English language as defaults. If you wish to change either of these, you can use the `icon-set` property.
 
 It looks like this:
@@ -221,11 +231,11 @@ You do not need to include the `label` property unless you are:
 The example below uses the `icon-set` property to change the icons to use `Fontawesome-v5` and also changes all the text (still in English, but you get the point).
 
 It is also using the `start-x` and `start-y` properties.
-      </q-markdown>
+        </q-markdown>
+      </example-card>
 
-      <example-card title="Icons and Language" name="IconsAndLanguage" :tag-parts="getTagParts(require('!!raw-loader!../examples/IconsAndLanguage.vue').default)" />
-
-      <q-markdown>
+      <example-card title="No Menu" name="NoMenu" :tag-parts="getTagParts(require('!!raw-loader!../examples/NoMenu.vue').default)">
+        <q-markdown>
 Using the `no-menu` property means the titlebar will not draw the menu, which means you have to provide the functionality yourself.
 
 In the example below, we are using a button that when clicked retrieves the `computedMenuData` from QWindow so it can be displayed. We have to do this before the QMenu is displayed, so we can control that via the `showMenu` data attribute.
@@ -233,10 +243,11 @@ In the example below, we are using a button that when clicked retrieves the `com
 Just to re-iterate, all state handling must be driven from outside of QWindow, but QWindow makes it very easy for you by providing all the necessary data and functions to do so.
 
 Be aware, that for `no-menu` you probably don't wants to add actions that may impede the user, like `maximize` or `fullscreen`. In the example below, `fullscreen` is still being allowed because most browsers have a hotkey (F11 in Chrome) to toggle fullscreen or by pressing the ESC key.
-      </q-markdown>
-      <example-card title="No Menu" name="NoMenu" :tag-parts="getTagParts(require('!!raw-loader!../examples/NoMenu.vue').default)" />
+        </q-markdown>
+      </example-card>
 
-      <q-markdown>
+      <example-card title="Headless" name="Headless" :tag-parts="getTagParts(require('!!raw-loader!../examples/Headless.vue').default)">
+        <q-markdown>
 Using the `headless` property means the titlebar will not be drawn, therefore there will be no menu drawn, which means you have to provide the functionality yourself.
 
 In the example below, we are using a button that when clicked retrieves the `computedMenuData` from QWindow so it can be displayed. We have to do this before the QMenu is displayed, so we can control that via the `showMenu` data attribute.
@@ -244,17 +255,17 @@ In the example below, we are using a button that when clicked retrieves the `com
 Just to re-iterate, all state handling must be driven from outside of QWindow, but QWindow makes it very easy for you by providing all the necessary data and functions to do so.
 
 Be aware, that for `headless` you probably don't wants to add actions that may impede the user, like `maximize` or `fullscreen`. In the example below, `fullscreen` is still being allowed because most browsers have a hotkey (F11 in Chrome) to toggle fullscreen or by pressing the ESC key.
-      </q-markdown>
-
-      <example-card title="Headless" name="Headless" :tag-parts="getTagParts(require('!!raw-loader!../examples/Headless.vue').default)" />
+        </q-markdown>
+      </example-card>
 
       <example-card title="Headless With AutoPin" name="HeadlessAutoPin" :tag-parts="getTagParts(require('!!raw-loader!../examples/HeadlessAutoPin.vue').default)" />
 
-      <q-markdown>
+      <example-card title="Headless/AutoPin Selected Styles" name="HeadlessAutoPinSelected" :tag-parts="getTagParts(require('!!raw-loader!../examples/HeadlessAutoPinSelected.vue').default)">
+        <q-markdown>
 The example below is **not** using any slot content. Try clicking on the window and then off the window while embedded and then when floating.
-      </q-markdown>
+        </q-markdown>
+      </example-card>
 
-      <example-card title="Headless/AutoPin Selected Styles" name="HeadlessAutoPinSelected" :tag-parts="getTagParts(require('!!raw-loader!../examples/HeadlessAutoPinSelected.vue').default)" />
     </div>
   </hero>
 </template>
