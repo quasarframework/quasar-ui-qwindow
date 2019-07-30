@@ -1208,6 +1208,8 @@ export default function (ssrContext) {
         } else {
           clientY = e.clientY
           clientX = e.clientX
+          pageY = e.pageY
+          pageX = e.pageX
         }
 
         switch (resizeHandle) {
@@ -1269,8 +1271,13 @@ export default function (ssrContext) {
                 this.state.left = clientX - this.mouseOffsetX
               }
             } else {
-              this.state.top = clientY - grandOffsetTop - this.mouseOffsetY
-              this.state.left = clientX - grandOffsetLeft - this.mouseOffsetX
+              if (this.scrollWithWindow === true) {
+                this.state.top = clientY - this.mouseOffsetY + window.pageYOffset
+                this.state.left = clientX - this.mouseOffsetX + window.pageXOffset
+              } else {
+                this.state.top = clientY - grandOffsetTop - this.mouseOffsetY
+                this.state.left = clientX - grandOffsetLeft - this.mouseOffsetX
+              }
             }
             this.state.bottom = this.state.top + tmpHeight
             this.state.right = this.state.left + tmpWidth
@@ -1310,8 +1317,13 @@ export default function (ssrContext) {
             this.mouseOffsetY = e.touches[0].clientY - this.state.top
           }
         } else {
-          this.mouseOffsetX = e.offsetX
-          this.mouseOffsetY = e.offsetY
+          if (this.scrollWithWindow === true) {
+            this.mouseOffsetX = e.pageX - this.state.left
+            this.mouseOffsetY = e.pageY - this.state.top
+          } else {
+            this.mouseOffsetX = e.offsetX
+            this.mouseOffsetY = e.offsetY
+          }
         }
         this.state.dragging = true
       },
