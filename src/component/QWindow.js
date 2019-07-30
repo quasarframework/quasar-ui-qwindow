@@ -1262,18 +1262,13 @@ export default function (ssrContext) {
             this.onDrag(e, 'right')
             break
           case 'titlebar':
-            if (this.$q.platform.is.mobile === true) {
-              if (this.scrollWithWindow === true) {
-                this.state.top = clientY - this.mouseOffsetY + window.pageYOffset
-                this.state.left = clientX - this.mouseOffsetX + window.pageXOffset
-              } else {
+            if (this.scrollWithWindow === true) {
+              this.state.top = clientY - this.mouseOffsetY + window.pageYOffset
+              this.state.left = clientX - this.mouseOffsetX + window.pageXOffset
+            } else {
+              if (this.$q.platform.is.mobile === true) {
                 this.state.top = clientY - this.mouseOffsetY
                 this.state.left = clientX - this.mouseOffsetX
-              }
-            } else {
-              if (this.scrollWithWindow === true) {
-                this.state.top = clientY - this.mouseOffsetY + window.pageYOffset
-                this.state.left = clientX - this.mouseOffsetX + window.pageXOffset
               } else {
                 this.state.top = clientY - grandOffsetTop - this.mouseOffsetY
                 this.state.left = clientX - grandOffsetLeft - this.mouseOffsetX
