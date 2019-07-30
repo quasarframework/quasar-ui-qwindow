@@ -1532,7 +1532,7 @@ export default function (ssrContext) {
 
       __render (h) {
         // get stateInfo for each menu item
-        let menuData = this.computedMenuData
+        let menuData = [ ...this.computedMenuData ]
 
         return h('div', this.setBothColors(this.color, this.backgroundColor, {
           staticClass: 'q-window ' + this.classes,
