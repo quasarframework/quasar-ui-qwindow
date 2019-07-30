@@ -530,6 +530,7 @@ export default function (ssrContext) {
           (this.hideToolbarDivider !== true ? ' q-window__titlebar--divider' : '') +
           (this.dense === true ? ' q-window__titlebar--dense' : '') +
           (this.isEmbedded !== true && this.isMinimized !== true ? ' absolute' : '') +
+          (this.isDragging === true ? ' q-window__touch-action' : '') +
           ' row justify-between items-center'
         return staticClass
       },
@@ -577,7 +578,7 @@ export default function (ssrContext) {
           (this.isFloating === true && this.isFullscreen !== true ? ' q-window__floating' : '') +
           (this.isFullscreen === true ? ' q-window__fullscreen' : '') +
           (this.isSelected === true && this.isEmbedded !== true && this.isFullscreen !== true ? ' q-window__selected' : '') +
-          (this.isDragging === true ? ' q-window__dragging' : '')
+          (this.isDragging === true ? ' q-window__dragging q-window__touch-action' : '')
       }
     },
 
@@ -1197,12 +1198,13 @@ export default function (ssrContext) {
         const grandOffsetTop = grandparent.offsetTop
         const grandOffsetLeft = grandparent.offsetLeft
 
-        let clientY = ''
-        let clientX = ''
+        let clientY, clientX, pageY, pageX
 
         if (this.$q.platform.is.mobile === true) {
           clientY = e.touches[0].clientY
           clientX = e.touches[0].clientX
+          pageY = e.touches[0].pageY
+          pageX = e.touches[0].pageX
         } else {
           clientY = e.clientY
           clientX = e.clientX
@@ -1258,8 +1260,18 @@ export default function (ssrContext) {
             this.onDrag(e, 'right')
             break
           case 'titlebar':
-            this.state.top = clientY - grandOffsetTop - this.mouseOffsetY
-            this.state.left = clientX - grandOffsetLeft - this.mouseOffsetX
+            if (this.$q.platform.is.mobile === true) {
+              if (this.scrollWithWindow === true) {
+                this.state.top = clientY - this.mouseOffsetY + window.pageYOffset
+                this.state.left = clientX - this.mouseOffsetX + window.pageXOffset
+              } else {
+                this.state.top = clientY - this.mouseOffsetY
+                this.state.left = clientX - this.mouseOffsetX
+              }
+            } else {
+              this.state.top = clientY - grandOffsetTop - this.mouseOffsetY
+              this.state.left = clientX - grandOffsetLeft - this.mouseOffsetX
+            }
             this.state.bottom = this.state.top + tmpHeight
             this.state.right = this.state.left + tmpWidth
             break
@@ -1267,7 +1279,8 @@ export default function (ssrContext) {
       },
 
       onTouchMove (e, resizeHandle) {
-        let touchY = e.touches[0].clientY
+        prevent(e)
+        let touchY = e.touches[0].pageY
         let touchYDelta = touchY - this.lastTouchY
         if (window.pageYOffset === 0) {
           // to supress pull-to-refresh preventDefault
@@ -1289,8 +1302,13 @@ export default function (ssrContext) {
         if (this.$q.platform.is.mobile === true) {
           this.lastTouchY = e.touches[0].clientY
 
-          this.mouseOffsetX = e.touches[0].clientX - this.state.left
-          this.mouseOffsetY = e.touches[0].clientY - this.state.top
+          if (this.scrollWithWindow === true) {
+            this.mouseOffsetX = e.touches[0].pageX - this.state.left
+            this.mouseOffsetY = e.touches[0].pageY - this.state.top
+          } else {
+            this.mouseOffsetX = e.touches[0].clientX - this.state.left
+            this.mouseOffsetY = e.touches[0].clientY - this.state.top
+          }
         } else {
           this.mouseOffsetX = e.offsetX
           this.mouseOffsetY = e.offsetY
@@ -1299,6 +1317,8 @@ export default function (ssrContext) {
       },
 
       onTouchStart (e, resizeHandle) {
+        // prevent(e)
+        e.preventDefault()
         this.onDragStart(e, resizeHandle)
       },
 
@@ -1326,6 +1346,7 @@ export default function (ssrContext) {
       },
 
       onTouchEnd (e, resizeHandle) {
+        prevent(e)
         this.onDragEnd(e, resizeHandle)
       },
 
