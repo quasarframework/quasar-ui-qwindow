@@ -1442,7 +1442,7 @@ export default function (ssrContext) {
         }
 
         return h(QBtn, {
-          staticClass: 'q-window__titlebar--action-item',
+          staticClass: 'q-window__titlebar--actions',
           props: {
             flat: true,
             round: true,

@@ -25,7 +25,7 @@ body
     box-shadow none
 
   &__floating
-    box-shadow 1px 1px 7px 1px rgba(0,0,0,.2)
+    box-shadow $box-shadow
 
   &__fullscreen
     position fixed !important
@@ -41,7 +41,7 @@ body
     display flex
     flex-wrap: nowrap;
     overflow hidden
-    padding 2px 0 2px 8px
+    padding $titlebar-padding
     width 100%
     box-sizing border-box
     white-space nowrap
@@ -63,9 +63,6 @@ body
       font-size 1rem
 
     &--actions
-      color currentColor
-
-    &--action-item
       padding 2px 4px
 
   &__body
@@ -74,7 +71,7 @@ body
 
   &__selected
     border-color rgba(0,0,0,.2)
-    box-shadow 1px 1px 7px 1px rgba(0,0,0,.2)
+    box-shadow $box-shadow
 
   &__resize
     &-handle
@@ -154,10 +151,10 @@ body
   position absolute
   width $gripper-size
   height $gripper-size
-  background-color #ffffff
-  border 1px solid #000000
+  background-color $gripper-background-color
+  border $gripper-border
   &:hover
-    background-color #000000!important
+    background-color $gripper-hover-background-color
   &-round
     border-radius 50%
   &-top
