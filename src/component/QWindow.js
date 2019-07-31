@@ -1479,7 +1479,7 @@ export default function (ssrContext) {
           titlebarSlot === void 0 ? this.__renderMoreButton(h, menuData) : '',
           titlebarSlot !== void 0 ? titlebarSlot(menuData) : '',
           (this.canDrag === true) &&
-            this.__renderResizeHandle(h, 'titlebar', this.noMenu ? 0 : 44) // width of more button
+            this.__renderResizeHandle(h, 'titlebar', this.noMenu ? 0 : 35) // width of more button
         ])
       },
 
