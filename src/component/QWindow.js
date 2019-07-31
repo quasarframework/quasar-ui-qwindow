@@ -1613,7 +1613,12 @@ export default function (ssrContext) {
 
       __showPortal () {
         if (this.__portal !== void 0 && this.__portal.showing !== true) {
-          document.body.appendChild(this.__portal.$el)
+          let app = document.getElementById('q-app')
+          if (app) {
+            app.appendChild(this.__portal.$el)
+          } else {
+            document.body.appendChild(this.__portal.$el)
+          }
           this.__portal.showing = true
         }
       },
