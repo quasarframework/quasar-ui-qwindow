@@ -1198,18 +1198,18 @@ export default function (ssrContext) {
         const grandOffsetTop = grandparent.offsetTop
         const grandOffsetLeft = grandparent.offsetLeft
 
-        let clientY, clientX, pageY, pageX
+        let clientY, clientX //, pageY, pageX
 
         if (this.$q.platform.is.mobile === true) {
           clientY = e.touches[0].clientY
           clientX = e.touches[0].clientX
-          pageY = e.touches[0].pageY
-          pageX = e.touches[0].pageX
+          // pageY = e.touches[0].pageY
+          // pageX = e.touches[0].pageX
         } else {
           clientY = e.clientY
           clientX = e.clientX
-          pageY = e.pageY
-          pageX = e.pageX
+          // pageY = e.pageY
+          // pageX = e.pageX
         }
 
         switch (resizeHandle) {
