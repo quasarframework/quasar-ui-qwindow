@@ -6391,17 +6391,17 @@ quasar-app-extension-qautomate@^1.0.0-alpha.5:
 "quasar-app-extension-qwindow@file:..":
   version "1.0.0-alpha.1"
   dependencies:
-    quasar-mixin-colorize "^1.0.0-alpha.5"
+    quasar-mixin-colorize "^1.0.0-alpha.6"
 
 quasar-mixin-colorize@^1.0.0-alpha.4:
   version "1.0.0-alpha.4"
   resolved "https://registry.yarnpkg.com/quasar-mixin-colorize/-/quasar-mixin-colorize-1.0.0-alpha.4.tgz#94dfcf13e05fc99599e8937c4308e398d4b56d10"
   integrity sha512-ZTR4RTHaxEdrbyyV3CAJm7AZNoctB7xtoH5mZq9a+nenFFUZ1mYU5svuy7zBmtjQFsv0h7qU2uTOCpd1KRUVBg==
 
-quasar-mixin-colorize@^1.0.0-alpha.5:
-  version "1.0.0-alpha.5"
-  resolved "https://registry.yarnpkg.com/quasar-mixin-colorize/-/quasar-mixin-colorize-1.0.0-alpha.5.tgz#fa271f488e23b918bc862e2a98ec7c35c26faadc"
-  integrity sha512-yuQg0qCBBRDJWSwdTz36aTWdVgIgTVg5ovI6XwWENSjbXlc8NO8Lt1xovnziKDAnLs0XtKM0bhUakBrbw4InFg==
+quasar-mixin-colorize@^1.0.0-alpha.6:
+  version "1.0.0-alpha.6"
+  resolved "https://registry.yarnpkg.com/quasar-mixin-colorize/-/quasar-mixin-colorize-1.0.0-alpha.6.tgz#6cd5cdb62d37bf3bde6b740f4ca4d70bf55bfeaf"
+  integrity sha512-4G4OFMCv+4tXQ74hMV7V8RA/UhWdj1WDxE7hryjj7p9RDXO9hiGKLDTOR86MtGbkSglIBvNwBsAO6yaKxktiuQ==
 
 quasar@^1.0.5:
   version "1.0.5"
