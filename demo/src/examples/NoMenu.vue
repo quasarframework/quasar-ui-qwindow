@@ -34,8 +34,8 @@
       v-model="visible"
       no-menu
       title="QWindow No Menu"
-      :startX="100"
-      :startY="100"
+      :start-x="100"
+      :start-y="100"
       :height="150"
       :width="350"
       :actions="['embedded', 'pin', 'fullscreen']"

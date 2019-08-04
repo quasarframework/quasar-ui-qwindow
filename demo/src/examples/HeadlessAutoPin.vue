@@ -35,8 +35,8 @@
       headless
       auto-pin
       title="QWindow Wrap Up"
-      :startX="200"
-      :startY="200"
+      :start-x="200"
+      :start-y="200"
       :height="150"
       :width="350"
       :actions="['embedded', 'pin', 'fullscreen']"
