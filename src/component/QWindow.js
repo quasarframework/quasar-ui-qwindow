@@ -1556,6 +1556,9 @@ export default function (ssrContext) {
       },
 
       __renderBody (h) {
+        if (this.title === 'QWindow Actions') {
+          // debugger
+        }
         const defaultScopedSlot = this.$scopedSlots.default
         const defaultSlot = this.$slots.default
         return h('div', {
