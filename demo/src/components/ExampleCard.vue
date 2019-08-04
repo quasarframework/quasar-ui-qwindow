@@ -94,6 +94,7 @@ export default {
     ComplexSlot: () => import('../examples/ComplexSlot'),
     IconsAndLanguage: () => import('../examples/IconsAndLanguage'),
     NoMenu: () => import('../examples/NoMenu'),
+    ProvideInject: () => import('../examples/ProvideInject'),
     Headless: () => import('../examples/Headless'),
     HeadlessAutoPin: () => import('../examples/HeadlessAutoPin'),
     HeadlessAutoPinSelected: () => import('../examples/HeadlessAutoPinSelected')

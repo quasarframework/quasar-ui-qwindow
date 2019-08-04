@@ -246,6 +246,18 @@ Be aware, that for `no-menu` you probably don't wants to add actions that may im
         </q-markdown>
       </example-card>
 
+      <example-card title="Provide/Inject" name="ProvideInject" :tag-parts="getTagParts(require('!!raw-loader!../examples/ProvideInject.vue').default)">
+        <q-markdown>
+Vue [Provide and Inject](https://vuejs.org/v2/api/#provide-inject) is for **advanced** users. It is not within the scope of this document to teach you how to use this technique. However, if you are using Provide/Inject, be aware that when `floating`, a QWindow will not be able to pass along the injection without remediation on your part.
+
+When a QWindow is `floating`, it is using portal code. This means a new Vue `$root` instance is created and it is not aware of your registered Injector. The fix is relatively easy. Just put the Injector class in the slot as well, so that the new Vue `$root` instance, created by the portal, knows your intension.
+
+In the first QWindow example below, the **Injector** is being handled incorrectly. It works while `embedded`, but does not work while `floating`. The second QWindow is being handled properly. When `floating`, you will see the injected data inside the window.
+
+The code tabs in this example will not show you everything used in the example. If you are interested in the Inject and Provide code used, check out the Github repo in the demo code.
+        </q-markdown>
+      </example-card>
+
       <example-card title="Headless" name="Headless" :tag-parts="getTagParts(require('!!raw-loader!../examples/Headless.vue').default)">
         <q-markdown>
 Using the `headless` property means the titlebar will not be drawn, therefore there will be no menu drawn, which means you have to provide the functionality yourself.
@@ -267,6 +279,9 @@ The example below is **not** using any slot content. Try clicking on the window 
       </example-card>
 
     </div>
+    <q-page-scroller position="bottom-right" :scroll-offset="150" :offset="[18, 18]">
+      <q-btn fab icon="keyboard_arrow_up" color="primary" />
+    </q-page-scroller>
   </hero>
 </template>
 
@@ -320,6 +335,7 @@ export default {
     this.addToToc('Complex Slot', 2)
     this.addToToc('Icons and Language', 2)
     this.addToToc('No Menu', 2)
+    this.addToToc('Provide/Inject', 2)
     this.addToToc('Headless', 2)
     this.addToToc('Headless With AutoPin', 2)
     this.addToToc('Headless/AutoPin Selected Styles', 2)
