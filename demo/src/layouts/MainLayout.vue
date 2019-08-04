@@ -104,7 +104,7 @@ export default {
       const id = location.hash.substring(1, location.hash.length)
       setTimeout(() => {
         this.scrollTo(id)
-      }, 200)
+      }, 350)
     }
   },
   methods: {
