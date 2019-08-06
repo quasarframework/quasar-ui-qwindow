@@ -6389,7 +6389,7 @@ quasar-app-extension-qautomate@^1.0.0-alpha.5:
     ware-loader "^0.2.4"
 
 "quasar-app-extension-qwindow@file:..":
-  version "1.0.0-alpha.1"
+  version "1.0.0-alpha.2"
   dependencies:
     quasar-mixin-colorize "^1.0.0-alpha.6"
 
