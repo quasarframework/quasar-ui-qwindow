@@ -3,6 +3,10 @@ QWindow
 
 QWindow is a [Quasar App Extension](https://quasar.dev/app-extensions/introduction). It allows you to have a floating, movable, and resizable HTML windows in your Quasar App.
 
+![QWindow](statics/qwindow.png "QWindow" =800x800)
+
+This work is currently in `beta` and there are expected changes while things get worked out. Your help with testing is greatly appreciated. Suggestions and PRs welcomed.
+
 # Install
 To add this App Extension to your Quasar application, run the following (in your Quasar app folder):
 ```
