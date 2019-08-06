@@ -20,13 +20,13 @@
     "@quasar/app": "^1.0.4",
     "@quasar/quasar-app-extension-qmarkdown": "^1.0.0-beta.16",
     "@quasar/quasar-app-extension-qribbon": "^1.0.0-beta.3",
+    "@quasar/quasar-app-extension-qwindow": "file:..",
     "@vue/eslint-config-standard": "^4.0.0",
     "babel-eslint": "^10.0.2",
     "eslint": "^6.1.0",
     "eslint-loader": "^2.2.1",
     "eslint-plugin-vue": "^5.2.3",
-    "quasar-app-extension-qautomate": "^1.0.0-alpha.5",
-    "quasar-app-extension-qwindow": "file:../."
+    "quasar-app-extension-qautomate": "^1.0.0-alpha.5"
   },
   "engines": {
     "node": ">= 8.9.0",
