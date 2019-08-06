@@ -22,7 +22,6 @@ Can be found [here](https://github.com/quasarframework/app-extension-qwindow/tre
 # Documentation and Examples
 Can be found [here](https://quasarframework.github.io/app-extension-qwindow).
 
-
 # Install
 To add this App Extension to your Quasar application, run the following (in your Quasar app folder):
 ```
