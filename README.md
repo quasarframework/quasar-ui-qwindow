@@ -16,6 +16,13 @@ This work is currently in `beta` and there are expected changes while things get
 # Info
 QWindow allows you to have floating, movable, and resizable HTML windows in your Quasar App.
 
+# Demo Project (source)
+Can be found [here](https://github.com/quasarframework/app-extension-qwindow/tree/master/demo).
+
+# Documentation and Examples
+Can be found [here](https://quasarframework.github.io/app-extension-qwindow).
+
+
 # Install
 To add this App Extension to your Quasar application, run the following (in your Quasar app folder):
 ```
