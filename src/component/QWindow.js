@@ -127,7 +127,10 @@ export default function (ssrContext) {
           'close',
           'fullscreen'].includes(action))
       },
-      bringToFrontAfterDrag: Boolean,
+      bringToFrontAfterDrag: {
+        type: Boolean,
+        default: true
+      },
       menuFunc: Function,
       titlebarStyle: [String, Object, Array],
       titlebarClass: [String, Object, Array],
