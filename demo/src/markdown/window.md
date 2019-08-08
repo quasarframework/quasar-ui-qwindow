@@ -281,33 +281,36 @@ The HTML:
 | Vue Property | Type | Description |
 | --- | --- | --- |
 | value | Boolean | v-model; controls visibility<br>Default: true |
+| title | String | The title for the titlebar |
 | dense | Boolean | Makes the titlebar height more dense |
 | embedded | Boolean | If the QWindow should be initially embedded |
 | pinned | Boolean | If the QWindow should be initially pinned |
-| maximized | Boolean | If the QWindow should be initially maximized |
 | fullscreen | Boolean | If the QWindow should initially be fullscreen |
+| maximized | Boolean | If the QWindow should be initially maximized |
+| no-menu | Boolean | Prevent the titlebar from drawing the menu (see No Menu example) |
+| no-move | Boolean | Restricts the ability to 'move' the QWindow. Moving can still be accomplished by resizing unless you restrict using the `resizable` property |
+| no-resize | Boolean | Restricts the ability to "resize" the QWindow |
+| resizable | Array | Contains an array of resize handle names that are allowed<br>Default: [ 'top', 'left', 'right', 'bottom', 'top-left', 'top-right', 'bottom-left', 'bottom-right'] |
+| scroll-with-window | Boolean | When the document body is scrolled, the QWindow will scroll with it. Normal behavior is to "stay-in-place".<br>Default: false |
+| auto-pin | Boolean | QWindow will manage grippers depending on selected state |
+| hide-toolbar-divider | Boolean | Controls if the titlebar separator should be displayed |
+| hide-grippers | Boolean | Controls if the grippers should be displayed |
+| round-grippers | Boolean | Use round grippers instead of square |
+| headless | Boolean | Prevent titlebar from being drawn (see Headless example) |
+| icon-set | Object | Allows icons and language to be changed. See below for details |
 | start-x | [Number, String] | The starting x position |
 | start-y | [Number, String] | The starting y position |
 | width | [Number, String] | The starting width |
 | height | [Number, String] | The starting height |
 | actions | Array | The actions that can be applied to the QWindow<br>Values: ['pin', 'embedded', 'maximize', 'close', 'fullscreen']<br>Default:['pin', 'embedded', 'close'] |
-| no-move | Boolean | Restricts the ability to 'move' the QWindow. Moving can still be accomplished by resizing unless you restrict using the `resizable` property |
-| resizable | Array | Contains and array of resize handle names that are allowed<br>Default: [ 'top', 'left', 'right', 'bottom', 'top-left', 'top-right', 'bottom-left', 'bottom-right'] |
-| auto-pin | Boolean | QWindow will manage grippers depending on selected state |
-| scroll-with-window | Boolean | When the document body is scrolled, the QWindow will scroll with it. Normal behavior is to "stay-in-place".<br>Default: false |
-| bring-to-front-after-drag | Boolean | Change z-index after drag/resize |
+| bring-to-front-after-drag | Boolean | Bring the dragged window to the front after drag/resize.<br>Default: true }
+| color | String | Any color from the [Quasar Color Pallete](https://quasar.dev/style/color-palette) or any CSS color |
+| background-color | String | Any color from the [Quasar Color Pallete](https://quasar.dev/style/color-palette) or any CSS color |
+| gripper-color | String | Any color from the [Quasar Color Pallete](https://quasar.dev/style/color-palette) or any CSS color |
+| gripper-background-color | String | This can be any CSS color value |
+
 | menu-func | Function | Allows the menu to me modified before being displayed |
-| title | String | The title for the titlebar |
-| icon-set | Object | Allows icons and language to be changed. See below for details |
-| no-menu | Boolean | Prevent the titlebar from drawing the menu (see No Menu example) |
-| headless | Boolean | Prevent titlebar from being drawn (see Headless example) |
-| hide-toolbar-divider | Boolean | Controls if the titlebar separator should be displayed |
-| hide-grippers | Boolean | Controls if the grippers should be displayed |
-| round-grippers | Boolean | Use round grippers instead of square |
-| color | String | This can be any CSS color value or Quasar color |
-| background-color | String | This can be any CSS color value or Quasar color |
-| gripper-color | String | This can be any CSS color value or Quasar color |
-| gripper-background-color | String | This can be any CSS color value | border-width | String | This can be any CSS unit<br>Default: 1px |
+| border-width | String | This can be any CSS unit<br>Default: 1px |
 | border-style | String | This can be any CSS border style<br>Default: solid |
 | titlebar-style | [String, Object, Array] | Style definitions to be attributed to the titlebar |
 | titlebar-class | [String, Object, Array] | Class definitions to be attributed to the titlebar |
