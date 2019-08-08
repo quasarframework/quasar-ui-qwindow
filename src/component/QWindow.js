@@ -53,6 +53,7 @@ export default function (ssrContext) {
     props: {
       value: Boolean,
       title: String,
+      dense: Boolean,
       embedded: Boolean,
       pinned: Boolean,
       fullscreen: Boolean,
@@ -81,7 +82,6 @@ export default function (ssrContext) {
       autoPin: Boolean,
 
       disabled: Boolean,
-      dense: Boolean,
       hideToolbarDivider: Boolean,
       hideGrippers: Boolean,
       roundGrippers: Boolean,
