@@ -6393,11 +6393,6 @@ quasar-app-extension-qautomate@^1.0.0-alpha.5:
     param-case "^2.1.1"
     ware-loader "^0.2.4"
 
-"quasar-app-extension-qwindow@file:..":
-  version "1.0.0-alpha.2"
-  dependencies:
-    quasar-mixin-colorize "^1.0.0-alpha.6"
-
 quasar-mixin-colorize@^1.0.0-alpha.4:
   version "1.0.0-alpha.4"
   resolved "https://registry.yarnpkg.com/quasar-mixin-colorize/-/quasar-mixin-colorize-1.0.0-alpha.4.tgz#94dfcf13e05fc99599e8937c4308e398d4b56d10"
