@@ -1,0 +1,682 @@
+{
+  "type": "component",
+  "props": {
+    "value": {
+      "type": "Boolean",
+      "category": "model",
+      "default": true,
+      "desc": "Controls visibility of the window"
+    },
+    "title": {
+      "type": "String",
+      "category": "content",
+      "desc": "The title for the titlebar"
+    },
+    "dense": {
+      "type": "Boolean",
+      "category": "style",
+      "desc": "Makes the titlebar height more dense"
+    },
+    "embedded": {
+      "type": "Boolean",
+      "category": "state",
+      "desc": "If the QWindow should be initially embedded"
+    },
+    "pinned": {
+      "type": "Boolean",
+      "category": "state",
+      "desc": "If the QWindow should be initially pinned"
+    },
+    "fullscreen": {
+      "type": "Boolean",
+      "category": "state",
+      "desc": "If the QWindow should initially be fullscreen"
+    },
+    "maximized": {
+      "type": "Boolean",
+      "category": "state",
+      "desc": "If the QWindow should be initially maximized"
+    },
+    "no-menu": {
+      "type": "Boolean",
+      "category": "state",
+      "desc": "Prevent the titlebar from drawing the menu (see No Menu example)"
+    },
+    "no-move": {
+      "type": "Boolean",
+      "category": "state",
+      "desc": "Restricts the ability to 'move' the QWindow. Moving can still be accomplished by resizing unless you restrict using the `resizable` property"
+    },
+    "no-resize": {
+      "type": "Boolean",
+      "category": "state",
+      "desc": "Restricts the ability to 'resize' the QWindow"
+    },
+    "resizable": {
+      "type": "Array",
+      "category": "state",
+      "desc": "Contains an array of resize handle names that are allowed",
+      "default": "['top','left','right','bottom','top-left','top-right','bottom-left','bottom-right']",
+      "values": [
+        "top",
+        "left",
+        "right",
+        "bottom",
+        "top-left",
+        "top-right",
+        "bottom-left",
+        "bottom-right"
+      ],
+      "examples": [
+        "top",
+        "left"
+      ]
+    },
+    "scroll-with-window": {
+      "type": "Boolean",
+      "category": "state",
+      "desc": "When the document body is scrolled, the QWindow will scroll with it. Normal behavior is to 'stay-in-place'"
+    },
+    "auto-pin": {
+      "type": "Boolean",
+      "category": "state",
+      "desc": "QWindow will manage grippers depending on selected state"
+    },
+    "hide-toolbar-divider": {
+      "type": "Boolean",
+      "category": "style",
+      "desc": "If the QWindow toolbar divider should be displayed"
+    },
+    "hide-grippers": {
+      "type": "Boolean",
+      "category": "style",
+      "desc": "If the QWindow grippers should be displayed"
+    },
+    "round-grippers": {
+      "type": "Boolean",
+      "category": "style",
+      "desc": "If the QWindow grippers should be round instead of square"
+    },
+    "headless": {
+      "type": "Boolean",
+      "category": "style",
+      "desc": "Prevent titlebar from being drawn (see Headless example)"
+    },
+    "icon-set": {
+      "type": "Object",
+      "category": "style",
+      "desc": "Allows icons and language to be changed. This is the menu definition which is modified to is converted to a menu object for display purposes (see `menu-func`)",
+      "params": {
+        "object": {
+          "type": "Object",
+          "desc": "A map of menu definitions passed to the function",
+          "params": {
+            "type": "Object",
+            "desc": "A menu definition object key",
+            "values": ["visible","embedded","pinned","maximize","fullscreen"],
+            "params": {
+              "on": {
+                "type": "Object",
+                "desc": "Used when the state is true",
+                "params": {
+                  "icon": {
+                    "type": "String",
+                    "desc": "The icon to display when state for this menu item is true (can be empty)"
+                  },
+                  "label": {
+                    "type": "String",
+                    "desc": "The label to display when state for this menu item is true"
+                  }
+                }
+              },
+              "off": {
+                "type": "Object",
+                "desc": "Used when the state is false",
+                "params": {
+                  "icon": {
+                    "type": "String",
+                    "desc": "The icon to display when state for this menu item is false (can be empty)"
+                  },
+                  "label": {
+                    "type": "String",
+                    "desc": "The label to display when state for this menu item is false"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "start-x": {
+      "type": ["Number","String"],
+      "category": "state",
+      "desc": "The initial starting X position (in px)"
+    },
+    "start-y": {
+      "type": ["Number","String"],
+      "category": "state",
+      "desc": "The initial starting Y position (in px)"
+    },
+    "width": {
+      "type": ["Number","String"],
+      "category": "state",
+      "desc": "The initial starting width size (in px)"
+    },
+    "height": {
+      "type": ["Number","String"],
+      "category": "state",
+      "desc": "The initial starting height size (in px)"
+    },
+    "actions": {
+      "type": "Array",
+      "category": "state",
+      "desc": "The actions that can be applied to the QWindow"
+    },
+    "bring-to-front-after-drag": {
+      "type": "Boolean",
+      "default": true,
+      "category": "state",
+      "desc": "Bring the dragged window to the front after drag/resize"
+    },
+    "color": {
+      "type": "String",
+      "category": "style",
+      "desc": "Any color from the [Quasar Color Pallete](https://quasar.dev/style/color-palette) or any CSS color"
+    },
+    "background-color": {
+      "type": "String",
+      "category": "style",
+      "desc": "Any color from the [Quasar Color Pallete](https://quasar.dev/style/color-palette) or any CSS color"
+    },
+    "gripper-color": {
+      "type": "String",
+      "category": "style",
+      "desc": "Any color from the [Quasar Color Pallete](https://quasar.dev/style/color-palette) or any CSS color"
+    },
+    "gripper-background-color": {
+      "type": "String",
+      "category": "style",
+      "desc": "Any color from the [Quasar Color Pallete](https://quasar.dev/style/color-palette) or any CSS color"
+    },
+    "menu-func": {
+      "type": "Function",
+      "category": "style",
+      "examples": [":menu-func=\"myMenuModifier\""],
+      "desc": "Allows the menu to me modified before being displayed",
+      "params": {
+        "collection": {
+          "type": "Array",
+          "desc": "An array of menu item objects passed to the function",
+          "definition": {
+            "key": {
+              "type": "String",
+              "desc": "The key representing state data",
+              "examples": [
+                "embedded",
+                "fullscreen"
+              ]
+            },
+            "state": {
+              "type": "Boolean",
+              "desc": "If the state is true (uses 'on') or false (uses 'off')"
+            },
+            "on": {
+              "type": "Object",
+              "desc": "Object definition used when the state is true",
+              "params": {
+                "icon": {
+                  "type": "String",
+                  "desc": "The icon to display when state for this menu item is true (can be empty)",
+                  "__exemption": [ "examples" ]
+                },
+                "label": {
+                  "type": "String",
+                  "desc": "The label to display when state for this menu item is true",
+                  "__exemption": [ "examples" ]
+                },
+                "func": {
+                  "type": "Function",
+                  "desc": "The function to call when the state is changed to true",
+                  "__exemption": [ "examples" ]
+                }
+              }
+            },
+            "off": {
+              "type": "Object",
+              "desc": "Object definition used when the state is false",
+              "params": {
+                "icon": {
+                  "type": "String",
+                  "desc": "The icon to display when state for this menu item is false (can be empty)",
+                  "__exemption": [ "examples" ]
+                },
+                "label": {
+                  "type": "String",
+                  "desc": "The label to display when state for this menu item is false",
+                  "__exemption": [ "examples" ]
+                },
+                "func": {
+                  "type": "Function",
+                  "desc": "The function to call when the state is changed to false",
+                  "__exemption": [ "examples" ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "border-width": {
+      "type": "String",
+      "default": "1px",
+      "category": "style",
+      "desc": "This can be any CSS unit (including unit)",
+      "examples": [
+        "1px",
+        ".15rem"
+      ]
+    },
+    "border-style": {
+      "type": "String",
+      "default": "solid",
+      "category": "style",
+      "desc": "This can be any CSS border style",
+      "examples": [
+        "solid",
+        "dashed"
+      ]
+    },
+    "titlebar-style": {
+      "type": ["String","Object","Array"],
+      "category": "style",
+      "desc": "Style definitions to be attributed to the titlebar",
+      "examples": [
+        "background-color: #ff0000",
+        ":titlebar-style=\"{ backgroundColor: '#ff0000' }\""
+      ]
+    },
+    "titlebar-class": {
+      "type": ["String","Object","Array"],
+      "category": "style",
+      "desc": "Class definitions to be attributed to the titlebar",
+      "examples": [
+        "my-special-class",
+        ":titlebar-class=\"{ 'my-special-class': [Boolean condition] }\""
+      ]
+    },
+    "content-style": {
+      "type": ["String","Object","Array"],
+      "category": "style",
+      "desc": "Style definitions to be attributed to the content",
+      "examples": [
+        "background-color: #ff0000",
+        ":content-style=\"{ backgroundColor: '#ff0000' }\""
+      ]
+    },
+    "content-class": {
+      "type": ["String","Object","Array"],
+      "category": "style",
+      "desc": "Class definitions to be attributed to the content",
+      "examples": [
+        "my-special-class",
+        ":content-class=\"{ 'my-special-class': [Boolean condition] }\""
+      ]
+    }
+  },
+  "events": {
+    "input": {
+      "desc": "v-model; When the QWindow is displayed or hidden",
+      "params": {
+        "state": {
+          "type": "Boolean",
+          "desc": "Current state of the event"
+        }
+      }
+    },
+    "embedded": {
+      "desc": "When the QWindow enters or leaves the embedded state",
+      "params": {
+        "state": {
+          "type": "Boolean",
+          "desc": "Current state of the event"
+        }
+      }
+    },
+    "pinned": {
+      "desc": "When the QWindow enters or leaves the pinned state",
+      "params": {
+        "state": {
+          "type": "Boolean",
+          "desc": "Current state of the event"
+        }
+      }
+    },
+    "maximize": {
+      "desc": "When the QWindow enters or leaves the maximize state",
+      "params": {
+        "state": {
+          "type": "Boolean",
+          "desc": "Current state of the event"
+        }
+      }
+    },
+    "fullscreen": {
+      "desc": "When the QWindow enters or leaves the fullscreen state",
+      "params": {
+        "state": {
+          "type": "Boolean",
+          "desc": "Current state of the event"
+        }
+      }
+    },
+    "selected": {
+      "desc": "When the QWindow is selected or not",
+      "params": {
+        "state": {
+          "type": "Boolean",
+          "desc": "Current state of the event"
+        }
+      }
+    },
+    "position": {
+      "desc": "When the QWindow is moved or resized",
+      "params": {
+        "position": {
+          "type": "Object",
+          "desc": "The object containing position data for the QWindow",
+          "definition": {
+            "left": {
+              "type": "Number",
+              "desc": "The left position relative to the viewport",
+              "__exemption": [ "examples" ]
+            },
+            "top": {
+              "type": "Number",
+              "desc": "The top position relative to the viewport",
+              "__exemption": [ "examples" ]
+            },
+            "width": {
+              "type": "Number",
+              "desc": "The width of the QWindow",
+              "__exemption": [ "examples" ]
+            },
+            "height": {
+              "type": "Number",
+              "desc": "The height of the QWindow",
+              "__exemption": [ "examples" ]
+            },
+            "scrollX": {
+              "type": "Number",
+              "desc": "The left position relative to the horizontal scroll",
+              "__exemption": [ "examples" ]
+            },
+            "scrollY": {
+              "type": "Number",
+              "desc": "The top position relative to the vertical scroll",
+              "__exemption": [ "examples" ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "methods": {
+    "show": {
+      "desc": "Makes the QWindow visible"
+    },
+    "hide": {
+      "desc": "Makes the QWindow hidden"
+    },
+    "lock": {
+      "desc": "Makes the QWindow embedded"
+    },
+    "unlock": {
+      "desc": "Makes the QWindow floating"
+    },
+    "pin": {
+      "desc": "Makes the QWindow pinned (fixed at location)"
+    },
+    "unpin": {
+      "desc": "Makes the QWindow non-pinned (movable, resizable, etc)"
+    },
+    "maximize": {
+      "desc": "Makes the QWindow maximized"
+    },
+    "restore": {
+      "desc": "Restores the QWindow maximized"
+    },
+    "fullscreenEnter": {
+      "desc": "Makes the QWindow enter fullscreen"
+    },
+    "fullscreenLeave": {
+      "desc": "Makes the QWindow leave fullscreen"
+    },
+    "bringToFront": {
+      "desc": "Brings the QWindow to the front layer"
+    },
+    "sendToBack": {
+      "desc": "Send the QWindow to the back layer"
+    },
+    "centerWindow": {
+      "desc": "Centers the QWindow on the visible view port"
+    },
+    "setX": {
+      "desc": "Programmatically set the x position",
+      "params": {
+        "x": {
+          "type": "Number",
+          "desc": "The x position"
+        }
+      }
+    },
+    "setY": {
+      "desc": "Programmatically set the y position",
+      "params": {
+        "y": {
+          "type": "Number",
+          "desc": "The y position"
+        }
+      }
+    },
+    "setXY": {
+      "desc": "Programmatically set both the x and y positions",
+      "params": {
+        "width": {
+          "type": "Number",
+          "desc": "The width"
+        },
+        "height": {
+          "type": "Number",
+          "desc": "The height"
+        }
+      }
+    },
+    "setWidth": {
+      "desc": "Programmatically set the QWindow width",
+      "params": {
+        "width": {
+          "type": "Number",
+          "desc": "The width"
+        }
+      }
+    },
+    "setHeight": {
+      "desc": "Programmatically set the QWindow height",
+      "params": {
+        "height": {
+          "type": "Number",
+          "desc": "The height"
+        }
+      }
+    },
+    "canDo": {
+      "desc": "Pass in a action, like `embedded` or `close` and will return true or false if it can be done at this time. Useful for determining items in the menu",
+      "params": {
+        "state": {
+          "type": "String",
+          "desc": "The action to test against",
+          "examples": [
+            "embedded",
+            "close"
+          ]
+        }
+      },
+      "returns": {
+        "type": "Boolean",
+        "desc": "true if the passed in action can be done at this time otherwise false"
+      }
+    }
+  },
+  "computed": {
+    "isVisible": {
+      "type": "Boolean",
+      "desc": "true if the QWindow is currently visible, otherwise false"
+    },
+    "isEmbedded": {
+      "type": "Boolean",
+      "desc": "true if the QWindow is currently embedded, otherwise false"
+    },
+    "isFloating": {
+      "type": "Boolean",
+      "desc": "true if the QWindow is currently floating, otherwise false"
+    },
+    "isPinned": {
+      "type": "Boolean",
+      "desc": "true if the QWindow is currently pinned, otherwise false"
+    },
+    "isMaximized": {
+      "type": "Boolean",
+      "desc": "true if the QWindow is currently maximized, otherwise false"
+    },
+    "isFullscreen": {
+      "type": "Boolean",
+      "desc": "true if the QWindow is currently fullscreen, otherwise false"
+    },
+    "isSelected": {
+      "type": "Boolean",
+      "desc": "true if the QWindow is currently selected, otherwise false"
+    },
+    "isDragging": {
+      "type": "Boolean",
+      "desc": "true if the QWindow is currently being moved or resized, otherwise false"
+    },
+    "canDrag": {
+      "type": "Boolean",
+      "desc": "true if all criteria aligns that make the QWindow movable/resizable"
+    },
+    "computedToolbarHeight": {
+      "type": "Number",
+      "desc": "The toolbar height (when toolbar is visible)"
+    },
+    "computedLeft": {
+      "type": "Number",
+      "desc": "The left position of the QWindow"
+    },
+    "computedTop": {
+      "type": "Number",
+      "desc": "The top position of the QWindow"
+    },
+    "computedRight": {
+      "type": "Number",
+      "desc": "The right position of the QWindow"
+    },
+    "computedBottom": {
+      "type": "Number",
+      "desc": "The bottom position of the QWindow"
+    },
+    "computedWidth": {
+      "type": "Number",
+      "desc": "The width of the QWindow"
+    },
+    "computedHeight": {
+      "type": "Number",
+      "desc": "The height of the QWindow"
+    },
+    "computedScrollX": {
+      "type": "Number",
+      "desc": "The x position plus scroll width of the QWindow"
+    },
+    "computedScrollY": {
+      "type": "Number",
+      "desc": "The y position plus scroll height of the QWindow"
+    },
+    "computedPosition": {
+      "type": "Object",
+      "desc": "The current position of the QWindow",
+      "definition": {
+        "left": {
+          "type": "Number",
+          "desc": "The left position relative to the viewport",
+          "__exemption": [ "examples" ]
+        },
+        "top": {
+          "type": "Number",
+          "desc": "The top position relative to the viewport",
+          "__exemption": [ "examples" ]
+        },
+        "width": {
+          "type": "Number",
+          "desc": "The width of the QWindow",
+          "__exemption": [ "examples" ]
+        },
+        "height": {
+          "type": "Number",
+          "desc": "The height of the QWindow",
+          "__exemption": [ "examples" ]
+        },
+        "scrollX": {
+          "type": "Number",
+          "desc": "The left position relative to the horizontal scroll",
+          "__exemption": [ "examples" ]
+        },
+        "scrollY": {
+          "type": "Number",
+          "desc": "The top position relative to the vertical scroll",
+          "__exemption": [ "examples" ]
+        }
+      },
+      "__exemption": [ "examples" ]
+    },
+    "computedActions": {
+      "type": "Array",
+      "desc": "Contains an array of currently allowed states (like `embedded`, `pinned`, `visible`, etc). Useful for menu determination. For instance, if the length is 0, then do not show a menu",
+      "__exemption": [ "examples" ]
+    },
+    "computedMenuData": {
+      "type": "Array",
+      "desc": "This is the actual data used in determining the menu. Be aware that this data is a copy and direct manipulation may be lost. If it is needed, it should be retrieved before each use",
+      "__exemption": [ "examples" ]
+    }
+  },
+  "slots": {
+    "default": {
+      "desc": "This is the default slotted content",
+      "__exemption": [ "examples" ]
+    }
+  },
+  "scoped slots": {
+    "default": {
+      "desc": "This is the default slotted content. An object is returned with a key zIndex. This value is useful to set the slotted content to zIndex + 1 if `z-order` is a concern (for instance, when using QDrawer)",
+      "params": {
+        "data": {
+          "type": "Object",
+          "desc": "Contains the scoped data",
+          "definitions": {
+            "zIndex": {
+              "type": "Number",
+              "desc": "The current `z-index` of the QWindow",
+              "__exemption": [ "examples" ]
+            }
+          }
+        }
+      },
+      "__exemption": [ "examples" ]
+    },
+    "titlebar": {
+      "type": "Array",
+      "desc": "See `computedMenuData` in the `Computed` section",
+      "__exemption": [ "examples" ]
+    }
+  }
+}
