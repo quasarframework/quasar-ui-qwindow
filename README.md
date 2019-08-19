@@ -9,7 +9,7 @@ QWindow (@quasar/qwindow)
 
 QWindow is an `UI App Extension` for [Quasar Framework v1](https://v1.quasar-framework.org/). It will not work with legacy versions of Quasar Framework.
 
-![QWindow](https://github.com/quasarframework/app-extension-qwindow/blob/dev/demo/src/statics/qwindow.png)
+![QWindow](https://raw.githubusercontent.com/quasarframework/app-extension-qwindow/dev/demo/src/statics/qwindow.png)
 
 This work is currently in `beta` and there are expected changes while things get worked out. Your help with testing is greatly appreciated. Suggestions and PRs welcomed.
 

@@ -53,6 +53,7 @@ export default function (ssrContext) {
     props: {
       value: Boolean,
       title: String,
+      dense: Boolean,
       embedded: Boolean,
       pinned: Boolean,
       fullscreen: Boolean,
@@ -81,7 +82,6 @@ export default function (ssrContext) {
       autoPin: Boolean,
 
       disabled: Boolean,
-      dense: Boolean,
       hideToolbarDivider: Boolean,
       hideGrippers: Boolean,
       roundGrippers: Boolean,
@@ -127,7 +127,10 @@ export default function (ssrContext) {
           'close',
           'fullscreen'].includes(action))
       },
-      bringToFrontAfterDrag: Boolean,
+      bringToFrontAfterDrag: {
+        type: Boolean,
+        default: true
+      },
       menuFunc: Function,
       titlebarStyle: [String, Object, Array],
       titlebarClass: [String, Object, Array],

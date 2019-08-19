@@ -10,13 +10,13 @@ This work is currently in `beta` and there are expected changes while things get
 # Install
 To add this App Extension to your Quasar application, run the following (in your Quasar app folder):
 ```
-quasar ext add qwindow
+quasar ext add @quasar/qwindow
 ```
 
 # Uninstall
 To remove this App Extension from your Quasar application, run the following (in your Quasar app folder):
 ```
-quasar ext remove qwindow
+quasar ext remove @quasar/qwindow
 ```
 
 # Describe
@@ -94,7 +94,7 @@ Or, by using the `hide-grippers` property you can turn off the visual display of
 
 ![Hide Grippers](statics/qwindow-hide-grippers.png "Hide Grippers" =300x300)
 
-Ad, of course, you can stylize the grippers with the `gripper-border-color` and `gripper-background-color` properties.
+And, of course, you can stylize the grippers with the `gripper-border-color` and `gripper-background-color` properties.
 
 ![Colored Grippers](statics/qwindow-colored-grippers.png "Colored Grippers" =300x300)
 
@@ -238,6 +238,11 @@ The example below is using Fontawesome to rerplace the Material Design icons and
 }
 ```
 
+Each key within the whole of this structure is optional. You can replace a part of it or all of it. If you have `Material Design` icons turned off in your `quasar.conf.js`, then you need to set all the icons.
+You do not need to include the `label` property unless you are:
+1. Changing the wording, or
+2. Using a different language
+
 ## Headless
 Using the `headless` property displays a QWindow without the titlebar. There is no longer a menu displayed, so cannot be modified by the user. However, the user can still move or resize the Qwindow. Try the `headless` property combined with the `auto-pin` property. A nice combination for website design software, as an example. Another option, by using the `isSelected` property, control the background color for a more professional look and feel.
 
@@ -274,206 +279,3 @@ The HTML:
   :content-class="$refs.window && $refs.window.isSelected ? 'headess-selected' : 'headess-deselected'"
 />
 ```
-
-# QWindow API
-
-## Vue Properties
-| Vue Property | Type | Description |
-| --- | --- | --- |
-| value | Boolean | v-model; controls visibility<br>Default: true |
-| dense | Boolean | Makes the titlebar height more dense |
-| embedded | Boolean | If the QWindow should be initially embedded |
-| pinned | Boolean | If the QWindow should be initially pinned |
-| maximized | Boolean | If the QWindow should be initially maximized |
-| fullscreen | Boolean | If the QWindow should initially be fullscreen |
-| start-x | [Number, String] | The starting x position |
-| start-y | [Number, String] | The starting y position |
-| width | [Number, String] | The starting width |
-| height | [Number, String] | The starting height |
-| actions | Array | The actions that can be applied to the QWindow<br>Values: ['pin', 'embedded', 'maximize', 'close', 'fullscreen']<br>Default:['pin', 'embedded', 'close'] |
-| no-move | Boolean | Restricts the ability to 'move' the QWindow. Moving can still be accomplished by resizing unless you restrict using the `resizable` property |
-| resizable | Array | Contains and array of resize handle names that are allowed<br>Default: [ 'top', 'left', 'right', 'bottom', 'top-left', 'top-right', 'bottom-left', 'bottom-right'] |
-| auto-pin | Boolean | QWindow will manage grippers depending on selected state |
-| scroll-with-window | Boolean | When the document body is scrolled, the QWindow will scroll with it. Normal behavior is to "stay-in-place".<br>Default: false |
-| bring-to-front-after-drag | Boolean | Change z-index after drag/resize |
-| menu-func | Function | Allows the menu to me modified before being displayed |
-| title | String | The title for the titlebar |
-| icon-set | Object | Allows icons and language to be changed. See below for details |
-| no-menu | Boolean | Prevent the titlebar from drawing the menu (see No Menu example) |
-| headless | Boolean | Prevent titlebar from being drawn (see Headless example) |
-| hide-toolbar-divider | Boolean | Controls if the titlebar separator should be displayed |
-| hide-grippers | Boolean | Controls if the grippers should be displayed |
-| round-grippers | Boolean | Use round grippers instead of square |
-| color | String | This can be any CSS color value or Quasar color |
-| background-color | String | This can be any CSS color value or Quasar color |
-| gripper-color | String | This can be any CSS color value or Quasar color |
-| gripper-background-color | String | This can be any CSS color value | border-width | String | This can be any CSS unit<br>Default: 1px |
-| border-style | String | This can be any CSS border style<br>Default: solid |
-| titlebar-style | [String, Object, Array] | Style definitions to be attributed to the titlebar |
-| titlebar-class | [String, Object, Array] | Class definitions to be attributed to the titlebar |
-| content-style | [String, Object, Array] | Style definitions to be attributed to the content |
-| content-class | [String, Object, Array] | Class definitions to be attributed to the content |
-
-QWindow uses `Material Design` icons and the English language as defaults. If you wish to change either of these, you can use the `icon-set` property.
-
-It looks like this:
-
-```js
-{
-  visible: {
-    on: {
-      icon: 'close',
-      label: 'Show'
-    },
-    off: {
-      icon: 'close',
-      label: 'Hide'
-    }
-  },
-  embedded: {
-    on: {
-      icon: 'lock_outline',
-      label: 'Embed'
-    },
-    off: {
-      icon: 'lock_open',
-      label: 'Float'
-    }
-  },
-  pinned: {
-    on: {
-      icon: 'location_searching',
-      label: 'Pin'
-    },
-    off: {
-      icon: 'gps_fixed',
-      label: 'Unpin'
-    }
-  },
-  maximize: {
-    on: {
-      icon: 'arrow_upward',
-      label: 'Maximize'
-    },
-    off: {
-      icon: 'restore',
-      label: 'Restore'
-    }
-  },
-  fullscreen: {
-    on: {
-      icon: 'fullscreen',
-      label: 'Enter fullscreen'
-    },
-    off: {
-      icon: 'fullscreen_exit',
-      label: 'Leave fullscreen'
-    }
-  }
-}
-```
-Each key within the whole of this structure is optional. You can replace a part of it or all of it. If you have `Material Design` icons turned off in your `quasar.conf.js`, then you need to set all the icons.
-You do not need to include the `label` property unless you are:
-1. Changing the wording, or
-2. Using a different language
-
-## QWindow Events
-| Vue Event | Args | Description |
-| --- | --- | --- |
-| @input | Boolean | v-model; When the QWindow is displayed or hidden |
-| @embedded | Boolean | When the QWindow enters or leaves the embedded state |
-| @pinned | Boolean | When the QWindow enters or leaves the pinned state |
-| @maximize | Boolean | When the QWindow enters or leaves the maximize state |
-| @fullscreen | Boolean | When the QWindow enters or leaves the fullscreen state |
-| @selected | Boolean | When the QWindow is selected or not |
-| @position | Object | When the QWindow is moved or resized.<br>{ left, top, width, height, scrollX, scrollY } |
-
-
-## QWindow Computed Properties
-| Vue Method | Type | Description |
-| --- | --- | --- |
-| isVisible | Boolean | true if the QWindow is currently visible, otherwise false |
-| isEmbedded | Boolean | true if the QWindow is currently embedded, otherwise false |
-| isFloating | Boolean | true if the QWindow is currently floating, otherwise false |
-| isPinned | Boolean | true if the QWindow is currently pinned, otherwise false |
-| isMaximized | Boolean | true if the QWindow is currently maximized, otherwise false |
-| isFullscreen | Boolean | true if the QWindow is currently fullscreen, otherwise false |
-| isSelected | Boolean | true if the QWindow is currently selected, otherwise false |
-| isDragging | Boolean | true if the QWindow is currently being moved or resized, otherwise false |
-| canDrag | Boolean | true if all criteria aligns that make the QWindow movable/resizable |
-| computedToolbarHeight | Number | The toolbar height |
-| computedLeft | Number | The left position of the QWindow |
-| computedTop | Number | The top position of the QWindow |
-| computedRight | Number | The right position of the QWindow |
-| computedBottom | Number | The bottom position of the QWindow |
-| computedHeight | Number | The height of the QWindow |
-| computedWidth | Number | The width of the QWindow |
-| computedScrollX | Number | The x position plus scroll width of the QWindow |
-| computedScrollY | Number | The y position plus scroll height of the QWindow |
-| computedPosition | Object | The current position of the QWindow<br>{ left, top, width, height, scrollX, scrollY } |
-| computedActions | Array | Contains an array of currently allowed states (like 'embedded', 'pinned', 'visble', etc). Useful for menu determination. For instance, if the length is 0, then do not show a menu |
-| computedMenuData | Array | This is the actual data used in determining the menu. Be aware that this data is a copy and direct manipulation may be lost. If it is needed, it should be retrieved before each use |
-
-The `computedMenuData` looks similar to this:
-```js
-[
-  {
-    key: 'embedded',
-    state: true,
-    off: {
-      label: 'Float',
-      icon: 'lock_open',
-      func: this.unlock()
-    },
-    on: {
-      label: 'Embed',
-      icon: 'lock_outline',
-      func: this.lock()
-    }
-  }
-]
-```
-When the menu is built, it uses `state` to determine whether to use the `off` object or the `on` object.
-
-
-## QWindow Methods
-| Vue Method | Args | Description |
-| --- | --- | --- |
-| show | | Makes the QWindow visible |
-| hide | | Makes the QWindow hidden |
-| lock | | Makes the QWindow embedded |
-| unlock | | Makes the QWindow floating |
-| pin | | Makes the QWindow pinned |
-| unpin | | Makes the QWindow non-pinned |
-| maximize | | Makes the QWindow maximized |
-| restore | | Restores the QWindow from maximized |
-| fullscreenEnter | | Makes the QWindow fullscreen |
-| fullscreenLeave | | Restores the QWindow from fullscreen |
-| bringToFront | | Brings the QWindow to the front layer |
-| sendToBack | | Sends the QWindow to the back layer |
-| centerWindow | | Centers the QWindow on the visible view port |
-| setX | Number | Programmatically set the x position |
-| setY | Number | Programmatically set the y position |
-| setXY | Number, Number | Programmatically set both the x and y positions |
-| setWidth | Number | Programmatically set the width |
-| setHeight | Number | Programmatically set the height |
-| canDo | String | Pass in a state, like 'embedded' or 'close' and will return true or false if it can be done at this time<br>Useful for determining items in the menu |
-
-
-## QWindow Slots
-| Vue Slot | Description |
-| --- | --- |
-| default | This is the default slotted content |
-
-## QWindow Scoped Slots
-| Vue Slot | Args | Description |
-| --- | --- | --- |
-| default | Object | This is the default slotted content<br>An object is returned with a key `zIndex`. Using this value is useful to set the slotted content to `zIndex + 1` if z order is a concern (like QDrawer) |
-| titlebar | Array | See `computedMenuData` above |
-
-
-# Donate
-If you appreciate the work that went into this App Extension, please consider [donating to Quasar](https://donate.quasar.dev).
-
----
-This page created with [QMarkdown](https://quasarframework.github.io/app-extension-qmarkdown), another great Quasar App Extension.
