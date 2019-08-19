@@ -2,7 +2,7 @@
   <hero>
     <q-markdown :src="markdown" toc @data="onToc" />
     <component-api
-      title="QWindow"
+      title="QWindow API"
       :json="json"
     />
     <q-markdown>
@@ -23,7 +23,6 @@ This page created with [QMarkdown](https://quasarframework.github.io/app-extensi
 
 <script>
 import Hero from '../components/Hero'
-// import ComponentApi from '../components/ComponentApi'
 import markdown from '../markdown/window.md'
 import json from '@quasar/quasar-app-extension-qwindow/src/component/QWindow.json'
 
@@ -57,7 +56,7 @@ export default {
   methods: {
     onToc (toc) {
       // add the manual ones
-      toc.push({ id: 'QWindow%20API', label: 'QWindow API', level: 1, children: Array(0) })
+      toc.push({ id: 'QWindow-API', label: 'QWindow API', level: 1, children: Array(0) })
       toc.push({ id: 'Donate', label: 'Donate', level: 1, children: Array(0) })
 
       this.toc = toc
