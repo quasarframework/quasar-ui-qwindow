@@ -31,6 +31,7 @@ module.exports = function (ctx) {
       // all: true, // --- includes everything; for dev only!
 
       components: [
+        'QBadge',
         'QBtn',
         'QCard',
         'QCardSection',
@@ -51,6 +52,7 @@ module.exports = function (ctx) {
         'QPageSticky',
         'QScrollArea',
         'QSeparator',
+        'QSpace',
         'QTab',
         'QTabPanel',
         'QTabPanels',
@@ -105,7 +107,8 @@ module.exports = function (ctx) {
       watchOptions: {
         ignored: [
           'node_modules',
-          '!node_modules/@quasar/quasar-app-extension-qwindow'
+          '!node_modules/@quasar/quasar-app-extension-qwindow',
+          '!node_modules/@quasar/quasar-app-extension-qpublish'
         ]
       }
     },

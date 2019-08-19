@@ -959,6 +959,11 @@
     raw-loader "^3.1.0"
     ware-loader "^0.2.4"
 
+"@quasar/quasar-app-extension-qpublish@../../app-extension-qpublish":
+  version "1.0.0-alpha.1"
+  dependencies:
+    quasar-mixin-colorize "^1.0.0-alpha.6"
+
 "@quasar/quasar-app-extension-qribbon@^1.0.0-beta.3":
   version "1.0.0-beta.3"
   resolved "https://registry.yarnpkg.com/@quasar/quasar-app-extension-qribbon/-/quasar-app-extension-qribbon-1.0.0-beta.3.tgz#4c49b0020b039668d08291a7e21cf1efdc4aa578"
@@ -967,7 +972,7 @@
     quasar-mixin-colorize "^1.0.0-alpha.4"
 
 "@quasar/quasar-app-extension-qwindow@file:..":
-  version "1.0.0-alpha.2"
+  version "1.0.0-alpha.3"
   dependencies:
     quasar-mixin-colorize "^1.0.0-alpha.6"
 
