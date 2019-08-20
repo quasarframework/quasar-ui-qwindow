@@ -127,10 +127,6 @@ export default function (ssrContext) {
           'close',
           'fullscreen'].includes(action))
       },
-      bringToFrontAfterDrag: {
-        type: Boolean,
-        default: true
-      },
       menuFunc: Function,
       titlebarStyle: [String, Object, Array],
       titlebarClass: [String, Object, Array],
@@ -813,6 +809,7 @@ export default function (ssrContext) {
           let layer = layers[index]
           layer.window.zIndex = startingZIndex + index
         }
+        // this window gets highest zIndex
         this.zIndex = startingZIndex + layers.length
       },
 
@@ -1130,6 +1127,10 @@ export default function (ssrContext) {
       },
 
       onMouseDown (e) {
+        if (this.isEmbedded) {
+          return
+        }
+
         // we need to make sure if user clicks on grippers
         // that the window does not become deselected
         const gripperSize = 10 // from stylus
@@ -1138,6 +1139,7 @@ export default function (ssrContext) {
         const x = getMousePosition(e, 'x')
         const y = getMousePosition(e, 'y')
         let left, top, width, height
+
         // embedded
         if (this.$el && this.$el.offsetParent) {
           // determine if mousedown is within the bounds of this component
@@ -1146,6 +1148,7 @@ export default function (ssrContext) {
           width = this.$el.offsetWidth
           height = this.$el.offsetHeight
         } else {
+          // not embedded
           if (this.isEmbedded === false) {
             const position = this.computedPosition
             left = position.scrollX
@@ -1168,7 +1171,9 @@ export default function (ssrContext) {
         }
         // emit 'selected' if it has changed
         if (oldSelected !== this.selected) {
-          // console.log('selected', this.selected)
+          if (this.isFloating && this.selected === true) {
+            this.bringToFront()
+          }
           this.$emit('selected', this.selected)
         }
       },
@@ -1334,6 +1339,7 @@ export default function (ssrContext) {
 
       onDragEnter (e, resizeHandle) {
         prevent(e)
+        this.bringToFront()
       },
 
       onDragOver (e, resizeHandle) {
@@ -1350,9 +1356,6 @@ export default function (ssrContext) {
         this.mouseOffsetY = -1
         this.state.dragging = false
         this.$emit('position', this.computedPosition)
-        if (this.bringToFrontAfterDrag === true) {
-          this.bringToFront()
-        }
       },
 
       onTouchEnd (e, resizeHandle) {
@@ -1559,9 +1562,6 @@ export default function (ssrContext) {
       },
 
       __renderBody (h) {
-        if (this.title === 'QWindow Actions') {
-          // debugger
-        }
         const defaultScopedSlot = this.$scopedSlots.default
         const defaultSlot = this.$slots.default
         return h('div', {
