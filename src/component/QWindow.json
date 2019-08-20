@@ -105,42 +105,26 @@
     "icon-set": {
       "type": "Object",
       "category": "style",
-      "desc": "Allows icons and language to be changed. This is the menu definition which is modified to is converted to a menu object for display purposes (see `menu-func`)",
-      "params": {
-        "object": {
+      "desc": "Allows icons and language to be changed. This is the menu definition which is modified and converted to a menu object for display purposes (see `menu-func`)",
+      "examples": [ "{ fullscreen: { on: { icon: 'fullscreen', label: 'Enter fullscreen' }, off: { icon: 'fullscreen_exit', label: 'Leave fullscreen' } } }"],
+      "definition": {
+        "identifier": {
           "type": "Object",
-          "desc": "A map of menu definitions passed to the function",
-          "params": {
-            "type": "Object",
-            "desc": "A menu definition object key",
-            "values": ["visible","embedded","pinned","maximize","fullscreen"],
-            "params": {
-              "on": {
-                "type": "Object",
-                "desc": "Used when the state is true",
-                "params": {
-                  "icon": {
-                    "type": "String",
-                    "desc": "The icon to display when state for this menu item is true (can be empty)"
-                  },
-                  "label": {
-                    "type": "String",
-                    "desc": "The label to display when state for this menu item is true"
-                  }
-                }
-              },
-              "off": {
-                "type": "Object",
-                "desc": "Used when the state is false",
-                "params": {
-                  "icon": {
-                    "type": "String",
-                    "desc": "The icon to display when state for this menu item is false (can be empty)"
-                  },
-                  "label": {
-                    "type": "String",
-                    "desc": "The label to display when state for this menu item is false"
-                  }
+          "desc": "Key for the object",
+          "values": ["visible","embedded","pinned","maximize","fullscreen"],
+          "definition": {
+            "state": {
+              "type": "Object",
+              "desc": "Used when the state is true",
+              "values": ["on","off"],
+              "definition": {
+                "icon": {
+                  "type": "String",
+                  "desc": "The icon to display based on state for this menu item (can be empty)"
+                },
+                "label": {
+                  "type": "String",
+                  "desc": "The label to display based on state for this menu item"
                 }
               }
             }
@@ -172,12 +156,6 @@
       "type": "Array",
       "category": "state",
       "desc": "The actions that can be applied to the QWindow"
-    },
-    "bring-to-front-after-drag": {
-      "type": "Boolean",
-      "default": true,
-      "category": "state",
-      "desc": "Bring the dragged window to the front after drag/resize"
     },
     "color": {
       "type": "String",
