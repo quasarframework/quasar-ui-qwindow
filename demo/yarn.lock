@@ -959,7 +959,7 @@
     raw-loader "^3.1.0"
     ware-loader "^0.2.4"
 
-"@quasar/quasar-app-extension-qpublish@^1.0.0-alpha.3":
+"@quasar/quasar-app-extension-qpublish@^1.0.0-alpha.4":
   version "1.0.0-alpha.4"
   resolved "https://registry.yarnpkg.com/@quasar/quasar-app-extension-qpublish/-/quasar-app-extension-qpublish-1.0.0-alpha.4.tgz#16800b55e24892d9435b3f1092bf92d25ba38c73"
   integrity sha512-uO8E97r+iPv4LEMP1Qf8owPeNp7GS2l08zr0L6gEGTS4ryLV1smBz2lBvDG59pk31N1dJWfCxIM5lo9lPumAAw==

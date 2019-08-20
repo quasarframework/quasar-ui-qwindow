@@ -120,14 +120,6 @@ The example below is just showing more content in the default slot.
         </q-markdown>
       </example-card>
 
-      <example-card title="Bring to Front After Drag" name="BringToFrontAfterDrag" :tag-parts="getTagParts(require('!!raw-loader!../examples/BringToFrontAfterDrag.vue').default)">
-        <q-markdown>
-One situation you may run into is when there is more than one QWindow components being displayed and they overlap each other. In this case, there may be no way easy to change their `z-index`. To resolve this, you can use the `bring-to-front-after-drag` property. The QWindow that is last dragged (or resized) will be moved to the top.
-
-In the example below, you will need to float both QWindows to see this in action.
-        </q-markdown>
-      </example-card>
-
       <example-card title="Modify Menu" name="ModifyMenu" :tag-parts="getTagParts(require('!!raw-loader!../examples/ModifyMenu.vue').default)">
         <q-markdown>
 There is opportunity to modify the displayed menu just before it is displayed. In the example below, two functions are added: `Bring to Front` and `Send to Back` where the appropriate functionality will be called.
@@ -330,7 +322,6 @@ export default {
     this.addToToc('Advanced')
     this.addToToc('Close Action', 2)
     this.addToToc('Scroll Area', 2)
-    this.addToToc('Bring to Front After Drag', 2)
     this.addToToc('Modify Menu', 2)
     this.addToToc('Complex Slot', 2)
     this.addToToc('Icons and Language', 2)

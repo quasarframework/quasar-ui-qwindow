@@ -9,7 +9,6 @@
       :height="300"
       :width="400"
       :menu-func="updateMenu1"
-      bring-to-front-after-drag
       :actions="['embedded', 'pin', 'maximize', 'fullscreen']"
       embedded
       content-class="bg-grey-1"
@@ -32,7 +31,6 @@
       :height="300"
       :width="400"
       :menu-func="updateMenu2"
-      bring-to-front-after-drag
       :actions="['embedded', 'pin', 'maximize', 'fullscreen']"
       embedded
       content-class="bg-grey-1"

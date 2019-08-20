@@ -95,7 +95,6 @@
         :embedded="embedded"
         :visible="visible"
         :pinned="pinned"
-        bring-to-front-after-drag
         :menu-func="updateMenu"
         content-class="bg-grey-1"
         @embedded="(v) => embedded = v"
@@ -163,7 +162,6 @@
   7. QWindow is embeddable anywhere like a normal HTML element. It displayes slotted content provided by the developer
   8. On any move or resize (while floating), `position` is emitted with `{x, y, width, height }` values
   9. If initial `startX`, `startY`, `width` and `height` are not given, defaults will be used. The algorithm always makes sure two windows do not completely overlap each other on initial render
-  10. There is a special property `bring-to-front-after-drag` that ensures a dragged/resized window always remains on top
                     </q-markdown>
 
                     <q-page-sticky position="top" expand class="bg-accent text-white">
