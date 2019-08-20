@@ -5,12 +5,15 @@
       "type": "Boolean",
       "category": "model",
       "default": true,
-      "desc": "Controls visibility of the window"
+      "desc": "`v-model`; Controls visibility of the window"
     },
     "title": {
       "type": "String",
       "category": "content",
-      "desc": "The title for the titlebar"
+      "desc": "The title for the titlebar",
+      "examples":[
+        "title=\"My Title\""
+      ]
     },
     "dense": {
       "type": "Boolean",
@@ -40,17 +43,17 @@
     "no-menu": {
       "type": "Boolean",
       "category": "state",
-      "desc": "Prevent the titlebar from drawing the menu (see No Menu example)"
+      "desc": "Prevent the titlebar from drawing the menu (see [No Menu](/examples#No-Menu) example)"
     },
     "no-move": {
       "type": "Boolean",
       "category": "state",
-      "desc": "Restricts the ability to 'move' the QWindow. Moving can still be accomplished by resizing unless you restrict using the `resizable` property"
+      "desc": "Restricts the ability to `move` the QWindow. Moving can still be accomplished by resizing unless you restrict using the `resizable` property"
     },
     "no-resize": {
       "type": "Boolean",
       "category": "state",
-      "desc": "Restricts the ability to 'resize' the QWindow"
+      "desc": "Restricts the ability to `resize` the QWindow"
     },
     "resizable": {
       "type": "Array",
@@ -68,8 +71,8 @@
         "bottom-right"
       ],
       "examples": [
-        "top",
-        "left"
+        ":resizable=\"['top', 'top-left', 'top-right']\"",
+        ":resizable=\"['top', 'top-left', 'top-right', 'bottom', 'bottom-left', 'bottom-right']\""
       ]
     },
     "scroll-with-window": {
@@ -90,7 +93,7 @@
     "hide-grippers": {
       "type": "Boolean",
       "category": "style",
-      "desc": "If the QWindow grippers should be displayed"
+      "desc": "If the QWindow grippers should be hidden"
     },
     "round-grippers": {
       "type": "Boolean",
@@ -111,20 +114,39 @@
         "identifier": {
           "type": "Object",
           "desc": "Key for the object",
-          "values": ["visible","embedded","pinned","maximize","fullscreen"],
+          "values": [
+            "visible",
+            "embedded",
+            "pinned",
+            "maximize",
+            "fullscreen"
+          ],
           "definition": {
-            "state": {
+            "on": {
               "type": "Object",
-              "desc": "Used when the state is true",
-              "values": ["on","off"],
+              "desc": "The `on` key identifier is used when the state is `true`",
               "definition": {
                 "icon": {
                   "type": "String",
-                  "desc": "The icon to display based on state for this menu item (can be empty)"
+                  "desc": "The icon to display based on state is `true` (can be empty)"
                 },
                 "label": {
                   "type": "String",
-                  "desc": "The label to display based on state for this menu item"
+                  "desc": "The label to display based on state is `true`"
+                }
+              }
+            },
+            "off": {
+              "type": "Object",
+              "desc": "The `off` key identifier is used when the state is `false`",
+              "definition": {
+                "icon": {
+                  "type": "String",
+                  "desc": "The icon to display based on state is `false` (can be empty)"
+                },
+                "label": {
+                  "type": "String",
+                  "desc": "The label to display based on state is `false`"
                 }
               }
             }
@@ -135,32 +157,59 @@
     "start-x": {
       "type": ["Number","String"],
       "category": "state",
-      "desc": "The initial starting X position (in px)"
+      "desc": "The initial starting X position (in px)",
+      "examples": [
+        "start-x=\"200\""
+      ]
     },
     "start-y": {
       "type": ["Number","String"],
       "category": "state",
-      "desc": "The initial starting Y position (in px)"
+      "desc": "The initial starting Y position (in px)",
+      "examples": [
+        "start-y=\"200\""
+      ]
     },
     "width": {
       "type": ["Number","String"],
       "category": "state",
-      "desc": "The initial starting width size (in px)"
+      "desc": "The initial starting width size (in px)",
+      "examples": [
+        "width=\"400\""
+      ]
     },
     "height": {
       "type": ["Number","String"],
       "category": "state",
-      "desc": "The initial starting height size (in px)"
+      "desc": "The initial starting height size (in px)",
+      "examples": [
+        "height=\"300\""
+      ]
     },
     "actions": {
       "type": "Array",
       "category": "state",
-      "desc": "The actions that can be applied to the QWindow"
+      "desc": "The actions that can be applied to the QWindow",
+      "default": "['pin', 'embedded', 'maximize', 'close', 'fullscreen']",
+      "values": [
+        "pin",
+        "embedded",
+        "maximize",
+        "close",
+        "fullscreen"
+      ],
+      "examples": [
+        "['pin', 'embedded']",
+        "['pin', 'embedded', 'fullscreen']"
+      ]
     },
     "color": {
       "type": "String",
       "category": "style",
-      "desc": "Any color from the [Quasar Color Pallete](https://quasar.dev/style/color-palette) or any CSS color"
+      "desc": "Any color from the [Quasar Color Pallete](https://quasar.dev/style/color-palette) or any CSS color",
+      "examples": [
+        "color=\"blue-grey-8\""
+      ]
     },
     "background-color": {
       "type": "String",
@@ -170,12 +219,18 @@
     "gripper-color": {
       "type": "String",
       "category": "style",
-      "desc": "Any color from the [Quasar Color Pallete](https://quasar.dev/style/color-palette) or any CSS color"
+      "desc": "Any color from the [Quasar Color Pallete](https://quasar.dev/style/color-palette) or any CSS color",
+      "examples": [
+        "gripper-color=\"green-6\""
+      ]
     },
     "gripper-background-color": {
       "type": "String",
       "category": "style",
-      "desc": "Any color from the [Quasar Color Pallete](https://quasar.dev/style/color-palette) or any CSS color"
+      "desc": "Any color from the [Quasar Color Pallete](https://quasar.dev/style/color-palette) or any CSS color",
+      "examples": [
+        "gripper-background-color=\"yellow-6\""
+      ]
     },
     "menu-func": {
       "type": "Function",
@@ -197,7 +252,7 @@
             },
             "state": {
               "type": "Boolean",
-              "desc": "If the state is true (uses 'on') or false (uses 'off')"
+              "desc": "If the state is true (uses `on`) or false (uses `off`)"
             },
             "on": {
               "type": "Object",
@@ -251,8 +306,8 @@
       "category": "style",
       "desc": "This can be any CSS unit (including unit)",
       "examples": [
-        "1px",
-        ".15rem"
+        "border-width=\"1px\"",
+        "border-width=\".15rem\""
       ]
     },
     "border-style": {
@@ -261,8 +316,8 @@
       "category": "style",
       "desc": "This can be any CSS border style",
       "examples": [
-        "solid",
-        "dashed"
+        "border-style=\"solid\"",
+        "border-style=\"dashed\""
       ]
     },
     "titlebar-style": {
@@ -270,7 +325,7 @@
       "category": "style",
       "desc": "Style definitions to be attributed to the titlebar",
       "examples": [
-        "background-color: #ff0000",
+        "titlebar-style=\"background-color: #ff0000\"",
         ":titlebar-style=\"{ backgroundColor: '#ff0000' }\""
       ]
     },
@@ -279,7 +334,7 @@
       "category": "style",
       "desc": "Class definitions to be attributed to the titlebar",
       "examples": [
-        "my-special-class",
+        "titlebar-class=\"my-special-class\"",
         ":titlebar-class=\"{ 'my-special-class': [Boolean condition] }\""
       ]
     },
@@ -288,7 +343,7 @@
       "category": "style",
       "desc": "Style definitions to be attributed to the content",
       "examples": [
-        "background-color: #ff0000",
+        "content-style=\"background-color: #ff0000\"",
         ":content-style=\"{ backgroundColor: '#ff0000' }\""
       ]
     },
@@ -297,14 +352,14 @@
       "category": "style",
       "desc": "Class definitions to be attributed to the content",
       "examples": [
-        "my-special-class",
+        "content-class=\"my-special-class\"",
         ":content-class=\"{ 'my-special-class': [Boolean condition] }\""
       ]
     }
   },
   "events": {
     "input": {
-      "desc": "v-model; When the QWindow is displayed or hidden",
+      "desc": "`v-model`; When the QWindow is displayed or hidden",
       "params": {
         "state": {
           "type": "Boolean",
@@ -422,7 +477,7 @@
       "desc": "Makes the QWindow maximized"
     },
     "restore": {
-      "desc": "Restores the QWindow maximized"
+      "desc": "Restores the QWindow (from maximized)"
     },
     "fullscreenEnter": {
       "desc": "Makes the QWindow enter fullscreen"
@@ -490,6 +545,13 @@
     },
     "canDo": {
       "desc": "Pass in a action, like `embedded` or `close` and will return true or false if it can be done at this time. Useful for determining items in the menu",
+      "values":[
+        "embedded",
+        "pinned",
+        "maximize",
+        "fullscreen",
+        "close"
+      ],
       "params": {
         "state": {
           "type": "String",
@@ -640,7 +702,10 @@
         "data": {
           "type": "Object",
           "desc": "Contains the scoped data",
-          "definitions": {
+          "examples": [
+            "{ zIndex: 4000 }"
+          ],
+          "definition": {
             "zIndex": {
               "type": "Number",
               "desc": "The current `z-index` of the QWindow",
