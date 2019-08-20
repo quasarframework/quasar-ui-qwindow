@@ -1,6 +1,6 @@
 {
   "name": "@quasar/quasar-app-extension-qwindow",
-  "version": "1.0.0-alpha.3",
+  "version": "1.0.0-alpha.4",
   "description": "Floating, movable, resizable windows for your Quasar App",
   "author": "Jeff Galbraith <jeff@quasar.dev>",
   "license": "MIT",
