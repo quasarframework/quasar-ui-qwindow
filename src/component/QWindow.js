@@ -966,6 +966,7 @@ export default function (ssrContext) {
       },
 
       canResize (resizeHandle) {
+        if (this.noResize === true) return false
         const missing = this.handles.filter(handle => !this.resizable.includes(handle))
         return missing.includes(resizeHandle) !== true
       },
