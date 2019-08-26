@@ -83,6 +83,7 @@ export default {
     GripperNone: () => import('../examples/GripperNone'),
     GripperRound: () => import('../examples/GripperRound'),
     GripperColored: () => import('../examples/GripperColored'),
+    NoResize: () => import('../examples/NoResize'),
     NoMove: () => import('../examples/NoMove'),
     Resizable: () => import('../examples/Resizable'),
     Messages: () => import('../examples/Messages'),
