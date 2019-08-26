@@ -452,6 +452,24 @@
           }
         }
       }
+    },
+    "beforeDrag": {
+      "desc": "When the QWindow is about to be moved or resized",
+      "params": {
+        "event": {
+          "type": "Object",
+          "desc": "The event associated with the drag"
+        }
+      }
+    },
+    "afterDrag": {
+      "desc": "When the QWindow is done moving or resizing",
+      "params": {
+        "event": {
+          "type": "Object",
+          "desc": "The event associated with the drag"
+        }
+      }
     }
   },
   "methods": {
