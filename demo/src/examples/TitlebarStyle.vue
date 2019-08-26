@@ -3,8 +3,8 @@
     <q-window
       v-model="visible"
       title="QWindow Titlebar Style"
-      :titlebarStyle="{ borderBottom: '1px solid #BB714F', fontStyle: 'italic', fontSize: '2em' }"
-      :contentStyle="{ border: '1px solid #BB714F' }"
+      :titlebar-style="{ borderBottom: '1px solid #BB714F', fontStyle: 'italic', fontSize: '2em' }"
+      :content-style="{ border: '1px solid #BB714F' }"
       border-width="1px"
       border-style="solid"
       color="#BB714F"
