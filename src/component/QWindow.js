@@ -1329,6 +1329,7 @@ export default function (ssrContext) {
           }
         }
         this.state.dragging = true
+        this.$emit('beforeDrag', e)
       },
 
       onTouchStart (e, resizeHandle) {
@@ -1355,6 +1356,7 @@ export default function (ssrContext) {
         this.mouseOffsetX = -1
         this.mouseOffsetY = -1
         this.state.dragging = false
+        this.$emit('afterDrag', e)
         this.$emit('position', this.computedPosition)
       },
 

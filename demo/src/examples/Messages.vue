@@ -16,6 +16,8 @@
       @maximize="v => messages.unshift(`maximize(${v})`)"
       @fullscreen="v => messages.unshift(`fullscreen(${v})`)"
       @selected="v => messages.unshift(`selected(${v})`)"
+      @beforeDrag="v => messages.unshift(`beforeDrag(${v})`)"
+      @afterDrag="v => messages.unshift(`afterDrag(${v})`)"
       @position="v => messages.unshift(`position(${JSON.stringify(v)})`)"
     >
       <div class="q-pa-md fit">
