@@ -5,8 +5,7 @@ import './window.styl'
 
 // Utils
 import { prevent } from 'quasar/src/utils/event'
-import { getVm } from 'quasar/src/utils/vm.js'
-import { Colorize } from 'quasar-mixin-colorize'
+import Colorize from '@quasar/quasar-app-extension-colorize/src/colorize.js'
 
 import {
   QBtn,
@@ -1599,17 +1598,18 @@ export default function (ssrContext) {
 
       __createPortal () {
         const obj = {
+          name: 'QWindowPortal',
+          parent: this,
+
           inheritAttrs: false,
 
           render: h => this.__render(h),
 
-          style: this.$options.style,
-          classes: this.$options.classes,
           components: this.$options.components,
           directives: this.$options.directives
         }
 
-        this.__portal = getVm(this, obj).$mount()
+        this.__portal = new Vue(obj).$mount()
       },
 
       __destroyPortal () {
