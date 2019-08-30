@@ -13,10 +13,7 @@
         </q-btn>
 
         <q-toolbar-title v-if="$q.screen.width > 500">
-          QWindow
-          <q-tooltip v-if="$q.screen.width < 1077">
-            QWindow
-          </q-tooltip>
+          QWindow <span class="text-outline" style="font-size: 14px">{{ version }}</span>
         </q-toolbar-title>
 
         <div>Quasar v{{ $q.version }}</div>
@@ -80,6 +77,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import { scroll } from 'quasar'
+const version = require('@quasar/quasar-app-extension-qwindow/package.json').version
 
 export default {
   name: 'MainLayout',
@@ -90,7 +88,8 @@ export default {
     return {
       leftDrawerOpen: this.$q.platform.is.desktop,
       rightDrawerOpen: this.$q.platform.is.desktop,
-      activeToc: 0
+      activeToc: 0,
+      version: version
     }
   },
   computed: {
