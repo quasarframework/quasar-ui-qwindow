@@ -520,6 +520,24 @@ export default function (ssrContext) {
             style.height = this.computedHeight + 'px'
           }
         }
+
+        if (this.contentStyle) {
+          const type = Object.prototype.toString.call(this.contentStyle)
+          if (type === '[object Object]') {
+            style = { ...style, ...this.contentStyle }
+          } else if ((type === '[object Array]')) {
+            this.contentStyle.forEach(item => {
+              style = { ...style, ...item }
+            })
+          } else if (typeof this.contentStyle === 'string') {
+            let items = this.contentStyle.split(',')
+            items.forEach(item => {
+              let props = item.split(':')
+              style[props[0].trim()] = props[1].trim()
+            })
+          }
+        }
+
         return style
       },
 
@@ -542,7 +560,7 @@ export default function (ssrContext) {
             style = Object.assign(this.titlebarStyle, style)
           } else if (typeof this.titlebarStyle === 'string') {
             style = this.titlebarStyle + '; height:' + titleHeight
-          } if (Array.isArray(this.titlebarStyle)) {
+          } else if (Array.isArray(this.titlebarStyle)) {
             style = this.titlebarStyle
             style.push({ height: titleHeight })
           }
