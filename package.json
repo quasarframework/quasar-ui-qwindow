@@ -1,6 +1,6 @@
 {
   "name": "@quasar/quasar-app-extension-qwindow",
-  "version": "1.0.0-alpha.9",
+  "version": "1.0.0-alpha.10",
   "description": "Floating, movable, resizable windows for your Quasar App",
   "author": "Jeff Galbraith <jeff@quasar.dev>",
   "license": "MIT",
@@ -28,7 +28,7 @@
   "devDependencies": {
     "@vue/eslint-config-standard": "^4.0.0",
     "babel-eslint": "^10.0.3",
-    "eslint": "^6.2.2",
+    "eslint": "^6.3.0",
     "eslint-loader": "^3.0.0",
     "eslint-plugin-vue": "^5.2.3",
     "fs": "^0.0.2",

@@ -66,6 +66,9 @@ In the example below, we will use all actions, except for `close` which will be 
       <example-card title="Color" name="Color" :tag-parts="getTagParts(require('!!raw-loader!../examples/Color.vue').default)" />
       <example-card title="Border" name="Border" :tag-parts="getTagParts(require('!!raw-loader!../examples/Border.vue').default)" />
       <example-card title="Titlebar Style" name="TitlebarStyle" :tag-parts="getTagParts(require('!!raw-loader!../examples/TitlebarStyle.vue').default)" />
+      <example-card title="Content Style - String" name="ContentStyleString" :tag-parts="getTagParts(require('!!raw-loader!../examples/ContentStyleString.vue').default)" />
+      <example-card title="Content Style - Object" name="ContentStyleObject" :tag-parts="getTagParts(require('!!raw-loader!../examples/ContentStyleObject.vue').default)" />
+      <example-card title="Content Style - Array" name="ContentStyleArray" :tag-parts="getTagParts(require('!!raw-loader!../examples/ContentStyleArray.vue').default)" />
 
       <example-card title="Hide Grippers" name="GripperNone" :tag-parts="getTagParts(require('!!raw-loader!../examples/GripperNone.vue').default)">
         <q-markdown>
@@ -312,6 +315,9 @@ export default {
     this.addToToc('Color', 2)
     this.addToToc('Border', 2)
     this.addToToc('Titlebar Style', 2)
+    this.addToToc('Content Style - String', 2)
+    this.addToToc('Content Style - Object', 2)
+    this.addToToc('Content Style - Array', 2)
     this.addToToc('Hide Grippers', 2)
     this.addToToc('Round Grippers', 2)
     this.addToToc('Colored Grippers', 2)
