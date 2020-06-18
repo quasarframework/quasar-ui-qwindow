@@ -61,7 +61,7 @@ export default {
         if (menuItems[menuItems.length - 1].key === 'visible') {
           menuItems.splice(menuItems.length - 1, 0, 'separator')
         }
-        let sendToBack = {
+        const sendToBack = {
           key: 'sendtoback',
           state: false,
           on: {
@@ -75,7 +75,7 @@ export default {
             func: this.sendToBack1
           }
         }
-        let bringToFront = {
+        const bringToFront = {
           key: 'bringtofront',
           state: false,
           on: {
@@ -89,7 +89,7 @@ export default {
             func: this.bringToFront1
           }
         }
-        let centerWindow = {
+        const centerWindow = {
           key: 'centerwindow',
           state: false,
           on: {
@@ -124,7 +124,7 @@ export default {
         if (menuItems[menuItems.length - 1].key === 'visible') {
           menuItems.splice(menuItems.length - 1, 0, 'separator')
         }
-        let sendToBack = {
+        const sendToBack = {
           key: 'sendtoback',
           state: false,
           on: {
@@ -138,7 +138,7 @@ export default {
             func: this.sendToBack2
           }
         }
-        let bringToFront = {
+        const bringToFront = {
           key: 'bringtofront',
           state: false,
           on: {
@@ -152,7 +152,7 @@ export default {
             func: this.bringToFront2
           }
         }
-        let centerWindow = {
+        const centerWindow = {
           key: 'centerwindow',
           state: false,
           on: {

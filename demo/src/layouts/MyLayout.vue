@@ -218,7 +218,7 @@ export default {
         if (menuItems[menuItems.length - 1].key === 'visible') {
           menuItems.splice(menuItems.length - 1, 0, 'separator')
         }
-        let sendToBack = {
+        const sendToBack = {
           key: 'sendtoback',
           state: false,
           on: {
@@ -232,7 +232,7 @@ export default {
             func: this.sendToBack
           }
         }
-        let bringToFront = {
+        const bringToFront = {
           key: 'bringtofront',
           state: false,
           on: {
