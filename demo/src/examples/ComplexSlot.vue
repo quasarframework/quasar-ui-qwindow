@@ -93,7 +93,7 @@
 
 <script>
 export default {
-  name: 'MyLayout',
+  name: 'ComplexSlot',
   data () {
     return {
       visible: true,

@@ -18,7 +18,7 @@
     "core-js": "^3.6.5"
   },
   "devDependencies": {
-    "@quasar/app": "^2.0.9"
+    "@quasar/app": "^2.1.0"
   },
   "browserslist": [
     "last 10 Chrome versions",

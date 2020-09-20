@@ -24,8 +24,7 @@ yarn-error.log*
 .babelrc
 
 # Other
-/src/components/QCalendar.json
-/src/utils/timestamp.json
+/src/components/QWindow.json
 jsconfig.json
 
 # Testing
