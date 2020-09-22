@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="q-ma-md" style="max-width: 800px; width: 100%">
     <q-window
       v-model="visible"
       title="QWindow Icons and Language"

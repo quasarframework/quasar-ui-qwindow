@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="q-ma-md" style="max-width: 800px; width: 100%">
     <q-window
       ref="window1"
       v-model="visible1"

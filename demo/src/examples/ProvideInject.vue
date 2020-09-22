@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="q-ma-md" style="max-width: 800px; width: 100%">
     <component-provide>
       <q-window
         ref="window"
