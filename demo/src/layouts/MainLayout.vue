@@ -1,22 +1,24 @@
 <template>
-  <q-layout view="HHh LpR fFf">
+  <q-layout view="HHh LpR fFf" @scroll="onScroll">
     <q-header elevated>
       <q-toolbar>
         <q-btn
           flat
           dense
           round
+          icon="menu"
           @click="leftDrawerOpen = !leftDrawerOpen"
           aria-label="Menu"
-        >
-          <q-icon name="menu" />
-        </q-btn>
+        />
 
-        <q-toolbar-title v-if="$q.screen.width > 500">
-          QWindow <span class="text-outline" style="font-size: 14px">{{ version }}</span>
+        <q-toolbar-title>
+          QWindow <span class="text-subtitle2">v{{ version }}</span>
         </q-toolbar-title>
 
-        <div>Quasar v{{ $q.version }}</div>
+        <q-space />
+
+        <q-btn flat round @click="$q.dark.toggle()" :icon="$q.dark.isActive ? 'brightness_2' : 'brightness_5'" />
+        <div v-if="$q.screen.width > 500">Quasar v{{ $q.version }}</div>
 
         <q-btn
           flat
@@ -33,20 +35,26 @@
 
     <q-drawer
       v-model="leftDrawerOpen"
+      show-if-above
       bordered
-      content-style="background-color: #f8f8ff"
+      aria-label="Menu"
+      class="menu"
     >
       <q-list>
         <q-item-label header>Essential Links</q-item-label>
+        <q-separator />
       </q-list>
       <essential-links />
     </q-drawer>
 
     <q-drawer
+      ref="drawer"
       v-model="rightDrawerOpen"
+      show-if-above
       side="right"
       bordered
-      content-style="background-color: #f8f8ff"
+      aria-label="Table of Contents"
+      class="toc"
     >
       <q-scroll-area class="fit">
         <q-list dense>
@@ -69,7 +77,9 @@
     </q-drawer>
 
     <q-page-container>
-      <router-view />
+      <transition name="fade">
+        <router-view />
+      </transition>
     </q-page-container>
   </q-layout>
 </template>
@@ -77,7 +87,8 @@
 <script>
 import { mapGetters } from 'vuex'
 import { scroll } from 'quasar'
-const version = require('@quasar/quasar-app-extension-qwindow/package.json').version
+const { setScrollPosition } = scroll
+import { version } from 'ui'
 
 export default {
   name: 'MainLayout',
@@ -86,16 +97,11 @@ export default {
   },
   data () {
     return {
+      version: version,
       leftDrawerOpen: this.$q.platform.is.desktop,
       rightDrawerOpen: this.$q.platform.is.desktop,
-      activeToc: 0,
-      version: version
+      activeToc: 0
     }
-  },
-  computed: {
-    ...mapGetters({
-      toc: 'common/toc'
-    })
   },
   mounted () {
     // code to handle anchor link on refresh/new page, etc
@@ -103,8 +109,13 @@ export default {
       const id = location.hash.substring(1, location.hash.length)
       setTimeout(() => {
         this.scrollTo(id)
-      }, 350)
+      }, 200)
     }
+  },
+  computed: {
+    ...mapGetters({
+      toc: 'common/toc'
+    })
   },
   methods: {
     scrollTo (id) {
@@ -112,12 +123,45 @@ export default {
       const el = document.getElementById(id)
 
       if (el) {
-        this.scrollPage(el)
+        setTimeout(() => {
+          this.scrollPage(el)
+        }, 200)
       }
     },
     scrollPage (el) {
+      // const target = getScrollTarget(el)
       const offset = el.offsetTop - 50
-      scroll.setScrollPosition(window, offset, 500)
+      // setScrollPosition(target, offset, 500)
+      setScrollPosition(window, offset, 500)
+    },
+    onScroll ({ position }) {
+      if (this.scrollingPage !== true) {
+        this.updateActiveToc(position)
+      }
+    },
+    updateActiveToc (position) {
+      const toc = this.toc
+      let last
+
+      for (const i in toc) {
+        const section = toc[i]
+        const item = document.getElementById(section.id)
+
+        if (item === null) {
+          continue
+        }
+
+        if (item.offsetTop >= position + 50) {
+          if (last === void 0) {
+            last = section.id
+          }
+          break
+        }
+      }
+
+      if (last !== void 0) {
+        this.activeToc = last
+      }
     }
   }
 }

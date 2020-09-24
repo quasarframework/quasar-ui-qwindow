@@ -1,14 +1,9 @@
 {
-  "qautomate": {
-    "quasarConfFixMode": "automatic",
-    "sort": true
-  },
-  "@quasar/qwindow": {},
   "@quasar/qribbon": {},
   "@quasar/qmarkdown": {
     "import_md": true,
     "import_vmd": true
   },
-  "@quasar/qpublish": {},
-  "@quasar/colorize": {}
+  "example-viewer": {},
+  "json-api-viewer": {}
 }
