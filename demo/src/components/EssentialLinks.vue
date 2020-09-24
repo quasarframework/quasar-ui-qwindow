@@ -19,7 +19,7 @@
       </q-item-section>
     </q-item>
     <q-separator />
-    <q-item clickable tag="a" target="_blank" href="https://github.com/quasarframework/app-extension-qwindow">
+    <q-item clickable tag="a" target="_blank" href="https://github.com/quasarframework/quasar-ui-qwindow">
       <q-item-section avatar>
         <q-icon name="extension" />
       </q-item-section>
@@ -28,7 +28,7 @@
         <q-item-label caption>qwindow</q-item-label>
       </q-item-section>
     </q-item>
-    <q-item clickable tag="a" target="_blank" href="https://github.com/quasarframework/app-extension-qmarkdown">
+    <q-item clickable tag="a" target="_blank" href="https://github.com/quasarframework/quasar-ui-qmarkdown">
       <q-item-section avatar>
         <q-icon name="extension" />
       </q-item-section>
