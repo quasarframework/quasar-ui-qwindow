@@ -2,7 +2,7 @@ import { QColorizeMixin } from 'q-colorize-mixin'
 import canRender from 'quasar/src/mixins/can-render'
 
 // Utils
-import { prevent } from 'quasar/src/utils/event'
+import { prevent, stopAndPrevent } from 'quasar/src/utils/event'
 
 import {
   QBtn,
@@ -25,10 +25,17 @@ const startingZIndex = 4000
 // 6000 is $z-fullscreen and $z-menu
 const maxZIndex = 6000 - 100
 
+// number of windows registered globally
 let QWindowCount = 0
+
+// layered windows
+let layers = {}
+
+// default starting position
+// relative to viewport for floating
+// relative to document for scroll-with-window
 let defaultX = 20
 let defaultY = 20
-let layers = {}
 
 const getMousePosition = function (e, type = 'x') {
   if (type === 'x') {
@@ -36,6 +43,16 @@ const getMousePosition = function (e, type = 'x') {
   }
   return e.pageY
 }
+
+// const getOffset = function (el) {
+//   let x = 0, y = 0
+//   while (el && !isNaN(el.offsetLeft) && !isNaN(el.offsetTop)) {
+//       x += el.offsetLeft - el.scrollLeft
+//       y += el.offsetTop - el.scrollTop
+//       el = el.offsetParent
+//   }
+//   return { top: y, left: x }
+// }
 
 export default {
   name: 'QWindow',
@@ -88,7 +105,7 @@ export default {
     backgroundColor: {
       type: String
     },
-    gripperColor: {
+    gripperBorderColor: {
       type: String
     },
     gripperBackgroundColor: {
@@ -140,6 +157,7 @@ export default {
         right: 400,
         minHeight: 100,
         minWidth: 100,
+        shouldDrag: false,
         dragging: false
       },
       restoreState: {
@@ -246,14 +264,14 @@ export default {
     this.__updateStateInfo()
 
     // calculate left starting position
-    if (this.startX) {
+    if (this.startX > 0) {
       this.state.left = this.startX
     } else {
       this.state.left = defaultX * QWindowCount
     }
 
     // calculate top starting position
-    if (this.startY) {
+    if (this.startY > 0) {
       this.state.top = this.startY
     } else {
       this.state.top = defaultY * QWindowCount
@@ -311,6 +329,7 @@ export default {
 
     // set up scroll handler
     document.addEventListener('scroll', this.__onScroll, { passive: true })
+    // set up mousedown on body (so windows can deselect themselves on outside click)
     document.body.addEventListener('mousedown', this.__onMouseDownBody, { passive: false })
   },
 
@@ -496,8 +515,8 @@ export default {
           height: '100%'
         }
       } else {
-        let top = this.state.top + (this.scrollWithWindow === false ? this.scrollY : 0)
-        let left = this.state.left + (this.scrollWithWindow === false ? this.scrollX : 0)
+        let top = this.state.top + (this.scrollWithWindow !== true ? this.scrollY : 0)
+        let left = this.state.left + (this.scrollWithWindow !== true ? this.scrollX : 0)
         style = {
           position: 'absolute',
           display: 'inline-block',
@@ -615,6 +634,7 @@ export default {
           this.pin()
         }
       }
+      this.$emit('selected', this.selected)
     },
     'stateInfo.visible.state' (val) {
       this.$emit('input', val)
@@ -1136,17 +1156,21 @@ export default {
     },
 
     __onScroll (e) {
-      this.scrollY = e.srcElement.scrollingElement.scrollTop
-      this.scrollX = e.srcElement.scrollingElement.scrollLeft
-      this.$nextTick(() => {
-        this.$emit('position', this.computedPosition)
-      })
+      if (window !== void 0) {
+        this.scrollY = window.pageYOffset
+        this.scrollX = window.pageXOffset
+        if (this.isFloating === true) {
+          this.$nextTick(() => {
+            this.$emit('position', this.computedPosition)
+          })
+        }
+      }
     },
 
     // mousedown for document.body
     __onMouseDownBody (e) {
       if (this.isEmbedded) {
-        this.state.dragging = false
+        this.state.shouldDrag = this.state.dragging = false
         return
       }
 
@@ -1188,278 +1212,298 @@ export default {
       } else {
         this.selected = false
       }
-      // emit 'selected' if it has changed
-      if (oldSelected !== this.selected) {
-        this.$emit('selected', this.selected)
-      }
     },
 
     // mousedown for element
     __onMouseDown (e, resizeHandle) {
-      const oldSelected = this.selected
+      this.__removeEventListeners(resizeHandle)
+      if (e.buttons !== 1) {
+        return
+      }
+
+      this.resizeHandle = resizeHandle
       this.selected === true
 
-      // emit 'selected' if it has changed
-      if (oldSelected !== this.selected) {
-        if (this.isFloating && this.selected === true) {
-          this.bringToFront()
-        }
-        this.$emit('selected', this.selected)
+      if (this.isFloating && this.selected === true) {
+        this.bringToFront()
       }
 
-      const x = getMousePosition(e, 'x')
-      const y = getMousePosition(e, 'y')
+      this.mousePos.x = getMousePosition(e, 'x')
+      this.mousePos.y = getMousePosition(e, 'y')
 
-      this.mousePos.x = x
-      this.mousePos.y = y
-
-      let shiftX = e.clientX - e.target.getBoundingClientRect().left
-      let shiftY = e.clientY - e.target.getBoundingClientRect().top
-
-      const self = this
-
-      /* ----------------------------------------------------- */
-      function __onMouseMove (e, resizeHandle2) {
-        prevent(e)
-  
-        const x = getMousePosition(e, 'x')
-        const y = getMousePosition(e, 'y')
-  
-        if (self.state.dragging !== true) {
-          if (Math.abs(self.mousePos.x - x) >= 3 || Math.abs(self.mousePos.y - y) >= 3) {
-            self.state.dragging = true
-          }
-          else {
-            return
-          }
-        }
-
-        self.state.dragging = true
-  
-        // save existing position information
-        const tmpTop = self.state.top
-        const tmpLeft = self.state.left
-        const tmpRight = self.state.right
-        const tmpBottom = self.state.bottom
-        const tmpHeight = tmpBottom - tmpTop
-        const tmpWidth = tmpRight - tmpLeft
-  
-        // make some short-cuts
-        const parent = self.$el.parentElement // e.currentTarget.parentElement.parentElement
-        const grandparent = self.$el.parentElement.parentElement.parentElement // e.currentTarget.parentElement.parentElement.parentElement
-  
-        const offsetTop = parent.offsetTop
-        const offsetLeft = parent.offsetLeft
-        const grandOffsetTop = grandparent.offsetTop
-        const grandOffsetLeft = grandparent.offsetLeft
-        
-        const clientY = y, clientX = x, pageX = e.pageX, pageY = e.pageY
-
-        switch (resizeHandle2 || resizeHandle) {
-          case 'top':
-            self.state.top = pageY - shiftY
-            self.$nextTick(() => {
-              if (self.computedHeight < self.state.minHeight) {
-                self.state.top = tmpBottom - self.state.minHeight
-              }
-            })
-            break
-          case 'left':
-            self.state.left = pageX - shiftX
-            self.$nextTick(() => {
-              if (self.computedWidth < self.state.minWidth) {
-                self.state.left = tmpRight - self.state.minWidth
-              }
-            })
-            break
-          case 'right':
-            self.state.right = pageX - shiftX
-            self.$nextTick(() => {
-              if (self.computedWidth < self.state.minWidth) {
-                self.state.right = tmpLeft - self.state.minWidth
-              }
-            })
-            break
-          case 'bottom':
-            self.state.bottom = pageY - shiftY
-            self.$nextTick(() => {
-              if (self.computedHeight < self.state.minHeight) {
-                self.state.bottom = tmpTop - self.state.minHeight
-              }
-            })
-            break
-          case 'top-left':
-            __onMouseMove(e, 'top')
-            __onMouseMove(e, 'left')
-            break
-          case 'top-right':
-            __onMouseMove(e, 'top')
-            __onMouseMove(e, 'right')
-            break
-          case 'bottom-left':
-            __onMouseMove(e, 'bottom')
-            __onMouseMove(e, 'left')
-            break
-          case 'bottom-right':
-            __onMouseMove(e, 'bottom')
-            __onMouseMove(e, 'right')
-            break
-          case 'titlebar':
-            if (self.scrollWithWindow === true) {
-              self.state.top = clientY - shiftY - self.mouseOffsetY + window.pageYOffset
-              self.state.left = clientX - shiftX - self.mouseOffsetX + window.pageXOffset
-            } else {
-              if (self.$q.platform.is.mobile === true) {
-                self.state.top = clientY - shiftY - self.mouseOffsetY
-                self.state.left = clientX - shiftX - self.mouseOffsetX
-              } else {
-                self.state.top = clientY - shiftY - grandOffsetTop - self.mouseOffsetY
-                self.state.left = clientX - shiftX - grandOffsetLeft - self.mouseOffsetX
-              }
-            }
-            self.state.bottom = self.state.top + tmpHeight
-            self.state.right = self.state.left + tmpWidth
-            break
-        }
-      }
-      /* ----------------------------------------------------- */
-
-      /* ----------------------------------------------------- */
-      function __onMouseUp() {
-        prevent(e)
-        document.removeEventListener('mousemove', __onMouseMove, { capture: true })
-        document.removeEventListener('mouseup', __onMouseUp, { capture: true })
-      }
-      /* ----------------------------------------------------- */
-
-      document.addEventListener('mousemove', __onMouseMove, { capture: true })
-      document.addEventListener('mouseup', __onMouseUp, { capture: true })
-     },
-
-    __onMouseUp (e, resizeHandle) {
-      this.state.dragging = false
-    },
-
-
-    __onDrag (e, resizeHandle) {
-      // e.preventDefault()
-      if (this.$q.platform.is.mobile !== true) {
-        if (this.$q.platform.is.chrome === true) {
-          if (e.clientX === 0 || e.clientY === 0) {
-            return
-          }
-        }
-      }
-
-      if (e.dataTransfer && e.dataTransfer.effectAllowed) {
-        e.dataTransfer.effectAllowed = 'none'
-      }
+      const rect = this.__portal.$el.getBoundingClientRect()
+      this.shiftX = e.clientX - rect.left
+      this.shiftY = e.clientY - rect.top
 
       // save existing position information
-      const tmpTop = this.state.top
-      const tmpLeft = this.state.left
-      const tmpRight = this.state.right
-      const tmpBottom = this.state.bottom
-      const tmpHeight = tmpBottom - tmpTop
-      const tmpWidth = tmpRight - tmpLeft
+      this.tmpTop = this.state.top
+      this.tmpLeft = this.state.left
+      this.tmpRight = this.state.right
+      this.tmpBottom = this.state.bottom
+      this.tmpHeight = this.tmpBottom - this.tmpTop
+      this.tmpWidth = this.tmpRight - this.tmpLeft
 
-      // make some short-cuts
-      const parent = e.currentTarget.parentElement.parentElement
-      const grandparent = e.currentTarget.parentElement.parentElement.parentElement
+      this.state.shouldDrag = true
 
-      const offsetTop = parent.offsetTop
-      const offsetLeft = parent.offsetLeft
-      const grandOffsetTop = grandparent.offsetTop
-      const grandOffsetLeft = grandparent.offsetLeft
+      this.__addEventListeners()
 
-      let clientY, clientX //, pageY, pageX
+      // stopAndPrevent(e)
+      prevent(e)
+     },
 
-      if (this.$q.platform.is.mobile === true) {
-        clientY = e.touches[0].clientY
-        clientX = e.touches[0].clientX
-        // pageY = e.touches[0].pageY
-        // pageX = e.touches[0].pageX
-      } else if (this.$q.platform.is.chrome === true) {
-          clientY = e.clientY
-          clientX = e.clientX
-        // pageY = e.pageY
-        // pageX = e.pageX
+    __addEventListeners () {
+      document.body.addEventListener('mousemove', this.__onMouseMove, { capture: true })
+      document.body.addEventListener('mouseup', this.__onMouseUp, { capture: true })
+      document.body.addEventListener('keyup', this.__onKeyUp, { capture: true })
+    },
+
+    __removeEventListeners () {
+      document.body.removeEventListener('mousemove', this.__onMouseMove)
+      document.body.removeEventListener('mouseup', this.__onMouseUp)
+      document.body.removeEventListener('keyup', this.__onKeyUp)
+    },
+
+    __onKeyUp (e) {
+      // if ESC key
+      if (e.keycode === 27 && this.isDragging() === true) {
+        prevent(e)
+        this.__removeEventListeners()
+        this.state.shouldDrag = this.state.dragging = false
+        this.state.top = this.tmpTop
+        this.state.left = this.tmpLeft
+        this.state.right = this.tmpRight
+        this.state.bottom = this.tmpBottom
+        this.$nextTick(() => {
+          this.$emit('canceled', this.computedPosition)
+        })
+  
       }
-      else {
-        clientY = parent.clientY
-        clientX = parent.clientX
+    },
+
+    __onMouseMove (e, resizeHandle) {
+      if (this.state.shouldDrag !== true || e.buttons !== 1) {
+        this.__removeEventListeners()
+        return
       }
 
-      switch (resizeHandle) {
+      const mouseX = getMousePosition(e, 'x')
+      const mouseY = getMousePosition(e, 'y')
+
+      // move 3 pixels to initiate moving
+      if (this.state.dragging !== true) {
+        if (Math.abs(this.mousePos.x - mouseX) >= 3 || Math.abs(this.mousePos.y - mouseY) >= 3) {
+          this.state.dragging = true
+          this.$emit('beforeDrag', e)
+        }
+        else {
+          return
+        }
+      }
+
+      const pageX = e.pageX, pageY = e.pageY
+
+      switch (resizeHandle || this.resizeHandle) {
         case 'top':
-          this.state.top = clientY - offsetTop
+          this.state.top = mouseY - window.pageYOffset - this.shiftY
           this.$nextTick(() => {
             if (this.computedHeight < this.state.minHeight) {
-              this.state.top = tmpBottom - this.state.minHeight
+              this.state.top = this.tmpBottom - this.state.minHeight
             }
           })
           break
         case 'left':
-          this.state.left = clientX - offsetLeft
+          this.state.left = mouseX - window.pageXOffset - this.shiftX
           this.$nextTick(() => {
             if (this.computedWidth < this.state.minWidth) {
-              this.state.left = tmpRight - this.state.minWidth
+              this.state.left = this.tmpRight - this.state.minWidth
             }
           })
           break
         case 'right':
-          this.state.right = clientX - offsetLeft
+          this.state.right = mouseX - window.pageXOffset
           this.$nextTick(() => {
             if (this.computedWidth < this.state.minWidth) {
-              this.state.right = tmpLeft - this.state.minWidth
+              this.state.right = this.tmpLeft - this.state.minWidth
             }
           })
           break
         case 'bottom':
-          this.state.bottom = clientY - offsetTop
+          this.state.bottom = mouseY - window.pageYOffset
           this.$nextTick(() => {
             if (this.computedHeight < this.state.minHeight) {
-              this.state.bottom = tmpTop - this.state.minHeight
+              this.state.bottom = this.tmpTop - this.state.minHeight
             }
           })
           break
         case 'top-left':
-          this.__onDrag(e, 'top')
-          this.__onDrag(e, 'left')
-          break
+          this.__onMouseMove(e, 'top')
+          this.__onMouseMove(e, 'left')
+          return
         case 'top-right':
-          this.__onDrag(e, 'top')
-          this.__onDrag(e, 'right')
-          break
+          this.__onMouseMove(e, 'top')
+          this.__onMouseMove(e, 'right')
+          return
         case 'bottom-left':
-          this.__onDrag(e, 'bottom')
-          this.__onDrag(e, 'left')
-          break
+          this.__onMouseMove(e, 'bottom')
+          this.__onMouseMove(e, 'left')
+          return
         case 'bottom-right':
-          this.__onDrag(e, 'bottom')
-          this.__onDrag(e, 'right')
-          break
+          this.__onMouseMove(e, 'bottom')
+          this.__onMouseMove(e, 'right')
+          return
         case 'titlebar':
           if (this.scrollWithWindow === true) {
-            this.state.top = clientY - this.mouseOffsetY + window.pageYOffset
-            this.state.left = clientX - this.mouseOffsetX + window.pageXOffset
+            this.state.top = mouseY - this.shiftY
+            this.state.left = mouseX - this.shiftX
           } else {
             if (this.$q.platform.is.mobile === true) {
-              this.state.top = clientY - this.mouseOffsetY
-              this.state.left = clientX - this.mouseOffsetX
+              this.state.top = pageY - this.shiftY - this.mouseOffsetY
+              this.state.left = pageX - this.shiftX - this.mouseOffsetX
             } else {
-              this.state.top = clientY - grandOffsetTop - this.mouseOffsetY
-              this.state.left = clientX - grandOffsetLeft - this.mouseOffsetX
+              this.state.top = mouseY - window.pageYOffset - this.shiftY
+              this.state.left = mouseX - window.pageXOffset - this.shiftX
             }
           }
-          this.state.bottom = this.state.top + tmpHeight
-          this.state.right = this.state.left + tmpWidth
+          this.state.bottom = this.state.top + this.tmpHeight
+          this.state.right = this.state.left + this.tmpWidth
           break
+      }
+
+      stopAndPrevent(e)
+    },
+    /* ----------------------------------------------------- */
+
+    /* ----------------------------------------------------- */
+    __onMouseUp(e) {
+      if (this.state.dragging === true) {
+        prevent(e)
+        this.__removeEventListeners()
+        this.state.shouldDrag = this.state.dragging = false
+        this.$emit('afterDrag', e)
+        this.$emit('position', this.computedPosition)
       }
     },
 
+    // __onDrag (e, resizeHandle) {
+    //   // e.preventDefault()
+    //   if (this.$q.platform.is.mobile !== true) {
+    //     if (this.$q.platform.is.chrome === true) {
+    //       if (e.clientX === 0 || e.clientY === 0) {
+    //         return
+    //       }
+    //     }
+    //   }
+
+    //   if (e.dataTransfer && e.dataTransfer.effectAllowed) {
+    //     e.dataTransfer.effectAllowed = 'none'
+    //   }
+
+    //   // save existing position information
+    //   const tmpTop = this.state.top
+    //   const tmpLeft = this.state.left
+    //   const tmpRight = this.state.right
+    //   const tmpBottom = this.state.bottom
+    //   const tmpHeight = tmpBottom - tmpTop
+    //   const tmpWidth = tmpRight - tmpLeft
+
+    //   // make some short-cuts
+    //   // const parent = e.currentTarget.parentElement.parentElement
+    //   // const grandparent = e.currentTarget.parentElement.parentElement.parentElement
+
+    //   const offsetTop = parent.offsetTop
+    //   const offsetLeft = parent.offsetLeft
+    //   const grandOffsetTop = grandparent.offsetTop
+    //   const grandOffsetLeft = grandparent.offsetLeft
+
+    //   let clientY, clientX //, pageY, pageX
+
+    //   if (this.$q.platform.is.mobile === true) {
+    //     clientY = e.touches[0].clientY
+    //     clientX = e.touches[0].clientX
+    //     // pageY = e.touches[0].pageY
+    //     // pageX = e.touches[0].pageX
+    //   } else if (this.$q.platform.is.chrome === true) {
+    //       clientY = e.clientY
+    //       clientX = e.clientX
+    //     // pageY = e.pageY
+    //     // pageX = e.pageX
+    //   }
+    //   else {
+    //     clientY = parent.clientY
+    //     clientX = parent.clientX
+    //   }
+
+    //   switch (resizeHandle) {
+    //     case 'top':
+    //       this.state.top = clientY - offsetTop
+    //       this.$nextTick(() => {
+    //         if (this.computedHeight < this.state.minHeight) {
+    //           this.state.top = tmpBottom - this.state.minHeight
+    //         }
+    //       })
+    //       break
+    //     case 'left':
+    //       this.state.left = clientX - offsetLeft
+    //       this.$nextTick(() => {
+    //         if (this.computedWidth < this.state.minWidth) {
+    //           this.state.left = tmpRight - this.state.minWidth
+    //         }
+    //       })
+    //       break
+    //     case 'right':
+    //       this.state.right = clientX - offsetLeft
+    //       this.$nextTick(() => {
+    //         if (this.computedWidth < this.state.minWidth) {
+    //           this.state.right = tmpLeft - this.state.minWidth
+    //         }
+    //       })
+    //       break
+    //     case 'bottom':
+    //       this.state.bottom = clientY - offsetTop
+    //       this.$nextTick(() => {
+    //         if (this.computedHeight < this.state.minHeight) {
+    //           this.state.bottom = tmpTop - this.state.minHeight
+    //         }
+    //       })
+    //       break
+    //     case 'top-left':
+    //       this.__onDrag(e, 'top')
+    //       this.__onDrag(e, 'left')
+    //       break
+    //     case 'top-right':
+    //       this.__onDrag(e, 'top')
+    //       this.__onDrag(e, 'right')
+    //       break
+    //     case 'bottom-left':
+    //       this.__onDrag(e, 'bottom')
+    //       this.__onDrag(e, 'left')
+    //       break
+    //     case 'bottom-right':
+    //       this.__onDrag(e, 'bottom')
+    //       this.__onDrag(e, 'right')
+    //       break
+    //     case 'titlebar':
+    //       if (this.scrollWithWindow === true) {
+    //         this.state.top = clientY - this.mouseOffsetY + window.pageYOffset
+    //         this.state.left = clientX - this.mouseOffsetX + window.pageXOffset
+    //       } else {
+    //         if (this.$q.platform.is.mobile === true) {
+    //           this.state.top = clientY - this.mouseOffsetY
+    //           this.state.left = clientX - this.mouseOffsetX
+    //         } else {
+    //           this.state.top = clientY - grandOffsetTop - this.mouseOffsetY
+    //           this.state.left = clientX - grandOffsetLeft - this.mouseOffsetX
+    //         }
+    //       }
+    //       this.state.bottom = this.state.top + tmpHeight
+    //       this.state.right = this.state.left + tmpWidth
+    //       break
+    //   }
+    // },
+
     __onTouchMove (e, resizeHandle) {
       prevent(e)
+      this.resizeHandle = resizeHandle
       let touchY = e.touches[0].pageY
       let touchYDelta = touchY - this.lastTouchY
       if (window.pageYOffset === 0) {
@@ -1471,76 +1515,77 @@ export default {
         }
       }
 
-      this.__onDrag(e, resizeHandle)
+      this.__onMouseMove(e)
     },
 
-    __onDragStart (e, resizeHandle) {
-      if (e.dataTransfer && e.dataTransfer.effectAllowed) {
-        e.dataTransfer.effectAllowed = 'none'
-        e.dataTransfer.setData('text/plain', 'node')
-      }
+    // __onDragStart (e, resizeHandle) {
+    //   if (e.dataTransfer && e.dataTransfer.effectAllowed) {
+    //     e.dataTransfer.effectAllowed = 'none'
+    //     e.dataTransfer.setData('text/plain', 'node')
+    //   }
 
-      if (this.$q.platform.is.mobile === true) {
-        this.lastTouchY = e.touches[0].clientY
+    //   if (this.$q.platform.is.mobile === true) {
+    //     this.lastTouchY = e.touches[0].clientY
 
-        if (this.scrollWithWindow === true) {
-          this.mouseOffsetX = e.touches[0].pageX - this.state.left
-          this.mouseOffsetY = e.touches[0].pageY - this.state.top
-        } else {
-          this.mouseOffsetX = e.touches[0].clientX - this.state.left
-          this.mouseOffsetY = e.touches[0].clientY - this.state.top
-        }
-      } else {
-        if (this.scrollWithWindow === true) {
-          this.mouseOffsetX = e.pageX - this.state.left
-          this.mouseOffsetY = e.pageY - this.state.top
-        } else {
-          this.mouseOffsetX = e.offsetX
-          this.mouseOffsetY = e.offsetY
-        }
-      }
-      this.state.dragging = true
-      this.$emit('beforeDrag', e)
-      return false // required
-    },
+    //     if (this.scrollWithWindow === true) {
+    //       this.mouseOffsetX = e.touches[0].pageX - this.state.left
+    //       this.mouseOffsetY = e.touches[0].pageY - this.state.top
+    //     } else {
+    //       this.mouseOffsetX = e.touches[0].clientX - this.state.left
+    //       this.mouseOffsetY = e.touches[0].clientY - this.state.top
+    //     }
+    //   } else {
+    //     if (this.scrollWithWindow === true) {
+    //       this.mouseOffsetX = e.pageX - this.state.left
+    //       this.mouseOffsetY = e.pageY - this.state.top
+    //     } else {
+    //       this.mouseOffsetX = e.offsetX
+    //       this.mouseOffsetY = e.offsetY
+    //     }
+    //   }
+    //   this.state.dragging = true
+    //   this.$emit('beforeDrag', e)
+    //   return false // required
+    // },
 
     __onTouchStart (e, resizeHandle) {
       prevent(e)
-      this.__onDragStart(e, resizeHandle)
+      this.__onMouseDown(e, resizeHandle)
     },
 
-    __onDragEnter (e, resizeHandle) {
-      prevent(e)
-      this.bringToFront()
-    },
+    // __onDragEnter (e, resizeHandle) {
+    //   prevent(e)
+    //   this.bringToFront()
+    // },
 
-    __onDragOver (e, resizeHandle) {
-      prevent(e)
-      if (e.dataTransfer && e.dataTransfer.effectAllowed) {
-        e.dataTransfer.effectAllowed = 'none'
-      }
-    },
+    // __onDragOver (e, resizeHandle) {
+    //   prevent(e)
+    //   if (e.dataTransfer && e.dataTransfer.effectAllowed) {
+    //     e.dataTransfer.effectAllowed = 'none'
+    //   }
+    // },
 
-    __onDragLeave (e, resizeHandle) {
-      prevent(e)
-    },
+    // __onDragLeave (e, resizeHandle) {
+    //   prevent(e)
+    // },
 
-    __onDragEnd (e, resizeHandle) {
-      prevent(e)
-      this.mouseOffsetX = -1
-      this.mouseOffsetY = -1
-      this.state.dragging = false
-      this.$emit('afterDrag', e)
-      this.$emit('position', this.computedPosition)
-    },
+    // __onDragEnd (e, resizeHandle) {
+    //   prevent(e)
+    //   this.mouseOffsetX = -1
+    //   this.mouseOffsetY = -1
+    //   this.state.dragging = false
+    //   this.$emit('afterDrag', e)
+    //   this.$emit('position', this.computedPosition)
+    // },
 
     __onTouchEnd (e, resizeHandle) {
       prevent(e)
-      this.__onDragEnd(e, resizeHandle)
+      this.resizeHandle = resizeHandle
+      this.__onMouseUp(e)
     },
 
-    __onDrop (e) {
-    },
+    // __onDrop (e) {
+    // },
 
     __renderMoreItem (h, stateInfo) {
       if (stateInfo === void 0) {
@@ -1641,7 +1686,7 @@ export default {
 
     __renderTitle (h) {
       return h('div', {
-        staticClass: 'col ellipsis'
+        staticClass: 'q-window__title col ellipsis'
       }, this.title)
     },
 
@@ -1665,12 +1710,14 @@ export default {
       ])
     },
 
+    // grippers can visibly be seen
     __renderGripper (h, resizeHandle) {
       if (this.__canResize(resizeHandle) === false) {
         return ''
       }
       let staticClass = 'gripper gripper-' + resizeHandle + (this.roundGrippers === true ? ' gripper-round' : '')
-      return h('div', this.setBothColors(this.gripperColor, this.gripperBackgroundColor, {
+      return h('div', this.setBorderColor(this.gripperBorderColor, this.setBackgroundColor(this.gripperBackgroundColor, {
+        ref: resizeHandle,
         staticClass: staticClass,
         on: {
           mousedown: (e) => this.__onMouseDown(e, resizeHandle),
@@ -1678,9 +1725,10 @@ export default {
           touchmove: (e) => this.__onTouchMove(e, resizeHandle),
           touchend: (e) => this.__onTouchEnd(e, resizeHandle)
         }
-      }))
+      })))
     },
 
+    // resize handles are for when there are no grippers
     __renderResizeHandle (h, resizeHandle, actionsWidth) {
       if (this.noMove && resizeHandle === 'titlebar') {
         return ''
@@ -1696,6 +1744,7 @@ export default {
         style.width = width + 'px'
       }
       return h('div', {
+        ref: resizeHandle,
         staticClass: staticClass,
         style: style,
         on: {
@@ -1727,9 +1776,6 @@ export default {
       return h('div', {
         staticClass: 'q-window__body row',
         style: this.__bodyStyle,
-        attrs: {
-          // draggable: false
-        }
       }, [
         defaultSlot || defaultScopedSlot ? defaultScopedSlot({ zIndex: this.zIndex }) : '',
         (this.headless === true && this.canDrag === true) &&

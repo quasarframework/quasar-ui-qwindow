@@ -235,12 +235,12 @@
         "background-color=\"orange-10\""
       ]
     },
-    "gripper-color": {
+    "gripper-border-color": {
       "type": "String",
       "category": "style",
       "desc": "Any color from the [Quasar Color Pallete](https://quasar.dev/style/color-palette) or any CSS color",
       "examples": [
-        "gripper-color=\"green-6\""
+        "gripper-border-color=\"green-6\""
       ]
     },
     "gripper-background-color": {
