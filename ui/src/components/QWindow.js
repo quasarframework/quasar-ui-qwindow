@@ -275,6 +275,7 @@ export default {
 
   beforeDestroy () {
     // just in case
+    this.__removeClass(body.document, 'q-window__touch-action')
     this.fullscreenLeave()
 
     document.removeEventListener('scroll', this.__onScroll, { passive: true })
@@ -1178,6 +1179,24 @@ export default {
       })
     },
 
+    __addClass (el, name) {
+      let arr = el.className.split(' ')
+      // make sure it's not already there
+      if (arr.indexOf(name) === -1) {
+        arr.push(name)
+        el.className = arr.join(' ')
+      }
+    },
+
+    __removeClass (el, name) {
+      let arr = el.className.split(' ')
+      let index = arr.indexOf(name)
+      if (index !== -1) {
+        arr.splice(index, 1)
+        el.className = arr.join(' ')
+      }
+    },
+
     __onScroll (e) {
       if (window !== void 0) {
         this.scrollY = window.pageYOffset
@@ -1240,7 +1259,7 @@ export default {
     // mousedown for element
     __onMouseDown (e, resizeHandle) {
       this.__removeEventListeners(resizeHandle)
-      if (e.touches == void 0 && e.buttons !== 1) {
+      if (e.touches === void 0 && e.buttons !== 1) {
         return
       }
 
@@ -1269,6 +1288,9 @@ export default {
       this.state.shouldDrag = true
 
       this.__addEventListeners()
+      if (e.touches !== void 0) {
+        this.__addClass(body.document, 'q-window__touch-action')
+      }
 
       // stopAndPrevent(e)
       prevent(e)
@@ -1392,6 +1414,9 @@ export default {
       if (this.state.dragging === true) {
         prevent(e)
         this.__removeEventListeners()
+        if (e.touches !== void 0) {
+          this.__removeClass(body.document, 'q-window__touch-action')
+        }
         this.state.shouldDrag = this.state.dragging = false
         this.$emit('afterDrag', e)
         this.$emit('position', this.computedPosition)
