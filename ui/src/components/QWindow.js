@@ -38,10 +38,33 @@ let defaultX = 20
 let defaultY = 20
 
 const getMousePosition = function (e, type = 'x') {
-  if (type === 'x') {
-    return e.pageX
+  if (e.touches !== void 0) {
+    if (type === 'x') {
+      return e.touches[0].pageX
+    }
+    return e.touches[0].pageY
   }
-  return e.pageY
+  else {
+    if (type === 'x') {
+      return e.pageX
+    }
+    return e.pageY
+  }
+}
+
+const getMouseShift = function (e, rect, type = 'x') {
+  if (e.touches !== void 0) {
+    if (type === 'x') {
+      return e.touches[0].clientX - rect.left
+    }
+    return e.touches[0].clientY - rect.top
+  }
+  else {
+    if (type === 'x') {
+      return e.clientX - rect.left
+    }
+    return e.clientY - rect.top
+  }
 }
 
 // const getOffset = function (el) {
@@ -1217,7 +1240,7 @@ export default {
     // mousedown for element
     __onMouseDown (e, resizeHandle) {
       this.__removeEventListeners(resizeHandle)
-      if (e.buttons !== 1) {
+      if (e.touches == void 0 && e.buttons !== 1) {
         return
       }
 
@@ -1232,8 +1255,8 @@ export default {
       this.mousePos.y = getMousePosition(e, 'y')
 
       const rect = this.__portal.$el.getBoundingClientRect()
-      this.shiftX = e.clientX - rect.left
-      this.shiftY = e.clientY - rect.top
+      this.shiftX = getMouseShift(e, rect, 'x')
+      this.shiftY = getMouseShift(e, rect, 'y')
 
       // save existing position information
       this.tmpTop = this.state.top
@@ -1281,7 +1304,7 @@ export default {
     },
 
     __onMouseMove (e, resizeHandle) {
-      if (this.state.shouldDrag !== true || e.buttons !== 1) {
+      if (this.state.shouldDrag !== true || e.touches == void 0 && e.buttons !== 1) {
         this.__removeEventListeners()
         return
       }
@@ -1299,8 +1322,6 @@ export default {
           return
         }
       }
-
-      const pageX = e.pageX, pageY = e.pageY
 
       switch (resizeHandle || this.resizeHandle) {
         case 'top':
@@ -1356,13 +1377,8 @@ export default {
             this.state.top = mouseY - this.shiftY
             this.state.left = mouseX - this.shiftX
           } else {
-            if (this.$q.platform.is.mobile === true) {
-              this.state.top = pageY - this.shiftY - this.mouseOffsetY
-              this.state.left = pageX - this.shiftX - this.mouseOffsetX
-            } else {
-              this.state.top = mouseY - window.pageYOffset - this.shiftY
-              this.state.left = mouseX - window.pageXOffset - this.shiftX
-            }
+            this.state.top = mouseY - window.pageYOffset - this.shiftY
+            this.state.left = mouseX - window.pageXOffset - this.shiftX
           }
           this.state.bottom = this.state.top + this.tmpHeight
           this.state.right = this.state.left + this.tmpWidth
@@ -1371,9 +1387,7 @@ export default {
 
       stopAndPrevent(e)
     },
-    /* ----------------------------------------------------- */
 
-    /* ----------------------------------------------------- */
     __onMouseUp(e) {
       if (this.state.dragging === true) {
         prevent(e)
@@ -1384,208 +1398,33 @@ export default {
       }
     },
 
-    // __onDrag (e, resizeHandle) {
-    //   // e.preventDefault()
-    //   if (this.$q.platform.is.mobile !== true) {
-    //     if (this.$q.platform.is.chrome === true) {
-    //       if (e.clientX === 0 || e.clientY === 0) {
-    //         return
-    //       }
-    //     }
-    //   }
-
-    //   if (e.dataTransfer && e.dataTransfer.effectAllowed) {
-    //     e.dataTransfer.effectAllowed = 'none'
-    //   }
-
-    //   // save existing position information
-    //   const tmpTop = this.state.top
-    //   const tmpLeft = this.state.left
-    //   const tmpRight = this.state.right
-    //   const tmpBottom = this.state.bottom
-    //   const tmpHeight = tmpBottom - tmpTop
-    //   const tmpWidth = tmpRight - tmpLeft
-
-    //   // make some short-cuts
-    //   // const parent = e.currentTarget.parentElement.parentElement
-    //   // const grandparent = e.currentTarget.parentElement.parentElement.parentElement
-
-    //   const offsetTop = parent.offsetTop
-    //   const offsetLeft = parent.offsetLeft
-    //   const grandOffsetTop = grandparent.offsetTop
-    //   const grandOffsetLeft = grandparent.offsetLeft
-
-    //   let clientY, clientX //, pageY, pageX
-
-    //   if (this.$q.platform.is.mobile === true) {
-    //     clientY = e.touches[0].clientY
-    //     clientX = e.touches[0].clientX
-    //     // pageY = e.touches[0].pageY
-    //     // pageX = e.touches[0].pageX
-    //   } else if (this.$q.platform.is.chrome === true) {
-    //       clientY = e.clientY
-    //       clientX = e.clientX
-    //     // pageY = e.pageY
-    //     // pageX = e.pageX
-    //   }
-    //   else {
-    //     clientY = parent.clientY
-    //     clientX = parent.clientX
-    //   }
-
-    //   switch (resizeHandle) {
-    //     case 'top':
-    //       this.state.top = clientY - offsetTop
-    //       this.$nextTick(() => {
-    //         if (this.computedHeight < this.state.minHeight) {
-    //           this.state.top = tmpBottom - this.state.minHeight
-    //         }
-    //       })
-    //       break
-    //     case 'left':
-    //       this.state.left = clientX - offsetLeft
-    //       this.$nextTick(() => {
-    //         if (this.computedWidth < this.state.minWidth) {
-    //           this.state.left = tmpRight - this.state.minWidth
-    //         }
-    //       })
-    //       break
-    //     case 'right':
-    //       this.state.right = clientX - offsetLeft
-    //       this.$nextTick(() => {
-    //         if (this.computedWidth < this.state.minWidth) {
-    //           this.state.right = tmpLeft - this.state.minWidth
-    //         }
-    //       })
-    //       break
-    //     case 'bottom':
-    //       this.state.bottom = clientY - offsetTop
-    //       this.$nextTick(() => {
-    //         if (this.computedHeight < this.state.minHeight) {
-    //           this.state.bottom = tmpTop - this.state.minHeight
-    //         }
-    //       })
-    //       break
-    //     case 'top-left':
-    //       this.__onDrag(e, 'top')
-    //       this.__onDrag(e, 'left')
-    //       break
-    //     case 'top-right':
-    //       this.__onDrag(e, 'top')
-    //       this.__onDrag(e, 'right')
-    //       break
-    //     case 'bottom-left':
-    //       this.__onDrag(e, 'bottom')
-    //       this.__onDrag(e, 'left')
-    //       break
-    //     case 'bottom-right':
-    //       this.__onDrag(e, 'bottom')
-    //       this.__onDrag(e, 'right')
-    //       break
-    //     case 'titlebar':
-    //       if (this.scrollWithWindow === true) {
-    //         this.state.top = clientY - this.mouseOffsetY + window.pageYOffset
-    //         this.state.left = clientX - this.mouseOffsetX + window.pageXOffset
-    //       } else {
-    //         if (this.$q.platform.is.mobile === true) {
-    //           this.state.top = clientY - this.mouseOffsetY
-    //           this.state.left = clientX - this.mouseOffsetX
-    //         } else {
-    //           this.state.top = clientY - grandOffsetTop - this.mouseOffsetY
-    //           this.state.left = clientX - grandOffsetLeft - this.mouseOffsetX
-    //         }
-    //       }
-    //       this.state.bottom = this.state.top + tmpHeight
-    //       this.state.right = this.state.left + tmpWidth
-    //       break
-    //   }
-    // },
-
     __onTouchMove (e, resizeHandle) {
-      prevent(e)
+      stopAndPrevent(e)
       this.resizeHandle = resizeHandle
-      let touchY = e.touches[0].pageY
-      let touchYDelta = touchY - this.lastTouchY
-      if (window.pageYOffset === 0) {
-        // to supress pull-to-refresh preventDefault
-        // on the overscrolling touchmove when
-        // window.pageYOffset === 0
-        if (touchYDelta > 0) {
-          prevent(e)
-        }
-      }
+      // let touchY = e.touches[0].pageY
+      // let touchYDelta = touchY - (this.lastTouchY ? this.lastTouchY : 0)
+      // if (window.pageYOffset === 0) {
+      //   // to supress pull-to-refresh preventDefault
+      //   // on the overscrolling touchmove when
+      //   // window.pageYOffset === 0
+      //   if (touchYDelta > 0) {
+      //     prevent(e)
+      //   }
+      // }
 
       this.__onMouseMove(e)
     },
 
-    // __onDragStart (e, resizeHandle) {
-    //   if (e.dataTransfer && e.dataTransfer.effectAllowed) {
-    //     e.dataTransfer.effectAllowed = 'none'
-    //     e.dataTransfer.setData('text/plain', 'node')
-    //   }
-
-    //   if (this.$q.platform.is.mobile === true) {
-    //     this.lastTouchY = e.touches[0].clientY
-
-    //     if (this.scrollWithWindow === true) {
-    //       this.mouseOffsetX = e.touches[0].pageX - this.state.left
-    //       this.mouseOffsetY = e.touches[0].pageY - this.state.top
-    //     } else {
-    //       this.mouseOffsetX = e.touches[0].clientX - this.state.left
-    //       this.mouseOffsetY = e.touches[0].clientY - this.state.top
-    //     }
-    //   } else {
-    //     if (this.scrollWithWindow === true) {
-    //       this.mouseOffsetX = e.pageX - this.state.left
-    //       this.mouseOffsetY = e.pageY - this.state.top
-    //     } else {
-    //       this.mouseOffsetX = e.offsetX
-    //       this.mouseOffsetY = e.offsetY
-    //     }
-    //   }
-    //   this.state.dragging = true
-    //   this.$emit('beforeDrag', e)
-    //   return false // required
-    // },
-
     __onTouchStart (e, resizeHandle) {
-      prevent(e)
+      stopAndPrevent(e)
       this.__onMouseDown(e, resizeHandle)
     },
 
-    // __onDragEnter (e, resizeHandle) {
-    //   prevent(e)
-    //   this.bringToFront()
-    // },
-
-    // __onDragOver (e, resizeHandle) {
-    //   prevent(e)
-    //   if (e.dataTransfer && e.dataTransfer.effectAllowed) {
-    //     e.dataTransfer.effectAllowed = 'none'
-    //   }
-    // },
-
-    // __onDragLeave (e, resizeHandle) {
-    //   prevent(e)
-    // },
-
-    // __onDragEnd (e, resizeHandle) {
-    //   prevent(e)
-    //   this.mouseOffsetX = -1
-    //   this.mouseOffsetY = -1
-    //   this.state.dragging = false
-    //   this.$emit('afterDrag', e)
-    //   this.$emit('position', this.computedPosition)
-    // },
-
     __onTouchEnd (e, resizeHandle) {
-      prevent(e)
+      stopAndPrevent(e)
       this.resizeHandle = resizeHandle
       this.__onMouseUp(e)
     },
-
-    // __onDrop (e) {
-    // },
 
     __renderMoreItem (h, stateInfo) {
       if (stateInfo === void 0) {
