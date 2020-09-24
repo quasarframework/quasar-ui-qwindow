@@ -3,7 +3,7 @@ QWindow
 
 QWindow is a [Quasar App Extension](https://quasar.dev/app-extensions/introduction). It allows you to have a floating, movable, and resizable HTML windows in your Quasar App.
 
-![QWindow](statics/qwindow.png "QWindow" =800x800)
+![QWindow](qwindow.png "QWindow" =800x800)
 
 This work is currently in `beta` and there are expected changes while things get worked out. Your help with testing is greatly appreciated. Suggestions and PRs welcomed.
 
@@ -75,7 +75,7 @@ You can set the initial state by providing one of the following: `embedded`, `pi
 ## Moving and Resizing
 When a QWindow is floating, it can be moved (via titlebar), or resized (via the grippers).
 
-![Floating](statics/qwindow-floating.png "Floating" =300x300)
+![Floating](qwindow-floating.png "Floating" =300x300)
 
 QWindow's grippers can be controlled with the `resizable` property (array). To turn on specific grippers, you specify in the array what you want.
 
@@ -83,20 +83,20 @@ QWindow's grippers can be controlled with the `resizable` property (array). To t
 [ 'top', 'left', 'right', 'bottom', 'top-left', 'top-right', 'bottom-left', 'bottom-right']
 ```
 
-![No Grippers on Top](statics/qwindow-no-resize-top.png "No Grippers on Top" =300x300)
+![No Grippers on Top](qwindow-no-resize-top.png "No Grippers on Top" =300x300)
 
 ## Grippers
 The grippers can be changed to be round with the `round-grippers` property.
 
-![Round Grippers](statics/qwindow-round-grippers.png "Round Grippers" =300x300)
+![Round Grippers](qwindow-round-grippers.png "Round Grippers" =300x300)
 
 Or, by using the `hide-grippers` property you can turn off the visual display of the grippers. In this case, instead of being able to grip the "boxes" in order to resize you can click anywhere along the sides, as well as the corners.
 
-![Hide Grippers](statics/qwindow-hide-grippers.png "Hide Grippers" =300x300)
+![Hide Grippers](qwindow-hide-grippers.png "Hide Grippers" =300x300)
 
 And, of course, you can stylize the grippers with the `gripper-border-color` and `gripper-background-color` properties.
 
-![Colored Grippers](statics/qwindow-colored-grippers.png "Colored Grippers" =300x300)
+![Colored Grippers](qwindow-colored-grippers.png "Colored Grippers" =300x300)
 
 ## Pinning
 When a QWindow is pinned, it can no longer be moved or resized. Try using the `auto-pin` property. When the QWindow is selected, the grippers become visible. When it is not selected, the QWindow will automatically pin (no grippers).
@@ -111,7 +111,7 @@ Using the mouse to scroll will cause the QWindow to be a bit "jerky". This is be
 ## Modifying the Menu
 The items in a menu can be replaced or augmented. You can use the `menu-func` (function) property. This function is sent a copy (array of objects) of the menu data and can be modified with an appropriate object defining the state of a menu item. You can also use the special keyword `separator` to have a separator inserted into the menu.
 
-![Modified Menu](statics/qwindow-modified-menu.png "Modified Menu" =200x300)
+![Modified Menu](qwindow-modified-menu.png "Modified Menu" =200x300)
 
 The HTML:
 ```html
@@ -181,7 +181,7 @@ The default icon set for QWindow is the Material Design icons. English is also t
 
 The example below is using Fontawesome to rerplace the Material Design icons and the English has been modified. In this same manner, you can also replace the language to whatever suits yur needs.
 
-![Icons and Language](statics/qwindow-icons-and-language.png "Icons and Language" =200x300)
+![Icons and Language](qwindow-icons-and-language.png "Icons and Language" =200x300)
 
 ```js
 {
@@ -246,8 +246,8 @@ You do not need to include the `label` property unless you are:
 ## Headless
 Using the `headless` property displays a QWindow without the titlebar. There is no longer a menu displayed, so cannot be modified by the user. However, the user can still move or resize the Qwindow. Try the `headless` property combined with the `auto-pin` property. A nice combination for website design software, as an example. Another option, by using the `isSelected` property, control the background color for a more professional look and feel.
 
-![Headless Deselected](statics/qwindow-headless-deslected.png "Headless Deselected" =300x300)
-![Headless Selected](statics/qwindow-headless-selected.png "Headless Selected" =300x300)
+![Headless Deselected](qwindow-headless-deslected.png "Headless Deselected" =300x300)
+![Headless Selected](qwindow-headless-selected.png "Headless Selected" =300x300)
 
 The style:
 ```stylus
