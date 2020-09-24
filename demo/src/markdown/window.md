@@ -252,11 +252,11 @@ Using the `headless` property displays a QWindow without the titlebar. There is 
 The style:
 ```stylus
 <style lang="stylus">
-.headess-deselected
+.headless-deselected
   background-color rgba(105,179,190,0.514) !important
   border 1px dashed #e3cb47 !important
 
-.headess-selected
+.headless-selected
   background-color rgba(172,83,83,0.42) !important
   border 1px dashed #e3cb47 !important
 </style>
@@ -276,6 +276,6 @@ The HTML:
   :width="350"
   :actions="['embedded', 'pin', 'fullscreen']"
   embedded
-  :content-class="$refs.window && $refs.window.isSelected ? 'headess-selected' : 'headess-deselected'"
+  :content-class="$refs.window && $refs.window.isSelected ? 'headless-selected' : 'headless-deselected'"
 />
 ```
