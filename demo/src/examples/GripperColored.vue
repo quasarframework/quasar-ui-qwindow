@@ -21,6 +21,8 @@
         v-model="visible"
         title="QWindow Colored Grippers"
         round-grippers
+        gripper-border-color="purple-8"
+        gripper-background-color="purple-2"
         :height="150"
         :width="350"
         :actions="['embedded', 'pin', 'maximize', 'fullscreen']"
