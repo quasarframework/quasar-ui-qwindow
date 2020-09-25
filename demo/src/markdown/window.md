@@ -32,7 +32,7 @@ Can be found [here](https://quasarframework.github.io/quasar-ui-qwindow/examples
 Can be found [here](https://github.com/quasarframework/quasar-ui-qwindow/tree/master/demo).
 
 # A Word About QWindow
-When floating, QWindow uses a Vue Portal. A Vue Portal is another instance of a Vue root useful for containing a Vue component so that it is not constrained by its parent element in any way. As such, the code has to calculate the position of the QWindow all the time, relative to the top of the page and the top of the view port. Because of this, when scrolling with the mouse or keyboard, the floating QWindow may appear to be a bit "jumpy". This is a result of the browser sending scroll positions in increments. One notch of a mouse scroll can be 52px. However, if you scroll using the scrollbar, the scroll position is incremented 1px at a time, giving a smoother look. This cannot be helped as this is how browsers work.
+When floating, QWindow uses a Vue Portal. A Vue Portal is another instance of a Vue root useful for containing a Vue component so that it is not constrained by its parent element in any way. As such, the code has to calculate the position of the QWindow all the time, relative to the top of the page and the top of the view port. Because of this, when scrolling with the mouse or keyboard, the floating QWindow may appear to be a bit "jumpy". This is a result of the browser sending scroll positions in increments. One notch of a mouse scroll can be 52px. This cannot be helped as this is how browsers work.
 
 # Working with QWindow
 Working with QWindow can be very minimal. Almost all essential properties have defaults. Here is an example of using QWindow:
