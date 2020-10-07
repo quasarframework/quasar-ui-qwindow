@@ -26,8 +26,8 @@ export default {
   computed: {
     style () {
       return {
-        border: '1px solid blue',
-        backgroundColor: 'ghostwhite'
+        border: this.$q.dark.isActive ? '1px solid yellow' : '1px solid blue',
+        backgroundColor: this.$q.dark.isActive ? 'gray' : 'ghostwhite'
       }
     }
   }

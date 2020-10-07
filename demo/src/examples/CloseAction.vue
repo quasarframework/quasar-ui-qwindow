@@ -8,7 +8,7 @@
       :width="350"
       :actions="['embedded', 'pin', 'maximize', 'fullscreen', 'close']"
       embedded
-      content-class="bg-grey-1"
+      :content-class="$q.dark.isActive ? 'bg-grey-8' : 'bg-grey-1'"
       @visible="(v) => visible = v"
     >
       <div class="q-pa-md fit">

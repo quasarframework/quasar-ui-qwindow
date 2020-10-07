@@ -26,12 +26,12 @@ export default {
   computed: {
     style1 () {
       return {
-        border: '1px solid blue'
+        border: this.$q.dark.isActive ? '1px solid yellow' : '1px solid blue'
       }
     },
     style2 () {
       return {
-        backgroundColor: 'ghostwhite'
+        backgroundColor: this.$q.dark.isActive ? 'gray' : 'ghostwhite'
       }
     }
   }

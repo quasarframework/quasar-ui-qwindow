@@ -7,7 +7,7 @@
       :width="350"
       :actions="['embedded']"
       embedded
-      content-class="bg-grey-1"
+      :content-class="$q.dark.isActive ? 'bg-grey-8' : 'bg-grey-1'"
     >
       <div class="q-pa-md fit">
         This is the "default" slot content

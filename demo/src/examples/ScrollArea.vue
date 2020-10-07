@@ -7,7 +7,7 @@
       :width="400"
       :actions="['embedded', 'pin', 'maximize', 'fullscreen']"
       embedded
-      content-class="bg-grey-1"
+      :content-class="$q.dark.isActive ? 'bg-grey-8' : 'bg-grey-1'"
     >
       <div class="q-pa-md fit scroll">
         <q-scroll-area style="width: 100%; height: 100%">

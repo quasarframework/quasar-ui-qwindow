@@ -23,7 +23,6 @@
     <q-drawer
       v-model="leftDrawerOpen"
       bordered
-      content-class="bg-grey-2"
     >
       <q-list>
         <q-item-label header>Essential Links</q-item-label>
@@ -96,7 +95,7 @@
         :visible="visible"
         :pinned="pinned"
         :menu-func="updateMenu"
-        content-class="bg-grey-1"
+        :content-class="$q.dark.isActive ? 'bg-grey-8' : 'bg-grey-1'"
         @embedded="(v) => embedded = v"
         @visible="(v) => visible = v"
         @pinned="(v) => pinned = v"
@@ -123,7 +122,6 @@
                 :width="350"
                 :breakpoint="700"
                 bordered
-                content-class="bg-grey-3"
                 :style="{ zIndex: zIndex + 1 }"
               >
                 <q-scroll-area class="fit">
@@ -139,7 +137,6 @@
                 bordered
                 :width="350"
                 :breakpoint="500"
-                content-class="bg-grey-3"
                 :style="{ zIndex: zIndex + 1 }"
               >
                 <q-scroll-area class="fit">
