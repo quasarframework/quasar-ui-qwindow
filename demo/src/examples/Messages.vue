@@ -10,7 +10,7 @@
         :width="350"
         :actions="['embedded', 'pin', 'maximize', 'fullscreen']"
         embedded
-        content-class="bg-grey-1"
+        :content-class="$q.dark.isActive ? 'bg-grey-8' : 'bg-grey-1'"
         @input="v => messages.unshift(`visible(${v})`)"
         @embedded="v => messages.unshift(`embedded(${v})`)"
         @pinned="v => messages.unshift(`pinned(${v})`)"

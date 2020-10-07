@@ -41,7 +41,7 @@ Working with QWindow can be very minimal. Almost all essential properties have d
     v-model="visible"
     title="QWindow Basic"
     :actions="['embedded']"
-    content-class="bg-grey-1"
+    :content-class="$q.dark.isActive ? 'bg-grey-8' : 'bg-grey-1'"
   >
     <div class="q-pa-md fit">
       This is the "default" slot content
@@ -62,7 +62,7 @@ In the above example, the QWindow will immediately be floating. If you want it e
     title="QWindow Basic"
     embedded
     :actions="['embedded']"
-    content-class="bg-grey-1"
+    :content-class="$q.dark.isActive ? 'bg-grey-8' : 'bg-grey-1'"
   >
     <div class="q-pa-md fit">
       This is the "default" slot content

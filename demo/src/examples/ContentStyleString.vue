@@ -3,7 +3,7 @@
     <q-window
       v-model="visible"
       title="QWindow Titlebar Style"
-      content-style="border: 1px solid blue, background-color: ghostwhite"
+      :content-style="$q.dark.isActive ? 'border: 1px solid yellow, background-color: gray' : 'border: 1px solid blue, background-color: ghostwhite'"
       :height="150"
       :width="350"
       :actions="['embedded', 'pin', 'maximize', 'fullscreen']"
