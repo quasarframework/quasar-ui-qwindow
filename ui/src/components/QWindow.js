@@ -29,13 +29,13 @@ const maxZIndex = 6000 - 100
 let QWindowCount = 0
 
 // layered windows
-let layers = {}
+const layers = {}
 
 // default starting position
 // relative to viewport for floating
 // relative to document for scroll-with-window
-let defaultX = 20
-let defaultY = 20
+const defaultX = 20
+const defaultY = 20
 
 const getMousePosition = function (e, type = 'x') {
   if (e.touches !== void 0) {
@@ -197,7 +197,7 @@ export default {
       zIndex: 4000,
       mouseOffsetX: -1,
       mouseOffsetY: -1,
-      mousePos: { x: 0, y: 0},
+      mousePos: { x: 0, y: 0 },
       scrollX: 0,
       scrollY: 0,
       selected: false,
@@ -275,7 +275,7 @@ export default {
 
   beforeDestroy () {
     // just in case
-    this.__removeClass(body.document, 'q-window__touch-action')
+    this.__removeClass(document.body, 'q-window__touch-action')
     this.fullscreenLeave()
 
     document.removeEventListener('scroll', this.__onScroll, { passive: true })
@@ -290,14 +290,16 @@ export default {
     // calculate left starting position
     if (this.startX > 0) {
       this.state.left = this.startX
-    } else {
+    }
+    else {
       this.state.left = defaultX * QWindowCount
     }
 
     // calculate top starting position
     if (this.startY > 0) {
       this.state.top = this.startY
-    } else {
+    }
+    else {
       this.state.top = defaultY * QWindowCount
     }
 
@@ -309,14 +311,16 @@ export default {
     if (this.value !== void 0) {
       if (this.value === true) {
         this.__setStateInfo('visible', true)
-      } else {
+      }
+      else {
         this.__setStateInfo('visible', false)
       }
     }
     if (this.embedded !== void 0) {
       if (this.embedded === true) {
         this.__setStateInfo('embedded', true)
-      } else {
+      }
+      else {
         this.__setStateInfo('embedded', false)
       }
     }
@@ -325,7 +329,8 @@ export default {
         if (this.canDo('pinned', true)) {
           this.__setStateInfo('pinned', true)
         }
-      } else {
+      }
+      else {
         if (this.canDo('pinned', false)) {
           this.__setStateInfo('pinned', false)
         }
@@ -339,14 +344,16 @@ export default {
     if (this.maximize !== void 0) {
       if (this.maximize === true && this.__getStateInfo('fullscreen') !== true) {
         this.__setStateInfo('maximize', true)
-      } else {
+      }
+      else {
         this.__setStateInfo('maximize', false)
       }
     }
     if (this.minimize !== void 0) {
       if (this.minimize === true && this.__getStateInfo('fullscreen') !== true) {
         this.__setStateInfo('minimize', true)
-      } else {
+      }
+      else {
         this.__setStateInfo('minimize', false)
       }
     }
@@ -468,7 +475,7 @@ export default {
 
     computedActions () {
       // sort and pick ones that are visible based on user selection and state
-      let actions = []
+      const actions = []
       if (this.actions.includes('embedded') && (this.canDo('embedded', true) || this.canDo('embedded', false))) {
         actions.push('embedded')
       }
@@ -493,7 +500,7 @@ export default {
 
     computedMenuData () {
       // get stateInfo for each menu item
-      let menuData = []
+      const menuData = []
       this.computedActions.map(key => {
         if (this.stateInfo[key]) {
           menuData.push({ ...this.stateInfo[key], key: key })
@@ -503,8 +510,8 @@ export default {
     },
 
     __computedSortedLayers () {
-      let sortedLayers = []
-      let keys = Object.keys(layers)
+      const sortedLayers = []
+      const keys = Object.keys(layers)
       for (let index = 0; index < keys.length; ++index) {
         sortedLayers.push(layers[keys[index]])
       }
@@ -529,7 +536,8 @@ export default {
           backgroundColor: this.backgroundColor,
           minWidth: '100px'
         }
-      } else if (this.isEmbedded === true) {
+      }
+      else if (this.isEmbedded === true) {
         style = {
           position: 'relative',
           visibility: this.__computedVisibility,
@@ -538,9 +546,10 @@ export default {
           width: '100%',
           height: '100%'
         }
-      } else {
-        let top = this.state.top + (this.scrollWithWindow !== true ? this.scrollY : 0)
-        let left = this.state.left + (this.scrollWithWindow !== true ? this.scrollX : 0)
+      }
+      else {
+        const top = this.state.top + (this.scrollWithWindow !== true ? this.scrollY : 0)
+        const left = this.state.left + (this.scrollWithWindow !== true ? this.scrollX : 0)
         style = {
           position: 'absolute',
           display: 'inline-block',
@@ -557,7 +566,8 @@ export default {
         if (this.isMaximized) {
           style.width = '100%'
           style.height = '100%'
-        } else {
+        }
+        else {
           style.width = this.computedWidth + 'px'
           style.height = this.computedHeight + 'px'
         }
@@ -567,14 +577,16 @@ export default {
         const type = Object.prototype.toString.call(this.contentStyle)
         if (type === '[object Object]') {
           style = { ...style, ...this.contentStyle }
-        } else if ((type === '[object Array]')) {
+        }
+        else if ((type === '[object Array]')) {
           this.contentStyle.forEach(item => {
             style = { ...style, ...item }
           })
-        } else if (typeof this.contentStyle === 'string') {
-          let items = this.contentStyle.split(',')
+        }
+        else if (typeof this.contentStyle === 'string') {
+          const items = this.contentStyle.split(',')
           items.forEach(item => {
-            let props = item.split(':')
+            const props = item.split(':')
             style[props[0].trim()] = props[1].trim()
           })
         }
@@ -600,9 +612,11 @@ export default {
       if (this.titlebarStyle) {
         if (typeof this.titlebarStyle === 'object') {
           style = Object.assign(this.titlebarStyle, style)
-        } else if (typeof this.titlebarStyle === 'string') {
+        }
+        else if (typeof this.titlebarStyle === 'string') {
           style = this.titlebarStyle + '; height:' + titleHeight
-        } else if (Array.isArray(this.titlebarStyle)) {
+        }
+        else if (Array.isArray(this.titlebarStyle)) {
           style = this.titlebarStyle
           style.push({ height: titleHeight })
         }
@@ -654,7 +668,8 @@ export default {
       if (this.autoPin === true) {
         if (val === true) {
           this.unpin()
-        } else {
+        }
+        else {
           this.pin()
         }
       }
@@ -670,7 +685,8 @@ export default {
           this.__showPortal()
           this.$forceUpdate()
         })
-      } else {
+      }
+      else {
         this.__hidePortal()
         this.$nextTick(() => {
           this.__destroyPortal()
@@ -703,7 +719,8 @@ export default {
       if (val === true) {
         this.__savePositionAndState()
         this.zIndex = maxZIndex
-      } else {
+      }
+      else {
         this.__restorePositionAndState()
         this.fullscreenInitiated = val
       }
@@ -828,7 +845,8 @@ export default {
       if (this.__getStateInfo('maximize') === true) {
         this.__setStateInfo('maximize', false)
         this.$emit('maximize', false)
-      } else if (this.__getStateInfo('minimize') === true) {
+      }
+      else if (this.__getStateInfo('minimize') === true) {
         this.__setStateInfo('minimize', false)
         this.$emit('minimize', false)
       }
@@ -864,9 +882,9 @@ export default {
 
     // bring this window to the front
     bringToFront () {
-      let layers = this.__computedSortedLayers
+      const layers = this.__computedSortedLayers
       for (let index = 0; index < layers.length; ++index) {
-        let layer = layers[index]
+        const layer = layers[index]
         layer.window.zIndex = startingZIndex + index
       }
       // this window gets highest zIndex
@@ -875,9 +893,9 @@ export default {
 
     // send this window to the back
     sendToBack () {
-      let layers = this.__computedSortedLayers
+      const layers = this.__computedSortedLayers
       for (let index = 0; index < layers.length; ++index) {
-        let layer = layers[index]
+        const layer = layers[index]
         layer.window.zIndex = startingZIndex + index + 1
       }
       this.zIndex = startingZIndex
@@ -926,7 +944,8 @@ export default {
             if (this.__getStateInfo('visible') !== true) {
               return true
             }
-          } else {
+          }
+          else {
             if (this.__getStateInfo('visible') === true) {
               return true
             }
@@ -939,7 +958,8 @@ export default {
               this.__getStateInfo('fullscreen') !== true) {
               return true
             }
-          } else {
+          }
+          else {
             if (this.__getStateInfo('embedded') === true &&
             this.__getStateInfo('fullscreen') !== true) {
               return true
@@ -955,7 +975,8 @@ export default {
               this.__getStateInfo('fullscreen') !== true) {
               return true
             }
-          } else {
+          }
+          else {
             if (this.__getStateInfo('pinned') === true &&
               this.__getStateInfo('embedded') !== true &&
               this.__getStateInfo('maximize') !== true &&
@@ -973,7 +994,8 @@ export default {
               this.__getStateInfo('fullscreen') !== true) {
               return true
             }
-          } else {
+          }
+          else {
             if (this.__getStateInfo('maximize') === true &&
               this.__getStateInfo('embedded') !== true &&
               this.__getStateInfo('minimize') !== true &&
@@ -990,7 +1012,8 @@ export default {
               this.__getStateInfo('fullscreen') !== true) {
               return true
             }
-          } else {
+          }
+          else {
             if (this.__getStateInfo('minimize') === true &&
               this.__getStateInfo('embedded') !== true &&
               this.__getStateInfo('maximize') !== true &&
@@ -1005,7 +1028,8 @@ export default {
             this.__getStateInfo('embedded') !== true) {
               return true
             }
-          } else {
+          }
+          else {
             if (this.__getStateInfo('fullscreen') === true &&
               this.__getStateInfo('embedded') !== true) {
               return true
@@ -1017,7 +1041,8 @@ export default {
             if (this.__getStateInfo('embedded') !== true) {
               return true
             }
-          } else {
+          }
+          else {
             return true
           }
           return false
@@ -1036,7 +1061,7 @@ export default {
     },
 
     __updateStateInfo () {
-      let stateInfo = {
+      const stateInfo = {
         visible: {
           state: this.stateInfo.visible !== void 0 && this.stateInfo.visible.state !== void 0 ? this.stateInfo.visible.state : true,
           on: {
@@ -1146,7 +1171,7 @@ export default {
     },
 
     __setMinimizePosition () {
-      let elements = document.getElementsByClassName('q-notifications__list--bottom')
+      const elements = document.getElementsByClassName('q-notifications__list--bottom')
       if (elements.length > 0) {
         elements[0].appendChild(this.$el)
       }
@@ -1180,7 +1205,7 @@ export default {
     },
 
     __addClass (el, name) {
-      let arr = el.className.split(' ')
+      const arr = el.className.split(' ')
       // make sure it's not already there
       if (arr.indexOf(name) === -1) {
         arr.push(name)
@@ -1189,8 +1214,8 @@ export default {
     },
 
     __removeClass (el, name) {
-      let arr = el.className.split(' ')
-      let index = arr.indexOf(name)
+      const arr = el.className.split(' ')
+      const index = arr.indexOf(name)
       if (index !== -1) {
         arr.splice(index, 1)
         el.className = arr.join(' ')
@@ -1220,7 +1245,7 @@ export default {
       // that the window does not become deselected
       const gripperSize = 10
 
-      const oldSelected = this.selected
+      // const oldSelected = this.selected
       const x = getMousePosition(e, 'x')
       const y = getMousePosition(e, 'y')
       let left, top, width, height
@@ -1232,7 +1257,8 @@ export default {
         top = this.$el.offsetParent.offsetTop + this.$el.offsetTop
         width = this.$el.offsetWidth
         height = this.$el.offsetHeight
-      } else {
+      }
+      else {
         // not embedded
         if (this.isEmbedded === false) {
           const position = this.computedPosition
@@ -1251,7 +1277,8 @@ export default {
       }
       if (x >= left && x < left + width && y >= top && y < top + height) {
         this.selected = true
-      } else {
+      }
+      else {
         this.selected = false
       }
     },
@@ -1264,7 +1291,7 @@ export default {
       }
 
       this.resizeHandle = resizeHandle
-      this.selected === true
+      this.selected = true
 
       if (this.isFloating && this.selected === true) {
         this.bringToFront()
@@ -1289,12 +1316,12 @@ export default {
 
       this.__addEventListeners()
       if (e.touches !== void 0) {
-        this.__addClass(body.document, 'q-window__touch-action')
+        this.__addClass(document.body, 'q-window__touch-action')
       }
 
       // stopAndPrevent(e)
       prevent(e)
-     },
+    },
 
     __addEventListeners () {
       document.body.addEventListener('mousemove', this.__onMouseMove, { capture: true })
@@ -1321,12 +1348,11 @@ export default {
         this.$nextTick(() => {
           this.$emit('canceled', this.computedPosition)
         })
-  
       }
     },
 
     __onMouseMove (e, resizeHandle) {
-      if (this.state.shouldDrag !== true || e.touches == void 0 && e.buttons !== 1) {
+      if (this.state.shouldDrag !== true || (e.touches === void 0 && e.buttons !== 1)) {
         this.__removeEventListeners()
         return
       }
@@ -1398,7 +1424,8 @@ export default {
           if (this.scrollWithWindow === true) {
             this.state.top = mouseY - this.shiftY
             this.state.left = mouseX - this.shiftX
-          } else {
+          }
+          else {
             this.state.top = mouseY - window.pageYOffset - this.shiftY
             this.state.left = mouseX - window.pageXOffset - this.shiftX
           }
@@ -1410,12 +1437,12 @@ export default {
       stopAndPrevent(e)
     },
 
-    __onMouseUp(e) {
+    __onMouseUp (e) {
       if (this.state.dragging === true) {
         prevent(e)
         this.__removeEventListeners()
         if (e.touches !== void 0) {
-          this.__removeClass(body.document, 'q-window__touch-action')
+          this.__removeClass(document.body, 'q-window__touch-action')
         }
         this.state.shouldDrag = this.state.dragging = false
         this.$emit('afterDrag', e)
@@ -1564,7 +1591,7 @@ export default {
       return h('div', {
         staticClass: this.__tbStaticClass,
         class: this.titlebarClass,
-        style: this.__tbStyle,
+        style: this.__tbStyle
       }, [
         titlebarSlot === void 0 ? this.__renderTitle(h) : '',
         titlebarSlot === void 0 ? this.__renderMoreButton(h, menuData) : '',
@@ -1579,7 +1606,7 @@ export default {
       if (this.__canResize(resizeHandle) === false) {
         return ''
       }
-      let staticClass = 'gripper gripper-' + resizeHandle + (this.roundGrippers === true ? ' gripper-round' : '')
+      const staticClass = 'gripper gripper-' + resizeHandle + (this.roundGrippers === true ? ' gripper-round' : '')
       return h('div', this.setBorderColor(this.gripperBorderColor, this.setBackgroundColor(this.gripperBackgroundColor, {
         ref: resizeHandle,
         staticClass: staticClass,
@@ -1600,9 +1627,9 @@ export default {
       if (resizeHandle !== 'titlebar' && this.__canResize(resizeHandle) === false) {
         return ''
       }
-      let staticClass = 'q-window__resize-handle ' + 'q-window__resize-handle--' + resizeHandle
+      const staticClass = 'q-window__resize-handle ' + 'q-window__resize-handle--' + resizeHandle
       let width = this.computedWidth
-      let style = {}
+      const style = {}
       if (actionsWidth && actionsWidth > 0 && this.canDrag === true) {
         width -= actionsWidth
         style.width = width + 'px'
@@ -1639,7 +1666,7 @@ export default {
       const defaultSlot = this.$slots.default
       return h('div', {
         staticClass: 'q-window__body row',
-        style: this.__bodyStyle,
+        style: this.__bodyStyle
       }, [
         defaultSlot || defaultScopedSlot ? defaultScopedSlot({ zIndex: this.zIndex }) : '',
         (this.headless === true && this.canDrag === true) &&
@@ -1650,7 +1677,7 @@ export default {
 
     __render (h) {
       // get stateInfo for each menu item
-      let menuData = [ ...this.computedMenuData ]
+      const menuData = [...this.computedMenuData]
 
       return h('div', this.setBothColors(this.color, this.backgroundColor, {
         staticClass: 'q-window ' + this.__classes,
@@ -1690,10 +1717,11 @@ export default {
 
     __showPortal () {
       if (this.__portal !== void 0 && this.__portal.showing !== true) {
-        let app = document.getElementById('q-app')
+        const app = document.getElementById('q-app')
         if (app) {
           app.appendChild(this.__portal.$el)
-        } else {
+        }
+        else {
           document.body.appendChild(this.__portal.$el)
         }
         this.__portal.showing = true

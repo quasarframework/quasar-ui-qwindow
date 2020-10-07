@@ -3,27 +3,22 @@ module.exports = {
 
   parserOptions: {
     parser: 'babel-eslint',
+    ecmaVersion: 2018, // Allows for the parsing of modern ECMAScript features
     sourceType: 'module'
   },
 
   env: {
-    browser: true,
-    jest: true
+    browser: true
   },
 
   extends: [
     // https://github.com/vuejs/eslint-plugin-vue#priority-a-essential-error-prevention
     // consider switching to `plugin:vue/strongly-recommended` or `plugin:vue/recommended` for stricter rules.
-    'plugin:vue/essential',
-    '@vue/standard',
-    'plugin:quasar/standard'
+    'standard'
   ],
 
   // required to lint *.vue files
   plugins: [
-    'vue',
-    'jest',
-    'quasar'
   ],
 
   globals: {
@@ -54,12 +49,6 @@ module.exports = {
     'prefer-promise-reject-errors': 'off',
 
     'brace-style': [2, 'stroustrup', { allowSingleLine: false }],
-
-    'jest/no-disabled-tests': 'warn',
-    'jest/no-focused-tests': 'error',
-    'jest/no-identical-title': 'error',
-    'jest/prefer-to-have-length': 'warn',
-    'jest/valid-expect': 'error',
 
     'no-void': 'off',
     // allow console.log during development only
