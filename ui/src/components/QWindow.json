@@ -64,6 +64,7 @@
     },
     "resizable": {
       "type": "Array",
+      "tsType": "StringArray",
       "category": "state",
       "desc": "Contains an array of resize handle names that are allowed",
       "default": "['top','left','right','bottom','top-left','top-right','bottom-left','bottom-right']",
@@ -577,14 +578,14 @@
     "setXY": {
       "desc": "Programmatically set both the x and y positions",
       "params": {
-        "width": {
+        "x": {
           "type": "Number",
-          "desc": "The width",
+          "desc": "The x position",
           "__exemption": [ "examples" ]
         },
-        "height": {
+        "y": {
           "type": "Number",
-          "desc": "The height",
+          "desc": "The y position",
           "__exemption": [ "examples" ]
         }
       }
