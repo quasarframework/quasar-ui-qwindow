@@ -21,7 +21,7 @@
     <q-separator />
     <q-item clickable tag="a" target="_blank" href="https://github.com/quasarframework/quasar-ui-qwindow">
       <q-item-section avatar>
-        <q-icon name="extension" />
+        <q-icon name="home" />
       </q-item-section>
       <q-item-section>
         <q-item-label>QWindow home</q-item-label>
@@ -30,7 +30,7 @@
     </q-item>
     <q-item clickable tag="a" target="_blank" href="https://github.com/quasarframework/quasar-ui-qmarkdown">
       <q-item-section avatar>
-        <q-icon name="extension" />
+        <q-icon name="fab fa-markdown" />
       </q-item-section>
       <q-item-section>
         <q-item-label>QMarkdown home</q-item-label>
@@ -105,6 +105,3 @@ export default {
   }
 }
 </script>
-
-<style>
-</style>
