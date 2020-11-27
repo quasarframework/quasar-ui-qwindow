@@ -244,7 +244,7 @@ You do not need to include the `label` property unless you are:
 2. Using a different language
 
 ## Headless
-Using the `headless` property displays a QWindow without the titlebar. There is no longer a menu displayed, so cannot be modified by the user. However, the user can still move or resize the Qwindow. Try the `headless` property combined with the `auto-pin` property. A nice combination for website design software, as an example. Another option, by using the `isSelected` property, control the background color for a more professional look and feel.
+Using the `headless` property displays a QWindow without the titlebar. There is no longer a menu displayed, so cannot be modified by the user. However, the user can still move or resize the QWindow. Try the `headless` property combined with the `auto-pin` property. A nice combination for website design software, as an example. Another option, by using the `isSelected` property, control the background color for a more professional look and feel.
 
 ![Headless Deselected](qwindow-headless-deslected.png "Headless Deselected" =300x300)
 ![Headless Selected](qwindow-headless-selected.png "Headless Selected" =300x300)
