@@ -1,6 +1,6 @@
 {
   "name": "@quasar/quasar-app-extension-qwindow",
-  "version": "1.0.0-beta.4",
+  "version": "1.0.0-beta.5",
   "description": "A Quasar App Extension",
   "author": "Jeff Galbraith <jeff@quasar.dev>",
   "license": "MIT",
@@ -33,7 +33,7 @@
     "pinned"
   ],
   "dependencies": {
-    "@quasar/quasar-ui-qwindow": "^1.0.0-beta.4"
+    "@quasar/quasar-ui-qwindow": "^1.0.0-beta.5"
   },
   "devDependencies": {
     "@vue/eslint-config-standard": "^5.1.2",

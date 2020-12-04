@@ -1,6 +1,6 @@
 {
   "name": "@quasar/quasar-ui-qwindow",
-  "version": "1.0.0-beta.4",
+  "version": "1.0.0-beta.5",
   "author": "Jeff Galbraith <jeff@quasar.dev>",
   "description": "Floating, movable, resizable windows for your Quasar App",
   "license": "MIT",
