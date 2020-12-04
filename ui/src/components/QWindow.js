@@ -1286,6 +1286,7 @@ export default {
     // mousedown for element
     __onMouseDown (e, resizeHandle) {
       this.__removeEventListeners(resizeHandle)
+
       if (e.touches === void 0 && e.buttons !== 1) {
         return
       }
@@ -1330,9 +1331,9 @@ export default {
     },
 
     __removeEventListeners () {
-      document.body.removeEventListener('mousemove', this.__onMouseMove)
-      document.body.removeEventListener('mouseup', this.__onMouseUp)
-      document.body.removeEventListener('keyup', this.__onKeyUp)
+      document.body.removeEventListener('mousemove', this.__onMouseMove, { capture: true })
+      document.body.removeEventListener('mouseup', this.__onMouseUp, { capture: true })
+      document.body.removeEventListener('keyup', this.__onKeyUp, { capture: true })
     },
 
     __onKeyUp (e) {
@@ -1360,7 +1361,7 @@ export default {
       const mouseX = getMousePosition(e, 'x')
       const mouseY = getMousePosition(e, 'y')
 
-      // move 3 pixels to initiate moving
+      // wait 3 pixel move to initiate drag
       if (this.state.dragging !== true) {
         if (Math.abs(this.mousePos.x - mouseX) >= 3 || Math.abs(this.mousePos.y - mouseY) >= 3) {
           this.state.dragging = true

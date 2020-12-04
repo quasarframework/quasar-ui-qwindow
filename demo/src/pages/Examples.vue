@@ -260,6 +260,9 @@ The example below is **not** using any slot content. Try clicking on the window 
       </q-markdown>
       <example-viewer title="Headless/AutoPin Selected Styles" file="HeadlessAutoPinSelected" :location-url="locationUrl" :js-paths="jsPaths" :css-paths="cssPaths" />
 
+      <example-title title="Misc" />
+      <example-viewer title="Multiple" file="Multiple" :location-url="locationUrl" :js-paths="jsPaths" :css-paths="cssPaths" />
+
     </div>
     <q-page-scroller position="bottom-right" :scroll-offset="150" :offset="[18, 18]">
       <q-btn fab icon="keyboard_arrow_up" color="primary" />
@@ -327,6 +330,9 @@ export default {
     this.addToToc('Headless', 2)
     this.addToToc('Headless With AutoPin', 2)
     this.addToToc('Headless/AutoPin Selected Styles', 2)
+
+    this.addToToc('Misc')
+    this.addToToc('Multiple', 2)
 
     this.toc = this.tempToc
   },
