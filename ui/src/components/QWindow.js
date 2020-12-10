@@ -584,7 +584,7 @@ export default {
           })
         }
         else if (typeof this.contentStyle === 'string') {
-          const items = this.contentStyle.split(',')
+          const items = this.contentStyle.split(';')
           items.forEach(item => {
             const props = item.split(':')
             style[props[0].trim()] = props[1].trim()
