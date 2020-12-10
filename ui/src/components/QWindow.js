@@ -67,16 +67,6 @@ const getMouseShift = function (e, rect, type = 'x') {
   }
 }
 
-// const getOffset = function (el) {
-//   let x = 0, y = 0
-//   while (el && !isNaN(el.offsetLeft) && !isNaN(el.offsetTop)) {
-//       x += el.offsetLeft - el.scrollLeft
-//       y += el.offsetTop - el.scrollTop
-//       el = el.offsetParent
-//   }
-//   return { top: y, left: x }
-// }
-
 export default {
   name: 'QWindow',
 
@@ -264,7 +254,8 @@ export default {
             label: 'Leave fullscreen'
           }
         }
-      }
+      },
+      __portal: void 0
     }
   },
 
@@ -509,20 +500,6 @@ export default {
       return menuData
     },
 
-    __computedSortedLayers () {
-      const sortedLayers = []
-      const keys = Object.keys(layers)
-      for (let index = 0; index < keys.length; ++index) {
-        sortedLayers.push(layers[keys[index]])
-      }
-      function sort (a, b) {
-        return a.zIndex > b.zIndex
-      }
-      sortedLayers.sort(sort)
-
-      return sortedLayers
-    },
-
     __style () {
       let style
       if (this.isMinimized === true) {
@@ -584,7 +561,7 @@ export default {
           })
         }
         else if (typeof this.contentStyle === 'string') {
-          const items = this.contentStyle.split(',')
+          const items = this.contentStyle.split(';')
           items.forEach(item => {
             const props = item.split(':')
             style[props[0].trim()] = props[1].trim()
@@ -882,22 +859,25 @@ export default {
 
     // bring this window to the front
     bringToFront () {
-      const layers = this.__computedSortedLayers
-      for (let index = 0; index < layers.length; ++index) {
-        const layer = layers[index]
-        layer.window.zIndex = startingZIndex + index
+      // const sortedLayers = this.__computedSortedLayers
+      const sortedLayers = this.__sortedLayers()
+      for (let index = 0; index < sortedLayers.length; ++index) {
+        const layer = sortedLayers[index]
+        layer.zIndex = startingZIndex + index
       }
       // this window gets highest zIndex
-      this.zIndex = startingZIndex + layers.length
+      this.zIndex = startingZIndex + sortedLayers.length
     },
 
     // send this window to the back
     sendToBack () {
-      const layers = this.__computedSortedLayers
-      for (let index = 0; index < layers.length; ++index) {
-        const layer = layers[index]
-        layer.window.zIndex = startingZIndex + index + 1
+      // const sortedLayers = this.__computedSortedLayers
+      const sortedLayers = this.__sortedLayers()
+      for (let index = 0; index < sortedLayers.length; ++index) {
+        const layer = sortedLayers[index]
+        layer.zIndex = startingZIndex + index + 1
       }
+      // this window gets lowest zIndex
       this.zIndex = startingZIndex
     },
 
@@ -1053,6 +1033,50 @@ export default {
     // ------------------------------
     // private methods
     // ------------------------------
+
+    __canBeSelected (x, y) {
+      // const sortedLayers = this.__computedSortedLayers
+      const sortedLayers = this.__sortedLayers()
+      for (let index = sortedLayers.length - 1; index >= 0; --index) {
+        if (sortedLayers[index].__portal !== void 0) {
+          if (this.__isPointInRect(x, y, sortedLayers[index].__portal.$el)) {
+            if (sortedLayers[index].id === this.id) {
+              return true
+            }
+            else {
+              return false
+            }
+          }
+        }
+      }
+      return false
+    },
+
+    __isPointInRect (x, y, el) {
+      // include gripper size
+      const gripperSize = 10
+
+      const rect = el.getBoundingClientRect()
+
+      return x >= rect.left - gripperSize && x <= rect.left + rect.width + gripperSize &&
+        y >= rect.top - gripperSize && y <= rect.top + rect.height + gripperSize
+    },
+
+    __sortedLayers () {
+      const sortedLayers = []
+      const keys = Object.keys(layers)
+      for (let index = 0; index < keys.length; ++index) {
+        sortedLayers.push(layers[keys[index]].window)
+      }
+      function sort (a, b) {
+        return a.zIndex < b.zIndex ? -1 : a.zIndex === b.zIndex ? 0 : 1
+      }
+      sortedLayers.sort(sort)
+
+      return sortedLayers
+    },
+
+
 
     __canResize (resizeHandle) {
       if (this.noResize === true) return false
@@ -1241,45 +1265,15 @@ export default {
         return
       }
 
-      // we need to make sure if user clicks on grippers
-      // that the window does not become deselected
-      const gripperSize = 10
+      // if dragging, already selected
+      if (this.state.dragging !== true) {
+        const x = getMousePosition(e, 'x')
+        const y = getMousePosition(e, 'y')
 
-      // const oldSelected = this.selected
-      const x = getMousePosition(e, 'x')
-      const y = getMousePosition(e, 'y')
-      let left, top, width, height
-
-      // embedded
-      if (this.$el && this.$el.offsetParent) {
-        // determine if mousedown is within the bounds of this component
-        left = this.$el.offsetParent.offsetLeft + this.$el.offsetLeft
-        top = this.$el.offsetParent.offsetTop + this.$el.offsetTop
-        width = this.$el.offsetWidth
-        height = this.$el.offsetHeight
-      }
-      else {
-        // not embedded
-        if (this.isEmbedded === false) {
-          const position = this.computedPosition
-          left = position.scrollX
-          top = position.scrollY
-          width = position.width
-          height = position.height
+        this.selected = this.__canBeSelected(x, y)
+        if (this.selected) {
+          this.bringToFront()
         }
-      }
-      if (width <= 0 || height <= 0) return
-      if (this.noResize !== true) {
-        left -= gripperSize
-        top -= gripperSize
-        width += (gripperSize * 2)
-        height += (gripperSize * 2)
-      }
-      if (x >= left && x < left + width && y >= top && y < top + height) {
-        this.selected = true
-      }
-      else {
-        this.selected = false
       }
     },
 
@@ -1287,19 +1281,35 @@ export default {
     __onMouseDown (e, resizeHandle) {
       this.__removeEventListeners(resizeHandle)
 
+      this.selected = false
       if (e.touches === void 0 && e.buttons !== 1) {
         return
       }
 
-      this.resizeHandle = resizeHandle
-      this.selected = true
-
-      if (this.isFloating && this.selected === true) {
-        this.bringToFront()
+      if (this.isEmbedded === true) {
+        this.state.shouldDrag = this.state.dragging = false
+        return
       }
 
-      this.mousePos.x = getMousePosition(e, 'x')
-      this.mousePos.y = getMousePosition(e, 'y')
+      const x = getMousePosition(e, 'x')
+      const y = getMousePosition(e, 'y')
+
+      //  can window be selected
+      this.selected = this.__canBeSelected(x, y)
+      if (!this.selected) {
+        return
+      }
+
+      // bring window to front
+      this.bringToFront()
+
+
+      this.resizeHandle = resizeHandle
+      // this.selected = true
+
+      // save mouse position
+      this.mousePos.x = x
+      this.mousePos.y = y
 
       const rect = this.__portal.$el.getBoundingClientRect()
       this.shiftX = getMouseShift(e, rect, 'x')
@@ -1338,7 +1348,7 @@ export default {
 
     __onKeyUp (e) {
       // if ESC key
-      if (e.keycode === 27 && this.isDragging() === true) {
+      if (e.keyCode === 27 && this.isDragging === true) {
         prevent(e)
         this.__removeEventListeners()
         this.state.shouldDrag = this.state.dragging = false
