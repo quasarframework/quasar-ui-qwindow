@@ -1338,7 +1338,7 @@ export default {
 
     __onKeyUp (e) {
       // if ESC key
-      if (e.keycode === 27 && this.isDragging() === true) {
+      if (e.keyCode === 27 && this.isDragging === true) {
         prevent(e)
         this.__removeEventListeners()
         this.state.shouldDrag = this.state.dragging = false
