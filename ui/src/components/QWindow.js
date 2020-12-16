@@ -1270,7 +1270,7 @@ export default {
         const x = getMousePosition(e, 'x')
         const y = getMousePosition(e, 'y')
 
-        this.selected = this.__canBeSelected(x, y)
+        this.selected = this.__canBeSelected(x - this.scrollX, y - this.scrollY)
         if (this.selected) {
           this.bringToFront()
         }
@@ -1295,7 +1295,7 @@ export default {
       const y = getMousePosition(e, 'y')
 
       //  can window be selected
-      this.selected = this.__canBeSelected(x, y)
+      this.selected = this.__canBeSelected(x - this.scrollX, y - this.scrollY)
       if (!this.selected) {
         return
       }
