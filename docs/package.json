@@ -7,10 +7,17 @@
   "private": true,
   "scripts": {
     "lint": "eslint --ext .js,.vue ./",
-    "test": "echo \"No test specified\" && exit 0"
+    "lint-fix": "eslint --ext .js,.vue src --fix",
+    "build:site": "cd ../ui && yarn && yarn build && yarn link && cd ../docs && yarn link @quasar/quasar-ui-qwindow && quasar build",
+    "dev": "quasar dev",
+    "dev:ssr": "quasar dev -m ssr",
+    "dev:ios": "quasar dev -m ios",
+    "dev:android": "quasar dev -m android",
+    "dev:electron": "quasar dev -m electron"
   },
   "dependencies": {
     "@quasar/extras": "^1.0.0",
+    "@quasar/quasar-ui-qwindow": "./ui",
     "core-js": "^3.6.5",
     "quasar": "^2.0.0",
     "vue": "^3.0.0",

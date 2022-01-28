@@ -72,10 +72,9 @@ module.exports = configure(function (ctx) {
         chain.plugin('eslint-webpack-plugin')
           .use(ESLintPlugin, [{ extensions: [ 'js', 'vue' ] }])
 
-
         chain.resolve.alias.merge({
-          ui: path.resolve(__dirname, '../src/index.js'),
-          '@quasar/quasar-ui-qwindow': path.resolve(__dirname, '../src')
+          ui: path.resolve(__dirname, '../ui/src/index.js'),
+          '@quasar/quasar-ui-qwindow': path.resolve(__dirname, '../ui')
         })
 
       },

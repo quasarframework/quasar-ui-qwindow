@@ -70,7 +70,7 @@ function generate (src, dest) {
 }
 
 function generateUMD (dest, code, ext = '') {
-  return buildUtils.writeFile(`${dest}${ext}.css`, code, true)
+  return buildUtils.writeFile(`${ dest }${ ext }.css`, code, true)
     .then(code => nano.process(code, { from: void 0 }))
-    .then(code => buildUtils.writeFile(`${dest}${ext}.min.css`, code.css, true))
+    .then(code => buildUtils.writeFile(`${ dest }${ ext }.min.css`, code.css, true))
 }

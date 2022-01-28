@@ -1,14 +1,19 @@
-import { defineComponent } from 'vue'
+import { h, defineComponent } from 'vue'
 
 
 export default defineComponent({
   name: 'QWindow',
   setup(props, { slots }) {
 
-  console.log('WAJHDJKNJKDJKDKJJKDJKDHJK')
-    return () => ''
-  }
+  console.log('WAJHDJKNJKDJKDKJdd dddddd   dd d d  d dd JKDJKDHJK')
+    function render() {
+      return h('div', {
+        style: 'background-color: black;'
+      })
+    }
 
+    return () => render()
+  }
 })
 
 // import { QColorizeMixin } from 'q-colorize-mixin'
