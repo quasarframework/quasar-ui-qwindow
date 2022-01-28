@@ -6,7 +6,8 @@ import {
   computed,
   watch,
   onMounted,
-  ref
+  ref,
+  nextTick
 } from 'vue'
 
 import {
@@ -21,6 +22,11 @@ import {
   Scroll,
   useQuasar
 } from 'quasar'
+
+import {
+  prevent,
+  stopAndPrevent
+} from 'quasar/src/utils/event'
 
 // the starting zIndex for floating windows
 const startingZIndex = 4000
@@ -169,86 +175,86 @@ export default defineComponent({
 
     onBeforeUnmount(() => {
       // just in case
-      this.__removeClass(document.body, 'q-window__touch-action')
-      this.fullscreenLeave()
+      __removeClass(document.body, 'q-window__touch-action')
+      fullscreenLeave()
 
-      document.removeEventListener('scroll', this.__onScroll, {passive: true})
-      document.body.removeEventListener('mousedown', this.__onMouseDownBody, {passive: false})
+      document.removeEventListener('scroll', __onScroll, {passive: true})
+      document.body.removeEventListener('mousedown', __onMouseDownBody, {passive: false})
 
-      this.__destroyPortal()
+      __destroyPortal()
     })
 
     onMounted(() => {
-      this.__updateStateInfo()
+      __updateStateInfo()
 
       // calculate left starting position
-      if (this.startX > 0) {
-        this.state.left = this.startX
+      if (props.startX > 0) {
+        state.value.left = props.startX
       } else {
-        this.state.left = defaultX * QWindowCount
+        state.value.left = defaultX * QWindowCount
       }
 
       // calculate top starting position
-      if (this.startY > 0) {
-        this.state.top = this.startY
+      if (props.startY > 0) {
+        state.value.top = props.startY
       } else {
-        this.state.top = defaultY * QWindowCount
+        state.value.top = defaultY * QWindowCount
       }
 
       // calculate right and bottom starting positions
-      this.state.right = this.state.left + this.width
-      this.state.bottom = this.state.top + this.height
+      state.value.right = state.value.left + props.width
+      state.value.bottom = state.value.top + props.height
 
       // adjust initial user states
       if (this.value !== void 0) {
         if (this.value === true) {
-          this.__setStateInfo('visible', true)
+          __setStateInfo('visible', true)
         } else {
-          this.__setStateInfo('visible', false)
+          __setStateInfo('visible', false)
         }
       }
-      if (this.embedded !== void 0) {
-        if (this.embedded === true) {
-          this.__setStateInfo('embedded', true)
+      if (props.embedded !== void 0) {
+        if (props.embedded === true) {
+          __setStateInfo('embedded', true)
         } else {
-          this.__setStateInfo('embedded', false)
+          __setStateInfo('embedded', false)
         }
       }
-      if (this.pinned !== void 0) {
-        if (this.pinned === true) {
-          if (this.canDo('pinned', true)) {
-            this.__setStateInfo('pinned', true)
+      if (props.pinned !== void 0) {
+        if (props.pinned === true) {
+          if (canDo('pinned', true)) {
+            __setStateInfo('pinned', true)
           }
         } else {
-          if (this.canDo('pinned', false)) {
-            this.__setStateInfo('pinned', false)
+          if (canDo('pinned', false)) {
+            __setStateInfo('pinned', false)
           }
         }
       }
-      if (this.fullscreen !== void 0) {
-        if (this.fullscreen === true) {
-          this.fullscreenEnter()
+      if (props.fullscreen !== void 0) {
+        if (props.fullscreen === true) {
+          fullscreenEnter()
         }
       }
-      if (this.maximize !== void 0) {
-        if (this.maximize === true && this.__getStateInfo('fullscreen') !== true) {
-          this.__setStateInfo('maximize', true)
+      if (maximize() !== void 0) {
+        if (maximize() === true && __getStateInfo('fullscreen') !== true) {
+          __setStateInfo('maximize', true)
         } else {
-          this.__setStateInfo('maximize', false)
+          __setStateInfo('maximize', false)
         }
       }
-      if (this.minimize !== void 0) {
-        if (this.minimize === true && this.__getStateInfo('fullscreen') !== true) {
-          this.__setStateInfo('minimize', true)
+      if (minimize() !== void 0) {
+        if (minimize() === true && __getStateInfo('fullscreen') !== true) {
+          __setStateInfo('minimize', true)
         } else {
-          this.__setStateInfo('minimize', false)
+          __setStateInfo('minimize', false)
         }
       }
 
       // set up scroll handler
-      document.addEventListener('scroll', this.__onScroll, {passive: true})
+      document.addEventListener('scroll', __onScroll, {passive: true})
       // set up mousedown on body (so windows can deselect themselves on outside click)
-      document.body.addEventListener('mousedown', this.__onMouseDownBody, {passive: false})
+      document.body.addEventListener('mousedown', __onMouseDownBody, {passive: false})
     })
 
 
@@ -369,9 +375,9 @@ export default defineComponent({
 //   },
 //
     function __getStateInfo(id) {
-      // if (id in this.stateInfo) {
-      //  return this.stateInfo[id].state
-      //}
+       if (id in stateInfo.value) {
+        return stateInfo.value[id].state
+      }
       return false
     }
 
@@ -387,11 +393,11 @@ export default defineComponent({
     }, {deep: true})
 
     watch(() => selected, (val) => {
-      if (this.autoPin === true) {
+      if (autoPin === true) {
         if (val === true) {
-          this.unpin()
+          unpin()
         } else {
-          this.pin()
+          pin()
         }
       }
       this.$emit('selected', this.selected)
@@ -404,15 +410,15 @@ export default defineComponent({
 
     watch(() => 'stateInfo.embedded.state', (val) => {
       if (val !== true) {
-        this.__createPortal()
-        this.$nextTick(() => {
-          this.__showPortal()
+        __createPortal()
+        nextTick(() => {
+          __showPortal()
           this.$forceUpdate()
         })
       } else {
         this.__hidePortal()
-        this.$nextTick(() => {
-          this.__destroyPortal()
+        nextTick(() => {
+          __destroyPortal()
           this.$forceUpdate()
         })
       }
@@ -815,9 +821,9 @@ export default defineComponent({
         __savePositionAndState()
         __setFullWindowPosition()
 
-        this.__setStateInfo('embedded', false)
-        this.$nextTick(() => {
-          this.__setStateInfo('maximize', true)
+        __setStateInfo('embedded', false)
+        nextTick(() => {
+          __setStateInfo('maximize', true)
           this.$emit('maximize', true)
         })
         return true
@@ -1071,8 +1077,8 @@ export default defineComponent({
 
       const rect = el.getBoundingClientRect()
 
-      return x >= rect.left - gripperSize && x <= rect.left + rect.width + gripperSize &&
-        y >= rect.top - gripperSize && y <= rect.top + rect.height + gripperSize
+      return x >= rect.left - gripperSize && x <= rect.left + rect.width + gripperSize
+        && y >= rect.top - gripperSize && y <= rect.top + rect.height + gripperSize
     }
 
     function __sortedLayers() {
@@ -1184,8 +1190,8 @@ export default defineComponent({
 
 
     function __setStateInfo(id, val) {
-      if (id in this.stateInfo) {
-        this.stateInfo[id].state = val
+      if (id in stateInfo.value) {
+        stateInfo.value[id].state = val
         return true
       }
       return false
@@ -1193,18 +1199,18 @@ export default defineComponent({
 
 //
     function __getStateInfo(id) {
-      if (id in this.stateInfo) {
-        return this.stateInfo[id].state
+      if (id in stateInfo.value) {
+        return stateInfo.value[id].state
       }
       return false
     }
 
     function __setFullWindowPosition() {
-      this.state.top = 0
-      this.state.left = 0
-      this.state.bottom = this.$q.screen.height
-      this.state.right = this.$q.screen.width
-      this.$nextTick(() => {
+      state.value.top = 0
+      state.value.left = 0
+      state.value.bottom = this.$q.screen.height
+      state.value.right = this.$q.screen.width
+      nextTick(() => {
         this.$emit('position', this.computedPosition)
       })
     }
@@ -1217,28 +1223,28 @@ export default defineComponent({
     }
 
     function __savePositionAndState() {
-      this.restoreState.top = this.state.top
-      this.restoreState.left = this.state.left
-      this.restoreState.bottom = this.state.bottom
-      this.restoreState.right = this.state.right
-      this.restoreState.zIndex = this.__computedZIndex
-      this.restoreState.pinned = this.__getStateInfo('pinned')
-      this.restoreState.embedded = this.__getStateInfo('embedded')
-      this.restoreState.maximize = this.__getStateInfo('maximize')
-      this.restoreState.minimize = this.__getStateInfo('minimize')
+      restoreState.value.top = state.value.top
+      restoreState.value.left = state.value.left
+      restoreState.value.bottom = state.value.bottom
+      restoreState.value.right = state.value.right
+      restoreState.value.zIndex = __computedZIndex.value
+      restoreState.value.pinned = __getStateInfo('pinned')
+      restoreState.value.embedded = __getStateInfo('embedded')
+      restoreState.value.maximize = __getStateInfo('maximize')
+      restoreState.value.minimize = __getStateInfo('minimize')
     }
 
     function __restorePositionAndState() {
-      this.state.top = this.restoreState.top
-      this.state.left = this.restoreState.left
-      this.state.bottom = this.restoreState.bottom
-      this.state.right = this.restoreState.right
-      this.zIndex = this.restoreState.zIndex
-      this.__setStateInfo('pinned', this.restoreState.pinned)
-      this.__setStateInfo('embedded', this.restoreState.embedded)
-      this.__setStateInfo('maximize', this.restoreState.maximixe)
-      this.__setStateInfo('minimize', this.restoreState.minimize)
-      this.$nextTick(() => {
+      state.value.top = restoreState.value.top
+      state.value.left = restoreState.value.left
+      state.value.bottom = restoreState.value.bottom
+      state.value.right = restoreState.value.right
+      zIndex.value = restoreState.value.zIndex
+      __setStateInfo('pinned', restoreState.value.pinned)
+      __setStateInfo('embedded', restoreState.value.embedded)
+      __setStateInfo('maximize', restoreState.value.maximixe)
+      __setStateInfo('minimize', restoreState.value.minimize)
+      nextTick(() => {
         this.$emit('position', this.computedPosition)
       })
     }
@@ -1263,11 +1269,11 @@ export default defineComponent({
 
     function __onScroll(e) {
       if (window !== void 0) {
-        this.scrollY = window.pageYOffset
-        this.scrollX = window.pageXOffset
-        if (this.isFloating === true) {
-          this.$nextTick(() => {
-            this.$emit('position', this.computedPosition)
+        scrollY.value = window.pageYOffset
+        scrollX.value = window.pageXOffset
+        if (isFloating.value === true) {
+          nextTick(() => {
+            this.$emit('position', computedPosition.value)
           })
         }
       }
@@ -1276,34 +1282,34 @@ export default defineComponent({
 
     // mousedown for document.body
     function __onMouseDownBody(e) {
-      if (this.isEmbedded) {
-        this.state.shouldDrag = this.state.dragging = false
+      if (isEmbedded.value) {
+        state.value.shouldDrag = state.value.dragging = false
         return
       }
 
       // if dragging, already selected
-      if (this.state.dragging !== true) {
+      if (state.value.dragging !== true) {
         const x = getMousePosition(e, 'x')
         const y = getMousePosition(e, 'y')
 
-        this.selected = this.__canBeSelected(x - this.scrollX, y - this.scrollY)
+        selected.value = __canBeSelected(x - scrollX.value, y - scrollY.value)
         if (this.selected) {
-          this.bringToFront()
+          bringToFront()
         }
       }
     }
 
     // mousedown for element
     function __onMouseDown(e, resizeHandle) {
-      this.__removeEventListeners(resizeHandle)
+      __removeEventListeners(resizeHandle)
 
       this.selected = false
       if (e.touches === void 0 && e.buttons !== 1) {
         return
       }
 
-      if (this.isEmbedded === true) {
-        this.state.shouldDrag = this.state.dragging = false
+      if (isEmbedded.value === true) {
+        state.value.shouldDrag = state.value.dragging = false
         return
       }
 
@@ -1311,13 +1317,13 @@ export default defineComponent({
       const y = getMousePosition(e, 'y')
 
       //  can window be selected
-      this.selected = this.__canBeSelected(x - this.scrollX, y - this.scrollY)
-      if (!this.selected) {
+      selected.value = __canBeSelected(x - scrollX.value, y - scrollY.value)
+      if (!selected.value) {
         return
       }
 
       // bring window to front
-      this.bringToFront()
+      bringToFront()
 
 
       this.resizeHandle = resizeHandle
@@ -1351,38 +1357,38 @@ export default defineComponent({
     }
 
     function __addEventListeners() {
-      document.body.addEventListener('mousemove', this.__onMouseMove, {capture: true})
-      document.body.addEventListener('mouseup', this.__onMouseUp, {capture: true})
-      document.body.addEventListener('keyup', this.__onKeyUp, {capture: true})
+      document.body.addEventListener('mousemove', __onMouseMove, {capture: true})
+      document.body.addEventListener('mouseup', __onMouseUp, {capture: true})
+      document.body.addEventListener('keyup', __onKeyUp, {capture: true})
     }
 
     function __removeEventListeners() {
-      document.body.removeEventListener('mousemove', this.__onMouseMove, {capture: true})
-      document.body.removeEventListener('mouseup', this.__onMouseUp, {capture: true})
-      document.body.removeEventListener('keyup', this.__onKeyUp, {capture: true})
+      document.body.removeEventListener('mousemove', __onMouseMove, {capture: true})
+      document.body.removeEventListener('mouseup', __onMouseUp, {capture: true})
+      document.body.removeEventListener('keyup', __onKeyUp, {capture: true})
     }
 
 
     function __onKeyUp(e) {
       // if ESC key
-      if (e.keyCode === 27 && this.isDragging === true) {
+      if (e.keyCode === 27 && isDragging.value === true) {
         prevent(e)
-        this.__removeEventListeners()
-        this.state.shouldDrag = this.state.dragging = false
-        this.state.top = this.tmpTop
-        this.state.left = this.tmpLeft
-        this.state.right = this.tmpRight
-        this.state.bottom = this.tmpBottom
+        __removeEventListeners()
+        state.value.shouldDrag = state.value.dragging = false
+        state.value.top = this.tmpTop
+        state.value.left = this.tmpLeft
+        state.value.right = this.tmpRight
+        state.value.bottom = this.tmpBottom
         this.$nextTick(() => {
-          this.$emit('canceled', this.computedPosition)
+          this.$emit('canceled', computedPosition.value)
         })
       }
     }
 
 
     function __onMouseMove(e, resizeHandle) {
-      if (this.state.shouldDrag !== true || (e.touches === void 0 && e.buttons !== 1)) {
-        this.__removeEventListeners()
+      if (state.value.shouldDrag !== true || (e.touches === void 0 && e.buttons !== 1)) {
+        __removeEventListeners()
         return
       }
 
@@ -1390,9 +1396,9 @@ export default defineComponent({
       const mouseY = getMousePosition(e, 'y')
 
       // wait 3 pixel move to initiate drag
-      if (this.state.dragging !== true) {
-        if (Math.abs(this.mousePos.x - mouseX) >= 3 || Math.abs(this.mousePos.y - mouseY) >= 3) {
-          this.state.dragging = true
+      if (state.value.dragging !== true) {
+        if (Math.abs(mousePos.value.x - mouseX) >= 3 || Math.abs(mousePos.value.y - mouseY) >= 3) {
+          state.value.dragging = true
           this.$emit('beforeDrag', e)
         } else {
           return
@@ -1401,7 +1407,7 @@ export default defineComponent({
 
       switch (resizeHandle || this.resizeHandle) {
         case 'top':
-          this.state.top = mouseY - window.pageYOffset - this.shiftY
+          state.value.top = mouseY - window.pageYOffset - this.shiftY
           this.$nextTick(() => {
             if (this.computedHeight < this.state.minHeight) {
               this.state.top = this.tmpBottom - this.state.minHeight
@@ -1618,7 +1624,7 @@ export default defineComponent({
         return ''
       }
 
-      const titlebarSlot = this.$scopedSlots.titlebar
+      const titlebarSlot = this.$slots.titlebar
 
       return h('div', {
         staticClass: this.__tbStaticClass,
@@ -1628,8 +1634,8 @@ export default defineComponent({
         titlebarSlot === void 0 ? this.__renderTitle(h) : '',
         titlebarSlot === void 0 ? this.__renderMoreButton(h, menuData) : '',
         titlebarSlot !== void 0 ? titlebarSlot(menuData) : '',
-        (this.canDrag === true) &&
-        this.__renderResizeHandle(h, 'titlebar', this.noMenu ? 0 : 35) // width of more button
+        (this.canDrag === true)
+        && this.__renderResizeHandle(h, 'titlebar', this.noMenu ? 0 : 35) // width of more button
       ])
     }
 
@@ -1694,15 +1700,15 @@ export default defineComponent({
     }
 
     function __renderBody(h) {
-      const defaultScopedSlot = this.$scopedSlots.default
+      const defaultScopedSlot = this.$slots.default
       const defaultSlot = this.$slots.default
       return h('div', {
         staticClass: 'q-window__body row',
         style: this.__bodyStyle
       }, [
         defaultSlot || defaultScopedSlot ? defaultScopedSlot({zIndex: this.zIndex}) : '',
-        (this.headless === true && this.canDrag === true) &&
-        this.__renderResizeHandle(h, 'titlebar', this.noMenu ? 0 : 44) // width of more button
+        (this.headless === true && this.canDrag === true)
+        && this.__renderResizeHandle(h, 'titlebar', this.noMenu ? 0 : 44) // width of more button
 
       ])
     }
@@ -1716,8 +1722,8 @@ export default defineComponent({
         class: this.contentClass,
         style: this.__style
       }), [
-        (this.canDrag === true) && [...this.__renderResizeHandles(h)],
-        (this.canDrag === true) && [...this.__renderGrippers(h)],
+        (canDrag === true) && [...__renderResizeHandles(h)],
+        (canDrag === true) && [...__renderGrippers(h)],
         this.__renderTitlebar(h, menuData),
         this.isMinimized !== true && this.__renderBody(h)
       ])
