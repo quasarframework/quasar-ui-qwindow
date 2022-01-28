@@ -1,5 +1,6 @@
-import { version } from '../package.json'
 import QWindow from './components/QWindow'
+import pkg from '../package.json'
+const { version } = pkg
 
 export {
   version,
@@ -11,6 +12,7 @@ export default {
   QWindow,
 
   install (Vue) {
+    console.log('WAJJJJJJJJJ')
     Vue.component(QWindow.name, QWindow)
   }
 }

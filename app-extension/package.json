@@ -1,7 +1,7 @@
 {
   "name": "@quasar/quasar-app-extension-qwindow",
-  "version": "1.0.0-beta.7",
-  "description": "A Quasar App Extension",
+  "version": "2.0.0",
+  "description": "QWindow is an app extension for Quasar for making floating, movable, resizable windows for your Quasar App",
   "author": "Jeff Galbraith <jeff@quasar.dev>",
   "license": "MIT",
   "main": "src/index.js",
@@ -33,14 +33,7 @@
     "pinned"
   ],
   "dependencies": {
-    "@quasar/quasar-ui-qwindow": "^1.0.0-beta.7"
-  },
-  "devDependencies": {
-    "@vue/eslint-config-standard": "^6.0.0",
-    "babel-eslint": "^10.1.0",
-    "eslint": "^7.15.0",
-    "eslint-loader": "^4.0.2",
-    "eslint-plugin-vue": "^7.3.0"
+    "@quasar/quasar-ui-qwindow": "^2.0.0"
   },
   "engines": {
     "node": ">= 10.0.0",
