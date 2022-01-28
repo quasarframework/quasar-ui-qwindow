@@ -1,11 +1,244 @@
-import { h, defineComponent } from 'vue'
+import { h, defineComponent, onBeforeMount, onBeforeUnmount, computed } from 'vue'
+import {
+  QBtn,
+  QMenu,
+  QList,
+  QItem,
+  QItemSection,
+  QIcon,
+  QSeparator,
+  ClosePopup,
+  Scroll,
+  useQuasar
+} from 'quasar'
+
+// the starting zIndex for floating windows
+const startingZIndex = 4000
+
+// maxZIndex is for fullscreen
+// 6000 is $z-fullscreen and $z-menu
+const maxZIndex = 6000 - 100
+
+// number of windows registered globally
+const QWindowCount = 0
+
+// layered windows
+const layers = {}
+
+// default starting position
+// relative to viewport for floating
+// relative to document for scroll-with-window
+const defaultX = 20
+const defaultY = 20
+
+
+const getMousePosition = function (e, type = 'x') {
+  if (e.touches !== void 0) {
+    if (type === 'x') {
+      return e.touches[ 0 ].pageX
+    }
+    return e.touches[ 0 ].pageY
+  }
+ else {
+    if (type === 'x') {
+      return e.pageX
+    }
+    return e.pageY
+  }
+}
+const getMouseShift = function (e, rect, type = 'x') {
+  if (e.touches !== void 0) {
+    if (type === 'x') {
+      return e.touches[ 0 ].clientX - rect.left
+    }
+    return e.touches[ 0 ].clientY - rect.top
+  }
+ else {
+    if (type === 'x') {
+      return e.clientX - rect.left
+    }
+    return e.clientY - rect.top
+  }
+}
 
 
 export default defineComponent({
   name: 'QWindow',
+  directives: {
+    ClosePopup,
+    Scroll
+  },
+  props: {
+    value: Boolean,
+    title: String,
+    dense: Boolean,
+    embedded: Boolean,
+    pinned: Boolean,
+    fullscreen: Boolean,
+    maximized: Boolean,
+    minimized: Boolean,
+    noMenu: Boolean,
+    noMove: Boolean,
+    noResize: Boolean,
+    resizable: {
+      type: Array,
+      default: () => [
+        'top',
+        'left',
+        'right',
+        'bottom',
+        'top-left',
+        'top-right',
+        'bottom-left',
+        'bottom-right'
+      ]
+    },
+    scrollWithWindow: {
+      type: Boolean,
+      default: false
+    },
+    autoPin: Boolean,
+
+    disabled: Boolean,
+    hideToolbarDivider: Boolean,
+    hideGrippers: Boolean,
+    roundGrippers: Boolean,
+    headless: Boolean,
+    iconSet: Object,
+
+    backgroundColor: {
+      type: String
+    },
+    gripperBorderColor: {
+      type: String
+    },
+    gripperBackgroundColor: {
+      type: String
+    },
+    borderWidth: {
+      type: String,
+      default: '1px'
+    },
+    borderStyle: {
+      type: String,
+      default: 'solid'
+    },
+
+    startX: [ Number, String ],
+    startY: [ Number, String ],
+    width: {
+      type: [ Number, String ],
+      default: 400
+    },
+    height: {
+      type: [ Number, String ],
+      default: 400
+    },
+    actions: {
+      type: Array,
+      default: () => ([ 'pin', 'embedded', 'close' ]),
+      validator: (v) => v.some(action => [
+        'pin',
+        'embedded',
+        'minimize',
+        'maximize',
+        'close',
+        'fullscreen' ].includes(action))
+    },
+    menuFunc: Function,
+    titlebarStyle: [ String, Object, Array ],
+    titlebarClass: [ String, Object, Array ],
+    contentClass: [ String, Object, Array ],
+    contentStyle: [ String, Object, Array ]
+  },
   setup(props, { slots }) {
 
-  console.log('WAJHDJKNJKDJKDKJdd dddddd   dd d d  d dd JKDJKDHJK')
+
+    //const __removeClass = computed((el, name) => {
+    //  const arr = el.className.split(' ')
+    //  const index = arr.indexOf(name)
+    // if (index !== -1) {
+    //    arr.splice(index, 1)
+    //    el.className = arr.join(' ')
+    //  }
+    // })
+
+    //   __setStateInfo (id, val) {
+//     if (id in this.stateInfo) {
+//       this.stateInfo[id].state = val
+//       return true
+//     }
+//     return false
+//   },
+//
+    function __getStateInfo(id) {
+      // if (id in this.stateInfo) {
+      //  return this.stateInfo[id].state
+      //}
+      return false
+    }
+
+    const isVisible = computed(() => {
+      return __getStateInfo('visible')
+    })
+
+    const isEmbedded = computed(() => {
+      return __getStateInfo('embedded')
+    })
+
+    const isFloating = computed(() => {
+      return __getStateInfo('embedded') !== true
+    })
+
+    const isPinned = computed(() => {
+      return __getStateInfo('pinned')
+    })
+    const isFullscreen = computed(() => {
+      return __getStateInfo('fullscreen')
+    })
+
+    const isMaximized = computed(() => {
+      return __getStateInfo('maximize')
+    })
+
+    const isMinimized = computed(() => {
+      return __getStateInfo('minimize')
+    })
+
+    const isDisabled = computed(() => {
+      return disabled === true
+    })
+
+    const isEnabled = computed(() => {
+      return isDisabled.value === false
+    })
+
+    const isDragging = computed(() => {
+      return state.dragging === true
+    })
+
+    const isSelected = computed(() => {
+      return selected === true
+    })
+
+
+    onBeforeMount(() => {
+      // this.id = ++QWindowCount
+      // this.$set(layers, this.id, {window: this})
+    })
+//
+    onBeforeUnmount(() => {
+      // just in case
+      // this.__removeClass(document.body, 'q-window__touch-action')
+      //  this.fullscreenLeave()
+
+      //document.removeEventListener('scroll', this.__onScroll, {passive: true})
+      // document.body.removeEventListener('mousedown', this.__onMouseDownBody, {passive: false})
+
+      //this.__destroyPortal()
+    });
+
+
     function render() {
       return h('div', {
         style: 'background-color: black;'
@@ -22,75 +255,8 @@ export default defineComponent({
 // // Utils
 // import { prevent, stopAndPrevent } from 'quasar/src/utils/event'
 //
-// import {
-//   QBtn,
-//   QMenu,
-//   QList,
-//   QItem,
-//   QItemSection,
-//   QIcon,
-//   QSeparator,
-//   ClosePopup,
-//   Scroll
-// } from 'quasar'
-//
-// import Vue from 'vue'
-//
-// // the starting zIndex for floating windows
-// const startingZIndex = 4000
-//
-// // maxZIndex is for fullscreen
-// // 6000 is $z-fullscreen and $z-menu
-// const maxZIndex = 6000 - 100
-//
-// // number of windows registered globally
-// let QWindowCount = 0
-//
-// // layered windows
-// const layers = {}
-//
-// // default starting position
-// // relative to viewport for floating
-// // relative to document for scroll-with-window
-// const defaultX = 20
-// const defaultY = 20
-//
-// const getMousePosition = function (e, type = 'x') {
-//   if (e.touches !== void 0) {
-//     if (type === 'x') {
-//       return e.touches[0].pageX
-//     }
-//     return e.touches[0].pageY
-//   }
-//   else {
-//     if (type === 'x') {
-//       return e.pageX
-//     }
-//     return e.pageY
-//   }
-// }
-//
-// const getMouseShift = function (e, rect, type = 'x') {
-//   if (e.touches !== void 0) {
-//     if (type === 'x') {
-//       return e.touches[0].clientX - rect.left
-//     }
-//     return e.touches[0].clientY - rect.top
-//   }
-//   else {
-//     if (type === 'x') {
-//       return e.clientX - rect.left
-//     }
-//     return e.clientY - rect.top
-//   }
-// }
 
 
-// directives: {
-//   ClosePopup,
-//   Scroll
-// },
-//
 // mixins: [QColorizeMixin, canRender],
 //
 // props: {
