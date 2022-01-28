@@ -1,4 +1,12 @@
-import { h, defineComponent, onBeforeMount, onBeforeUnmount, computed } from 'vue'
+import {
+  h,
+  defineComponent,
+  onBeforeMount,
+  onBeforeUnmount,
+  computed,
+  ref
+} from 'vue'
+
 import {
   QBtn,
   QMenu,
@@ -154,6 +162,105 @@ export default defineComponent({
   setup(props, { slots }) {
 
 
+    // ======= REACTIVE DATA
+
+    const state = ref({
+      top: 10,
+      left: 10,
+      bottom: 400,
+      right: 400,
+      minHeight: 100,
+      minWidth: 100,
+      shouldDrag: false,
+      dragging: false
+    })
+
+    const restoreState = ref({
+      top: 10,
+      left: 10,
+      bottom: 400,
+      right: 400,
+      zIndex: 4000,
+      pinned: false,
+      embedded: false,
+      maximize: false,
+      minimize: false
+    })
+
+    const zIndex = ref(4000)
+    const mouseOffsetX = ref(-1)
+    const mouseOffsetY = ref(-1)
+    const mousePos = ref({ x: 0, y: 0 })
+    const scrollX = ref(0)
+    const scrollY = ref(0)
+    const selected = ref(false)
+    const fullscreenInitiated = ref(false)
+    const handles = ref([
+      'top',
+      'left',
+      'right',
+      'bottom',
+      'top-left',
+      'top-right',
+      'bottom-left',
+      'bottom-right'
+    ])
+    const stateInfo = ref() // filled in mounted
+    const iconSetTemplate = ref({ // uses material design icons
+      visible: {
+        on: {
+          icon: 'close',
+          label: 'Show'
+        },
+        off: {
+          icon: 'close',
+          label: 'Hide'
+        }
+      },
+      embedded: {
+        on: {
+          icon: 'lock_outline',
+          label: 'Embed'
+        },
+        off: {
+          icon: 'lock_open',
+          label: 'Float'
+        }
+      },
+      pinned: {
+        on: {
+          icon: 'location_searching',
+          label: 'Pin'
+        },
+        off: {
+          icon: 'gps_fixed',
+          label: 'Unpin'
+        }
+      },
+      maximize: {
+        on: {
+          icon: 'arrow_upward',
+          label: 'Maximize'
+        },
+        off: {
+          icon: 'restore',
+          label: 'Restore'
+        }
+      },
+      fullscreen: {
+        on: {
+          icon: 'fullscreen',
+          label: 'Enter fullscreen'
+        },
+        off: {
+          icon: 'fullscreen_exit',
+          label: 'Leave fullscreen'
+        }
+      }
+    })
+    const __portal = ref()
+
+
     //const __removeClass = computed((el, name) => {
     //  const arr = el.className.split(' ')
     //  const index = arr.indexOf(name)
@@ -178,6 +285,7 @@ export default defineComponent({
       return false
     }
 
+// ======= COMPUTED FUNCTIONS
     const isVisible = computed(() => {
       return __getStateInfo('visible')
     })
@@ -214,11 +322,249 @@ export default defineComponent({
     })
 
     const isDragging = computed(() => {
-      return state.dragging === true
+      return state.value.dragging === true
     })
 
     const isSelected = computed(() => {
-      return selected === true
+      return selected.value === true
+    })
+
+
+    const canDrag = computed(() => {
+      return isVisible.value === true
+        && isEmbedded.value !== true
+        && isPinned.value !== true
+        && isFullscreen.value !== true
+        && isMaximized.value !== true
+        && isMinimized.value !== true
+    })
+
+    const hasStateInfo = computed(() => {
+      return Object.keys(this.stateInfo).length > 0
+    })
+
+    const __computedVisibility = computed(() => {
+      return isVisible.value === true ? 'visible' : 'hidden'
+    })
+
+    const computedToolbarHeight = computed(() => {
+      return props.headless === true ? 0 : this.dense === true ? 28 : 40
+    })
+
+    const computedLeft = computed(() => {
+      return state.value.left
+    })
+    
+    const computedTop = computed(() => {
+      return state.value.top
+    })
+
+    const computedRight = computed(() => {
+      return state.value.right
+    })
+
+    const computedBottom = computed(() => {
+      return state.value.bottom
+    })
+
+    const computedHeight = computed(() => {
+      return computedBottom.value - computedTop.value
+    })
+
+    const computedWidth = computed(() => {
+      return computedRight.value - computedLeft.value
+    })
+
+    const computedScrollX = computed(() => {
+      return computedLeft.value + (props.scrollWithWindow === false ? this.scrollX : 0)
+    })
+
+    const computedScrollY = computed(() => {
+      return computedTop.value + (props.scrollWithWindow === false ? this.scrollY : 0)
+    })
+
+    const __computedZIndex = computed(() => {
+      //let extra = 0
+      //if (this.isDragging) extra = 100
+      return this.zIndex + extra
+    })
+
+    const computedPosition = computed(() => {
+      return {
+        left: state.value.left,
+        top: state.value.top,
+        width: computedWidth.value,
+        height: computedHeight.value,
+        scrollX: computedScrollX.value,
+        scrollY: computedScrollY.value
+      }
+    })
+
+
+    const computedActions = computed(() => {
+      // sort and pick ones that are visible based on user selection and state
+      const actions = []
+      if (this.actions.includes('embedded') && (this.canDo('embedded', true) || this.canDo('embedded', false))) {
+        actions.push('embedded')
+      }
+      if (this.actions.includes('pin') && (this.canDo('pinned', true) || this.canDo('pinned', false))) {
+        actions.push('pinned')
+      }
+      if (this.actions.includes('fullscreen') && (this.canDo('fullscreen', true) || this.canDo('fullscreen', false))) {
+        actions.push('fullscreen')
+      }
+      if (this.actions.includes('maximize') && (this.canDo('maximize', true) || this.canDo('maximize', false))) {
+        actions.push('maximize')
+      }
+      // if (this.actions.includes('minimize') && (this.canDo('minimize', true) || this.canDo('minimize', false))) {
+      //   actions.push('maximize')
+      // }
+      if (this.actions.includes('close') && this.canDo('close', true)) {
+        actions.push('visible')
+      }
+
+      return actions
+    })
+
+    const computedMenuData = computed(() => {
+      // get stateInfo for each menu item
+      const menuData = []
+      computedActions.value.map(key => {
+        // if (this.stateInfo[key]) {
+        //   menuData.push({ ...this.stateInfo[key], key: key })
+        // }
+      })
+      return menuData
+    })
+
+    const __style = computed(() => {
+      let style
+      if (this.isMinimized === true) {
+        style = {
+          position: 'relative',
+          visibility: this.__computedVisibility,
+          height: this.computedToolbarHeight + 'px',
+          borderWidth: '1px',
+          borderStyle: 'solid',
+          color: this.color,
+          backgroundColor: this.backgroundColor,
+          minWidth: '100px'
+        }
+      }
+ else if (this.isEmbedded === true) {
+        style = {
+          position: 'relative',
+          visibility: this.__computedVisibility,
+          borderWidth: this.borderWidth,
+          borderStyle: this.borderStyle,
+          width: '100%',
+          height: '100%'
+        }
+      }
+ else {
+        const top = this.state.top + (this.scrollWithWindow !== true ? this.scrollY : 0)
+        const left = this.state.left + (this.scrollWithWindow !== true ? this.scrollX : 0)
+        style = {
+          position: 'absolute',
+          display: 'inline-block',
+          borderWidth: this.borderWidth,
+          borderStyle: this.borderStyle,
+          padding: 0,
+          visibility: this.__computedVisibility,
+          minWidth: '90px',
+          minHeight: '50px',
+          top: top + 'px',
+          left: left + 'px',
+          zIndex: this.__computedZIndex
+        }
+        if (this.isMaximized) {
+          style.width = '100%'
+          style.height = '100%'
+        }
+ else {
+          style.width = this.computedWidth + 'px'
+          style.height = this.computedHeight + 'px'
+        }
+      }
+
+      if (this.contentStyle) {
+        const type = Object.prototype.toString.call(this.contentStyle)
+        if (type === '[object Object]') {
+          style = { ...style, ...this.contentStyle }
+        }
+ else if ((type === '[object Array]')) {
+          this.contentStyle.forEach(item => {
+            style = { ...style, ...item }
+          })
+        }
+ else if (typeof this.contentStyle === 'string') {
+          const items = this.contentStyle.split(';')
+          items.forEach(item => {
+            const props = item.split(':')
+            style[ props[ 0 ].trim() ] = props[ 1 ].trim()
+          })
+        }
+      }
+
+      return style
+    })
+//
+    const __tbStaticClass = computed(() => {
+      const staticClass = 'q-window__titlebar'
+        + (this.hideToolbarDivider !== true ? ' q-window__titlebar--divider' : '')
+        + (this.dense === true ? ' q-window__titlebar--dense' : '')
+        + (this.isEmbedded !== true && this.isMinimized !== true ? ' absolute' : '')
+        + (this.isDragging === true ? ' q-window__touch-action' : '')
+        + ' row justify-between items-center'
+      return staticClass
+    })
+
+    const __tbStyle = computed(() => {
+      const titleHeight = `${ this.computedToolbarHeight }px`
+      let style = { height: titleHeight }
+
+      if (this.titlebarStyle) {
+        if (typeof this.titlebarStyle === 'object') {
+          style = Object.assign(this.titlebarStyle, style)
+        }
+ else if (typeof this.titlebarStyle === 'string') {
+          style = this.titlebarStyle + '; height:' + titleHeight
+        }
+ else if (Array.isArray(this.titlebarStyle)) {
+          style = this.titlebarStyle
+          style.push({ height: titleHeight })
+        }
+      }
+      return style
+    })
+//
+    const __bodyStyle = computed(() => {
+      if (this.isEmbedded === true) {
+        return {
+          height: (this.height - this.computedToolbarHeight) + 'px'
+        }
+      }
+      if (this.isFullscreen === true) {
+        return {
+          position: 'fixed',
+          height: `calc(100% - ${ this.computedToolbarHeight }px`,
+          top: this.computedToolbarHeight + 'px'
+        }
+      }
+      return {
+        position: 'absolute',
+        top: this.computedToolbarHeight + 'px',
+        height: this.computedHeight - this.computedToolbarHeight - 2 + 'px'
+      }
+    })
+
+    const __classes = computed(() => {
+      return ''
+        + (this.isEnabled === true ? ' q-focusable q-hoverable' : ' disabled')
+        + (this.isFloating === true && this.isFullscreen !== true ? ' q-window__floating' : '')
+        + (this.isFullscreen === true ? ' q-window__fullscreen' : '')
+        + (this.isSelected === true && this.isEmbedded !== true && this.isFullscreen !== true ? ' q-window__selected' : '')
+        + (this.isDragging === true ? ' q-window__dragging q-window__touch-action' : '')
     })
 
 
@@ -258,90 +604,7 @@ export default defineComponent({
 
 
 // mixins: [QColorizeMixin, canRender],
-//
-// props: {
-//   value: Boolean,
-//   title: String,
-//   dense: Boolean,
-//   embedded: Boolean,
-//   pinned: Boolean,
-//   fullscreen: Boolean,
-//   maximized: Boolean,
-//   minimized: Boolean,
-//   noMenu: Boolean,
-//   noMove: Boolean,
-//   noResize: Boolean,
-//   resizable: {
-//     type: Array,
-//     default: () => [
-//       'top',
-//       'left',
-//       'right',
-//       'bottom',
-//       'top-left',
-//       'top-right',
-//       'bottom-left',
-//       'bottom-right'
-//     ]
-//   },
-//   scrollWithWindow: {
-//     type: Boolean,
-//     default: false
-//   },
-//   autoPin: Boolean,
-//
-//   disabled: Boolean,
-//   hideToolbarDivider: Boolean,
-//   hideGrippers: Boolean,
-//   roundGrippers: Boolean,
-//   headless: Boolean,
-//   iconSet: Object,
-//
-//   backgroundColor: {
-//     type: String
-//   },
-//   gripperBorderColor: {
-//     type: String
-//   },
-//   gripperBackgroundColor: {
-//     type: String
-//   },
-//   borderWidth: {
-//     type: String,
-//     default: '1px'
-//   },
-//   borderStyle: {
-//     type: String,
-//     default: 'solid'
-//   },
-//
-//   startX: [Number, String],
-//   startY: [Number, String],
-//   width: {
-//     type: [Number, String],
-//     default: 400
-//   },
-//   height: {
-//     type: [Number, String],
-//     default: 400
-//   },
-//   actions: {
-//     type: Array,
-//     default: () => (['pin', 'embedded', 'close']),
-//     validator: (v) => v.some(action => [
-//       'pin',
-//       'embedded',
-//       'minimize',
-//       'maximize',
-//       'close',
-//       'fullscreen'].includes(action))
-//   },
-//   menuFunc: Function,
-//   titlebarStyle: [String, Object, Array],
-//   titlebarClass: [String, Object, Array],
-//   contentClass: [String, Object, Array],
-//   contentStyle: [String, Object, Array]
-// },
+
 //
 // data () {
 //   return {
@@ -538,280 +801,10 @@ export default defineComponent({
 // },
 //
 // computed: {
-//   isVisible () {
-//     return this.__getStateInfo('visible')
-//   },
-//   isEmbedded () {
-//     return this.__getStateInfo('embedded')
-//   },
-//   isFloating () {
-//     return this.__getStateInfo('embedded') !== true
-//   },
-//   isPinned () {
-//     return this.__getStateInfo('pinned')
-//   },
-//   isFullscreen () {
-//     return this.__getStateInfo('fullscreen')
-//   },
-//   isMaximized () {
-//     return this.__getStateInfo('maximize')
-//   },
-//   isMinimized () {
-//     return this.__getStateInfo('minimize')
-//   },
+
+
 //
-//   isDisabled () {
-//     return this.disabled === true
-//   },
-//
-//   isEnabled () {
-//     return this.isDisabled === false
-//   },
-//
-//   isDragging () {
-//     return this.state.dragging === true
-//   },
-//
-//   isSelected () {
-//     return this.selected === true
-//   },
-//
-//   canDrag () {
-//     return this.isVisible === true &&
-//       this.isEmbedded !== true &&
-//       this.isPinned !== true &&
-//       this.isFullscreen !== true &&
-//       this.isMaximized !== true &&
-//       this.isMinimized !== true
-//   },
-//
-//   hasStateInfo () {
-//     return Object.keys(this.stateInfo).length > 0
-//   },
-//
-//   __computedVisibility () {
-//     return this.isVisible === true ? 'visible' : 'hidden'
-//   },
-//
-//   computedToolbarHeight () {
-//     return this.headless === true ? 0 : this.dense === true ? 28 : 40
-//   },
-//
-//   computedLeft () {
-//     return this.state.left
-//   },
-//
-//   computedTop () {
-//     return this.state.top
-//   },
-//
-//   computedRight () {
-//     return this.state.right
-//   },
-//
-//   computedBottom () {
-//     return this.state.bottom
-//   },
-//
-//   computedHeight () {
-//     return this.computedBottom - this.computedTop
-//   },
-//
-//   computedWidth () {
-//     return this.computedRight - this.computedLeft
-//   },
-//
-//   computedScrollX () {
-//     return this.computedLeft + (this.scrollWithWindow === false ? this.scrollX : 0)
-//   },
-//
-//   computedScrollY () {
-//     return this.computedTop + (this.scrollWithWindow === false ? this.scrollY : 0)
-//   },
-//
-//   __computedZIndex () {
-//     let extra = 0
-//     if (this.isDragging) extra = 100
-//     return this.zIndex + extra
-//   },
-//
-//   computedPosition () {
-//     return {
-//       left: this.state.left,
-//       top: this.state.top,
-//       width: this.computedWidth,
-//       height: this.computedHeight,
-//       scrollX: this.computedScrollX,
-//       scrollY: this.computedScrollY
-//     }
-//   },
-//
-//   computedActions () {
-//     // sort and pick ones that are visible based on user selection and state
-//     const actions = []
-//     if (this.actions.includes('embedded') && (this.canDo('embedded', true) || this.canDo('embedded', false))) {
-//       actions.push('embedded')
-//     }
-//     if (this.actions.includes('pin') && (this.canDo('pinned', true) || this.canDo('pinned', false))) {
-//       actions.push('pinned')
-//     }
-//     if (this.actions.includes('fullscreen') && (this.canDo('fullscreen', true) || this.canDo('fullscreen', false))) {
-//       actions.push('fullscreen')
-//     }
-//     if (this.actions.includes('maximize') && (this.canDo('maximize', true) || this.canDo('maximize', false))) {
-//       actions.push('maximize')
-//     }
-//     // if (this.actions.includes('minimize') && (this.canDo('minimize', true) || this.canDo('minimize', false))) {
-//     //   actions.push('maximize')
-//     // }
-//     if (this.actions.includes('close') && this.canDo('close', true)) {
-//       actions.push('visible')
-//     }
-//
-//     return actions
-//   },
-//
-//   computedMenuData () {
-//     // get stateInfo for each menu item
-//     const menuData = []
-//     this.computedActions.map(key => {
-//       if (this.stateInfo[key]) {
-//         menuData.push({ ...this.stateInfo[key], key: key })
-//       }
-//     })
-//     return menuData
-//   },
-//
-//   __style () {
-//     let style
-//     if (this.isMinimized === true) {
-//       style = {
-//         position: 'relative',
-//         visibility: this.__computedVisibility,
-//         height: this.computedToolbarHeight + 'px',
-//         borderWidth: '1px',
-//         borderStyle: 'solid',
-//         color: this.color,
-//         backgroundColor: this.backgroundColor,
-//         minWidth: '100px'
-//       }
-//     }
-//     else if (this.isEmbedded === true) {
-//       style = {
-//         position: 'relative',
-//         visibility: this.__computedVisibility,
-//         borderWidth: this.borderWidth,
-//         borderStyle: this.borderStyle,
-//         width: '100%',
-//         height: '100%'
-//       }
-//     }
-//     else {
-//       const top = this.state.top + (this.scrollWithWindow !== true ? this.scrollY : 0)
-//       const left = this.state.left + (this.scrollWithWindow !== true ? this.scrollX : 0)
-//       style = {
-//         position: 'absolute',
-//         display: 'inline-block',
-//         borderWidth: this.borderWidth,
-//         borderStyle: this.borderStyle,
-//         padding: 0,
-//         visibility: this.__computedVisibility,
-//         minWidth: '90px',
-//         minHeight: '50px',
-//         top: top + 'px',
-//         left: left + 'px',
-//         zIndex: this.__computedZIndex
-//       }
-//       if (this.isMaximized) {
-//         style.width = '100%'
-//         style.height = '100%'
-//       }
-//       else {
-//         style.width = this.computedWidth + 'px'
-//         style.height = this.computedHeight + 'px'
-//       }
-//     }
-//
-//     if (this.contentStyle) {
-//       const type = Object.prototype.toString.call(this.contentStyle)
-//       if (type === '[object Object]') {
-//         style = { ...style, ...this.contentStyle }
-//       }
-//       else if ((type === '[object Array]')) {
-//         this.contentStyle.forEach(item => {
-//           style = { ...style, ...item }
-//         })
-//       }
-//       else if (typeof this.contentStyle === 'string') {
-//         const items = this.contentStyle.split(';')
-//         items.forEach(item => {
-//           const props = item.split(':')
-//           style[props[0].trim()] = props[1].trim()
-//         })
-//       }
-//     }
-//
-//     return style
-//   },
-//
-//   __tbStaticClass () {
-//     const staticClass = 'q-window__titlebar' +
-//       (this.hideToolbarDivider !== true ? ' q-window__titlebar--divider' : '') +
-//       (this.dense === true ? ' q-window__titlebar--dense' : '') +
-//       (this.isEmbedded !== true && this.isMinimized !== true ? ' absolute' : '') +
-//       (this.isDragging === true ? ' q-window__touch-action' : '') +
-//       ' row justify-between items-center'
-//     return staticClass
-//   },
-//
-//   __tbStyle () {
-//     const titleHeight = `${this.computedToolbarHeight}px`
-//     let style = { height: titleHeight }
-//
-//     if (this.titlebarStyle) {
-//       if (typeof this.titlebarStyle === 'object') {
-//         style = Object.assign(this.titlebarStyle, style)
-//       }
-//       else if (typeof this.titlebarStyle === 'string') {
-//         style = this.titlebarStyle + '; height:' + titleHeight
-//       }
-//       else if (Array.isArray(this.titlebarStyle)) {
-//         style = this.titlebarStyle
-//         style.push({ height: titleHeight })
-//       }
-//     }
-//     return style
-//   },
-//
-//   __bodyStyle () {
-//     if (this.isEmbedded === true) {
-//       return {
-//         height: (this.height - this.computedToolbarHeight) + 'px'
-//       }
-//     }
-//     if (this.isFullscreen === true) {
-//       return {
-//         position: 'fixed',
-//         height: `calc(100% - ${this.computedToolbarHeight}px`,
-//         top: this.computedToolbarHeight + 'px'
-//       }
-//     }
-//     return {
-//       position: 'absolute',
-//       top: this.computedToolbarHeight + 'px',
-//       height: this.computedHeight - this.computedToolbarHeight - 2 + 'px'
-//     }
-//   },
-//
-//   __classes () {
-//     return '' +
-//       (this.isEnabled === true ? ' q-focusable q-hoverable' : ' disabled') +
-//       (this.isFloating === true && this.isFullscreen !== true ? ' q-window__floating' : '') +
-//       (this.isFullscreen === true ? ' q-window__fullscreen' : '') +
-//       (this.isSelected === true && this.isEmbedded !== true && this.isFullscreen !== true ? ' q-window__selected' : '') +
-//       (this.isDragging === true ? ' q-window__dragging q-window__touch-action' : '')
-//   }
-// },
+
 //
 // watch: {
 //   value (val) {
