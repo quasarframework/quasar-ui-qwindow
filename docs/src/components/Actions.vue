@@ -7,7 +7,7 @@
       :width="350"
       :actions="['embedded', 'pin', 'maximize', 'fullscreen']"
       embedded
-      content-class="bg-grey-8"
+      content-class="bg-grey-1"
     >
       <div class="q-pa-md fit">
         This is the "default" slot content
@@ -18,6 +18,7 @@
 
 <script>
 import { QWindow } from '@quasar/quasar-ui-qwindow/src/QWindow.js'
+import '@quasar/quasar-ui-qwindow/src/index.sass'
 export default {
   components: {
     QWindow

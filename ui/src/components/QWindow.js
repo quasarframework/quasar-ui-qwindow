@@ -557,7 +557,7 @@ export default defineComponent({
     })
 
     const __computedVisibility = computed(() => {
-      return isVisible.value === true ? 'visible' : 'hidden'
+      return true //isVisible.value === true ? 'visible' : 'hidden'
     })
 
     const computedToolbarHeight = computed(() => {
@@ -659,7 +659,7 @@ export default defineComponent({
           height: computedToolbarHeight.value + 'px',
           borderWidth: '1px',
           borderStyle: 'solid',
-         // color: props.color, // TODO
+          // color: props.color, // TODO
           backgroundColor: props.backgroundColor,
           minWidth: '100px'
         }
@@ -718,6 +718,8 @@ export default defineComponent({
     })
 
     const __tbStaticClass = computed(() => {
+      console.log('STATIC CLASS')
+      console.log(props.hideToolbarDivider)
       return 'q-window__titlebar'
         + (props.hideToolbarDivider !== true ? ' q-window__titlebar--divider' : '')
         + (props.dense === true ? ' q-window__titlebar--dense' : '')
@@ -777,9 +779,10 @@ export default defineComponent({
 
     // show the component
     function show() {
+      console.log('SHOW')
       if (canDo('visible', true)) {
         __setStateInfo('visible', true)
-        // emit('input', true)
+        emit('input', true)
         return true
       }
       return false
@@ -789,7 +792,7 @@ export default defineComponent({
     function hide() {
       if (canDo('visible', false)) {
         __setStateInfo('visible', false)
-        // emit('input', false)
+        emit('input', false)
         return true
       }
       return false
@@ -884,7 +887,7 @@ export default defineComponent({
     function fullscreenEnter() {
       if (canDo('fullscreen', true)) {
         fullscreenInitiated.value = true
-       // $q.fullscreen.request()
+        // $q.fullscreen.request()
         return true
       }
       return false
@@ -893,7 +896,7 @@ export default defineComponent({
     // leave fullscreen mode
     function fullscreenLeave() {
       if (canDo('fullscreen', false)) {
-      // $q.fullscreen.exit()
+        // $q.fullscreen.exit()
         return true
       }
       return false
@@ -903,9 +906,9 @@ export default defineComponent({
     function toggleFullscreen() {
       if (__getStateInfo('visible') !== true) {
         // not allowed
-        return
+
       }
-    //  $q.fullscreen.isActive ? fullscreenLeave() : fullscreenEnter() // TODO
+      //  $q.fullscreen.isActive ? fullscreenLeave() : fullscreenEnter() // TODO
     }
 
     // bring this window to the front
@@ -1221,7 +1224,9 @@ export default defineComponent({
 //
     function __getStateInfo(id) {
       if (id in stateInfo.value) {
-        return stateInfo.value[ id ].state
+        const bol = stateInfo.value[ id ].state
+        console.log(`${ id }: ${ bol }`)
+        return bol
       }
       return false
     }
@@ -1546,23 +1551,22 @@ export default defineComponent({
 
       return h(QItem, {
         key: stateInfo.key,
-        // TODO
-        // directives: [
-        //   {
-        //     name: 'close-popup',
-        //     value: true
-        //   }
-        // ],
+         directives: [
+           {
+             name: 'close-popup',
+             value: true
+           }
+         ],
         clickable: true,
         dense: props.dense,
         onClick: () => (stateInfo.state === true ? stateInfo.off.func() : stateInfo.on.func())
-      }, [
+      }, () => [
         h(QItemSection, {
           noWrap: true
-        }, stateInfo.state === true ? stateInfo.off.label : stateInfo.on.label),
+        }, () => (stateInfo.state === true ? stateInfo.off.label : stateInfo.on.label)),
         h(QItemSection, {
           avatar: true
-        }, [
+        }, () => [
           h(QIcon, {
             name: stateInfo.state === true ? stateInfo.off.icon : stateInfo.on.icon
           })
@@ -1575,7 +1579,7 @@ export default defineComponent({
       return menuData.map(stateInfo => __renderMoreItem(stateInfo))
     }
 
-    function __renderMoreMenu(h, menuData) {
+    function __renderMoreMenu(menuData) {
       // these two issues happen during early render
       if (computedActions.value.length === 0) {
         return ''
@@ -1590,12 +1594,12 @@ export default defineComponent({
       }
 
       // this.setBothColors(props.color, props.backgroundColor, // TODO
-      return h(QMenu, [
+      return h(QMenu, () =>[
         h(QList, {
           highlight: true,
           dense: true,
           style: [{ zIndex: (isEmbedded.value === true) ? void 0 : __computedZIndex.value + 1 }]
-        }, [
+        }, () => [
           ...__renderMoreItems(menuData)
         ])
       ])
@@ -1613,15 +1617,15 @@ export default defineComponent({
         round: true,
         dense: true,
         icon: 'more_vert'
-      }, [
-        __renderMoreMenu(menuData)
+      },  () => [
+         __renderMoreMenu(menuData)
       ])
     }
 
-    function __renderTitle(h) {
+    function __renderTitle() {
       return h('div', {
         class: 'q-window__title col ellipsis'
-      }, props.title)
+      },  props.title)
     }
 
     function __renderTitlebar(menuData) {
@@ -1632,14 +1636,13 @@ export default defineComponent({
       const titlebarSlot = (slots.titlebar && slots.titlebar())
 
       return h('div', {
-        class: [ __tbStaticClass.value,props.titlebarClass ],
+        class: [ __tbStaticClass.value, props.titlebarClass ],
         style: __tbStyle.value
       }, [
         titlebarSlot === void 0 ? __renderTitle() : '',
         titlebarSlot === void 0 ? __renderMoreButton(menuData) : '',
         titlebarSlot !== void 0 ? titlebarSlot(menuData) : '',
-        (canDrag.value === true)
-        && __renderResizeHandle('titlebar', props.noMenu ? 0 : 35) // width of more button
+       (canDrag.value === true) && __renderResizeHandle('titlebar', props.noMenu ? 0 : 35) // width of more button
       ])
     }
 
@@ -1650,9 +1653,10 @@ export default defineComponent({
       }
       const staticClass = 'gripper gripper-' + resizeHandle + (props.roundGrippers === true ? ' gripper-round' : '')
       // this.setBorderColor(props.gripperBorderColor, this.setBackgroundColor(props.gripperBackgroundColor,
-      return h('div', { // TODO
+      return h('div', {
         ref: resizeHandle,
         class: staticClass,
+        style: 'background-color: #000; border: 1px solid #000',
         on: {
           mousedown: (e) => __onMouseDown(e, resizeHandle),
           touchstart: (e) => __onTouchStart(e, resizeHandle),
@@ -1705,30 +1709,31 @@ export default defineComponent({
     }
 
     function __renderBody() {
-      const defaultScopedSlot = slots.default()
-      const defaultSlot = slots.default()
+      const slot = slots && slots.default
+      console.log('SLOT:')
+      console.log(slot)
       return h('div', {
         class: 'q-window__body row',
         style: __bodyStyle.value
       }, [
-        defaultSlot || defaultScopedSlot ? defaultScopedSlot({ zIndex: zIndex.value }) : '',
+        slot ? slot({ zIndex: zIndex.value }) : '',
         (props.headless === true && canDrag.value === true)
         && __renderResizeHandle('titlebar', props.noMenu ? 0 : 44) // width of more button
 
       ])
     }
 
-    function __render(h) {
+    function __render() {
       // get stateInfo for each menu item
       const menuData = [...computedMenuData.value]
-    console.log(menuData)
+      console.log(menuData)
       return h('div', {
-        class: [ 'q-window ' + __classes.value,props.contentClass ],
+        class: [ 'q-window ' + __classes.value, props.contentClass ],
         style: __style.value
       }, [
         (canDrag.value === true) && [...__renderResizeHandles()],
         (canDrag.value === true) && [...__renderGrippers()],
-        __renderTitlebar(h, menuData),
+        __renderTitlebar(menuData),
         isMinimized.value !== true && __renderBody()
       ])
     }
@@ -1777,12 +1782,12 @@ export default defineComponent({
     function renderComp() {
       console.log(__portal.value)
       if (__portal.value === void 0) {
-        //return __render(h)
+        return __render()
       }
-      return ''
+      return {}
     }
 
-    return renderComp()
+    return () => renderComp()
   }
 })
 
