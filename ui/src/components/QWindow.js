@@ -95,7 +95,7 @@ export default defineComponent({
     Scroll
   },
   props: {
-    value: Boolean,
+    modelValue: Boolean,
     title: String,
     dense: Boolean,
     embedded: Boolean,
@@ -350,8 +350,8 @@ export default defineComponent({
       state.value.bottom = state.value.top + props.height
 
       // adjust initial user states
-      if (props.value !== void 0) {
-        if (props.value === true) {
+      if (props.modelValue !== void 0) {
+        if (props.modelValue === true) {
           __setStateInfo('visible', true)
         } else {
           __setStateInfo('visible', false)
@@ -402,7 +402,7 @@ export default defineComponent({
     })
 
 
-    watch(() => props.value, (val) => {
+    watch(() => props.modelValue, (val) => {
       stateInfo.value.visible.state = val
     })
 
@@ -557,7 +557,7 @@ export default defineComponent({
     })
 
     const __computedVisibility = computed(() => {
-      return true //isVisible.value === true ? 'visible' : 'hidden'
+      return isVisible.value === true ? 'visible' : 'hidden'
     })
 
     const computedToolbarHeight = computed(() => {
