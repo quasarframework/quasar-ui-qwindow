@@ -7,7 +7,7 @@ import {
   watch,
   onMounted,
   ref,
-  nextTick
+  nextTick,
 } from 'vue'
 
 import {
@@ -165,7 +165,22 @@ export default defineComponent({
     contentClass: [String, Object, Array],
     contentStyle: [String, Object, Array]
   },
-  setup(props, {slots}) {
+
+  emits: [
+    'selected',
+    'input',
+    'fullscreen',
+    'embedded',
+    'pinned',
+    'maximize',
+    'minimize',
+    'position',
+    'canceled',
+    'beforeDrag',
+    'afterDrag'
+  ],
+
+  setup(props, {slots, emit, expose}) {
 
 
     onBeforeMount(() => {
@@ -357,55 +372,30 @@ export default defineComponent({
     const __portal = ref()
 
 
-    //const __removeClass = computed((el, name) => {
-    //  const arr = el.className.split(' ')
-    //  const index = arr.indexOf(name)
-    // if (index !== -1) {
-    //    arr.splice(index, 1)
-    //    el.className = arr.join(' ')
-    //  }
-    // })
-
-    //   __setStateInfo (id, val) {
-//     if (id in this.stateInfo) {
-//       this.stateInfo[id].state = val
-//       return true
-//     }
-//     return false
-//   },
-//
-    function __getStateInfo(id) {
-       if (id in stateInfo.value) {
-        return stateInfo.value[id].state
-      }
-      return false
-    }
-
-
     //   value (val) {
 //     this.stateInfo.visible.state = val
 //   },
     watch(() => props.iconSet, () => {
       // handler () {
-      this.__updateStateInfo()
+      __updateStateInfo()
       //}
 
     }, {deep: true})
 
     watch(() => selected, (val) => {
-      if (autoPin === true) {
+      if (props.autoPin === true) {
         if (val === true) {
           unpin()
         } else {
           pin()
         }
       }
-      this.$emit('selected', this.selected)
+      emit('selected', selected.value)
     })
 
 
     watch(() => 'stateInfo.visible.state', (val) => {
-      this.$emit('input', val)
+      emit('input', val)
     })
 
     watch(() => 'stateInfo.embedded.state', (val) => {
@@ -431,7 +421,7 @@ export default defineComponent({
         return
       }
       if (val === false) {
-        this.__restorePositionAndState()
+        __restorePositionAndState()
       }
     })
 
@@ -441,7 +431,7 @@ export default defineComponent({
         return
       }
       if (val === false) {
-        this.__restorePositionAndState()
+        __restorePositionAndState()
       }
     })
 
@@ -450,28 +440,28 @@ export default defineComponent({
         return
       }
       if (val === true) {
-        this.__savePositionAndState()
-        this.zIndex = maxZIndex
+        __savePositionAndState()
+        zIndex.value = maxZIndex
       } else {
-        this.__restorePositionAndState()
-        this.fullscreenInitiated = val
+        __restorePositionAndState()
+        fullscreenInitiated.value = val
       }
-      this.$emit('fullscreen', val)
+      emit('fullscreen', val)
     })
 
     watch(() => '$q.fullscreen.isActive', (val) => {
-      if (this.fullscreenInitiated === true) {
-        this.__setStateInfo('fullscreen', val)
+      if (fullscreenInitiated.value === true) {
+        __setStateInfo('fullscreen', val)
       }
     })
     watch(() => '$q.screen.height', (val) => {
-      if (this.isFullscreen === true) {
-        this.state.bottom = val
+      if (isFullscreen.value === true) {
+        state.value.bottom = val
       }
     })
     watch(() => '$q.screen.width', (val) => {
-      if (this.isFullscreen === true) {
-        this.state.right = val
+      if (isFullscreen.value === true) {
+        state.value.right = val
       }
     })
 
@@ -577,7 +567,7 @@ export default defineComponent({
     const __computedZIndex = computed(() => {
       //let extra = 0
       //if (this.isDragging) extra = 100
-      return this.zIndex + extra
+      return zIndex.value + extra
     })
 
     const computedPosition = computed(() => {
@@ -621,9 +611,9 @@ export default defineComponent({
       // get stateInfo for each menu item
       const menuData = []
       computedActions.value.map(key => {
-        // if (this.stateInfo[key]) {
-        //   menuData.push({ ...this.stateInfo[key], key: key })
-        // }
+        if (stateInfo.value[key]) {
+          menuData.push({...stateInfo.value[key], key: key})
+        }
       })
       return menuData
     })
@@ -637,7 +627,7 @@ export default defineComponent({
           height: computedToolbarHeight.value + 'px',
           borderWidth: '1px',
           borderStyle: 'solid',
-          color: props.color,
+          color: props.color, // TODO
           backgroundColor: props.backgroundColor,
           minWidth: '100px'
         }
@@ -675,7 +665,7 @@ export default defineComponent({
         }
       }
 
-      if (this.contentStyle) {
+      if (props.contentStyle) {
         const type = Object.prototype.toString.call(props.contentStyle)
         if (type === '[object Object]') {
           style = {...style, ...props.contentStyle}
@@ -758,7 +748,7 @@ export default defineComponent({
     function show() {
       if (canDo('visible', true)) {
         __setStateInfo('visible', true)
-        //this.$emit('input', true)
+        // emit('input', true)
         return true
       }
       return false
@@ -768,7 +758,7 @@ export default defineComponent({
     function hide() {
       if (canDo('visible', false)) {
         __setStateInfo('visible', false)
-        //this.$emit('input', false)
+        // emit('input', false)
         return true
       }
       return false
@@ -779,7 +769,7 @@ export default defineComponent({
     function lock() {
       if (canDo('embedded', true)) {
         __setStateInfo('embedded', true)
-        this.$emit('embedded', true)
+        emit('embedded', true)
         return true
       }
       return false
@@ -789,7 +779,7 @@ export default defineComponent({
     function unlock() {
       if (canDo('embedded', false)) {
         __setStateInfo('embedded', false)
-        this.$emit('embedded', false)
+        emit('embedded', false)
         return true
       }
       return false
@@ -799,7 +789,8 @@ export default defineComponent({
     function pin() {
       if (canDo('pinned', true)) {
         __setStateInfo('pinned', true)
-        this.$emit('pinned', true)
+        emit('pinned', true)
+
         return true
       }
       return false
@@ -809,7 +800,7 @@ export default defineComponent({
     function unpin() {
       if (canDo('pinned', false)) {
         __setStateInfo('pinned', false)
-        this.$emit('pinned', false)
+        emit('pinned', false)
         return true
       }
       return false
@@ -824,7 +815,7 @@ export default defineComponent({
         __setStateInfo('embedded', false)
         nextTick(() => {
           __setStateInfo('maximize', true)
-          this.$emit('maximize', true)
+          emit('maximize', true)
         })
         return true
       }
@@ -832,37 +823,37 @@ export default defineComponent({
     }
 
     function minimize() {
-      if (this.canDo('minimize', true)) {
-        this.__savePositionAndState()
-        this.__setMinimizePosition()
+      if (canDo('minimize', true)) {
+        __savePositionAndState()
+        __setMinimizePosition()
 
-        this.__setStateInfo('embedded', true)
-        this.__setStateInfo('minimize', true)
-        this.$emit('minimize', true)
+        __setStateInfo('embedded', true)
+        __setStateInfo('minimize', true)
+        emit('minimize', true)
         return true
       }
       return false
     }
 
     function restore() {
-      if (this.__getStateInfo('visible') !== true) {
+      if (__getStateInfo('visible') !== true) {
         // not allowed
         return
       }
-      if (this.__getStateInfo('maximize') === true) {
-        this.__setStateInfo('maximize', false)
-        this.$emit('maximize', false)
-      } else if (this.__getStateInfo('minimize') === true) {
-        this.__setStateInfo('minimize', false)
-        this.$emit('minimize', false)
+      if (__getStateInfo('maximize') === true) {
+        __setStateInfo('maximize', false)
+        emit('maximize', false)
+      } else if (__getStateInfo('minimize') === true) {
+        __setStateInfo('minimize', false)
+        emit('minimize', false)
       }
     }
 
     // go into fullscreen mode
     function fullscreenEnter() {
       if (canDo('fullscreen', true)) {
-        this.fullscreenInitiated = true
-        this.$q.fullscreen.request()
+        fullscreenInitiated.value = true
+        this.$q.fullscreen.request() // TODO
         return true
       }
       return false
@@ -871,7 +862,7 @@ export default defineComponent({
     // leave fullscreen mode
     function fullscreenLeave() {
       if (canDo('fullscreen', false)) {
-        this.$q.fullscreen.exit()
+        this.$q.fullscreen.exit() // TODO
         return true
       }
       return false
@@ -883,31 +874,31 @@ export default defineComponent({
         // not allowed
         return
       }
-      this.$q.fullscreen.isActive ? fullscreenLeave() : fullscreenEnter()
+      this.$q.fullscreen.isActive ? fullscreenLeave() : fullscreenEnter() // TODO
     }
 
     // bring this window to the front
     function bringToFront() {
       // const sortedLayers = this.__computedSortedLayers
-      const sortedLayers = this.__sortedLayers()
+      const sortedLayers = __sortedLayers()
       for (let index = 0; index < sortedLayers.length; ++index) {
         const layer = sortedLayers[index]
         layer.zIndex = startingZIndex + index
       }
       // this window gets highest zIndex
-      this.zIndex = startingZIndex + sortedLayers.length
+      zIndex.value = startingZIndex + sortedLayers.length
     }
 
     // send this window to the back
     function sendToBack() {
       // const sortedLayers = this.__computedSortedLayers
-      const sortedLayers = this.__sortedLayers()
+      const sortedLayers = __sortedLayers()
       for (let index = 0; index < sortedLayers.length; ++index) {
         const layer = sortedLayers[index]
         layer.zIndex = startingZIndex + index + 1
       }
       // this window gets lowest zIndex
-      this.zIndex = startingZIndex
+      zIndex.value = startingZIndex
     }
 
     function centerWindow() {
@@ -1054,12 +1045,12 @@ export default defineComponent({
 
     // ============ PRIVATE  FUNCTIONS
 
-    function __canBeSelected(x, y) {
+    function __canBeSelected(x, y) { // TODO
       // const sortedLayers = this.__computedSortedLayers
       const sortedLayers = __sortedLayers()
       for (let index = sortedLayers.length - 1; index >= 0; --index) {
-        if (sortedLayers[index].__portal !== void 0) {
-          if (__isPointInRect(x, y, sortedLayers[index].__portal.$el)) {
+        if (sortedLayers[index].__portal.value !== void 0) {
+          if (__isPointInRect(x, y, sortedLayers[index].__portal.value.$el)) {
             if (sortedLayers[index].id === this.id) {
               return true
             } else {
@@ -1098,63 +1089,63 @@ export default defineComponent({
     }
 
     function __canResize(resizeHandle) {
-      if (this.noResize === true) return false
-      const missing = this.handles.filter(handle => !this.resizable.includes(handle))
+      if (props.noResize === true) return false
+      const missing = this.handles.filter(handle => !props.resizable.includes(handle))
       return missing.includes(resizeHandle) !== true
     }
 
     function __updateStateInfo() {
-      const stateInfo = {
+      stateInfo.value = {
         visible: {
-          state: this.stateInfo.visible !== void 0 && this.stateInfo.visible.state !== void 0 ? this.stateInfo.visible.state : true,
+          state: stateInfo.value.visible !== void 0 && stateInfo.value.visible.state !== void 0 ? stateInfo.value.visible.state : true,
           on: {
-            label: this.iconSet !== void 0 && this.iconSet.visible !== void 0 && this.iconSet.visible.on !== void 0 && this.iconSet.visible.on.label !== void 0 ? this.iconSet.visible.on.label : this.iconSetTemplate.visible.on.label,
-            icon: this.iconSet !== void 0 && this.iconSet.visible !== void 0 && this.iconSet.visible.on !== void 0 && this.iconSet.visible.on.icon !== void 0 ? this.iconSet.visible.on.icon : this.iconSetTemplate.visible.on.icon,
-            func: this.show
+            label: props.iconSet !== void 0 && props.iconSet.visible !== void 0 && props.iconSet.visible.on !== void 0 && props.iconSet.visible.on.label !== void 0 ? props.iconSet.visible.on.label : iconSetTemplate.value.visible.on.label,
+            icon: props.iconSet !== void 0 && props.iconSet.visible !== void 0 && props.iconSet.visible.on !== void 0 && props.iconSet.visible.on.icon !== void 0 ? props.iconSet.visible.on.icon : iconSetTemplate.value.visible.on.icon,
+            func: show()
           },
           off: {
-            label: this.iconSet !== void 0 && this.iconSet.visible !== void 0 && this.iconSet.visible.off !== void 0 && this.iconSet.visible.off.label !== void 0 ? this.iconSet.visible.off.label : this.iconSetTemplate.visible.off.label,
-            icon: this.iconSet !== void 0 && this.iconSet.visible !== void 0 && this.iconSet.visible.off !== void 0 && this.iconSet.visible.off.icon !== void 0 ? this.iconSet.visible.off.icon : this.iconSetTemplate.visible.off.icon,
-            func: this.hide
+            label: props.iconSet !== void 0 && props.iconSet.visible !== void 0 && props.iconSet.visible.off !== void 0 && props.iconSet.visible.off.label !== void 0 ? props.iconSet.visible.off.label : iconSetTemplate.value.visible.off.label,
+            icon: props.iconSet !== void 0 && props.iconSet.visible !== void 0 && props.iconSet.visible.off !== void 0 && props.iconSet.visible.off.icon !== void 0 ? props.iconSet.visible.off.icon : iconSetTemplate.value.visible.off.icon,
+            func: hide()
           }
         },
         embedded: {
-          state: this.stateInfo.embedded !== void 0 && this.stateInfo.embedded.state !== void 0 ? this.stateInfo.embedded.state : true,
+          state: stateInfo.value.embedded !== void 0 && stateInfo.value.embedded.state !== void 0 ? stateInfo.value.embedded.state : true,
           on: {
-            label: this.iconSet !== void 0 && this.iconSet.embedded !== void 0 && this.iconSet.embedded.on !== void 0 && this.iconSet.embedded.on.label !== void 0 ? this.iconSet.embedded.on.label : this.iconSetTemplate.embedded.on.label,
-            icon: this.iconSet !== void 0 && this.iconSet.embedded !== void 0 && this.iconSet.embedded.on !== void 0 && this.iconSet.embedded.on.icon !== void 0 ? this.iconSet.embedded.on.icon : this.iconSetTemplate.embedded.on.icon,
-            func: this.lock
+            label: props.iconSet !== void 0 && props.iconSet.embedded !== void 0 && props.iconSet.embedded.on !== void 0 && props.iconSet.embedded.on.label !== void 0 ? props.iconSet.embedded.on.label : iconSetTemplate.value.embedded.on.label,
+            icon: props.iconSet !== void 0 && props.iconSet.embedded !== void 0 && props.iconSet.embedded.on !== void 0 && props.iconSet.embedded.on.icon !== void 0 ? props.iconSet.embedded.on.icon : iconSetTemplate.value.embedded.on.icon,
+            func: lock()
           },
           off: {
-            label: this.iconSet !== void 0 && this.iconSet.embedded !== void 0 && this.iconSet.embedded.off !== void 0 && this.iconSet.embedded.off.label !== void 0 ? this.iconSet.embedded.off.label : this.iconSetTemplate.embedded.off.label,
-            icon: this.iconSet !== void 0 && this.iconSet.embedded !== void 0 && this.iconSet.embedded.off !== void 0 && this.iconSet.embedded.off.icon !== void 0 ? this.iconSet.embedded.off.icon : this.iconSetTemplate.embedded.off.icon,
-            func: this.unlock
+            label: props.iconSet !== void 0 && props.iconSet.embedded !== void 0 && props.iconSet.embedded.off !== void 0 && props.iconSet.embedded.off.label !== void 0 ? props.iconSet.embedded.off.label : iconSetTemplate.value.embedded.off.label,
+            icon: props.iconSet !== void 0 && props.iconSet.embedded !== void 0 && props.iconSet.embedded.off !== void 0 && props.iconSet.embedded.off.icon !== void 0 ? props.iconSet.embedded.off.icon : iconSetTemplate.value.embedded.off.icon,
+            func: unlock()
           }
         },
         pinned: {
-          state: this.stateInfo.pinned !== void 0 && this.stateInfo.pinned.state !== void 0 ? this.stateInfo.pinned.state : false,
+          state: stateInfo.value.pinned !== void 0 && stateInfo.value.pinned.state !== void 0 ? stateInfo.value.pinned.state : false,
           on: {
-            label: this.iconSet !== void 0 && this.iconSet.pinned !== void 0 && this.iconSet.pinned.on !== void 0 && this.iconSet.pinned.on.label !== void 0 ? this.iconSet.pinned.on.label : this.iconSetTemplate.pinned.on.label,
-            icon: this.iconSet !== void 0 && this.iconSet.pinned !== void 0 && this.iconSet.pinned.on !== void 0 && this.iconSet.pinned.on.icon !== void 0 ? this.iconSet.pinned.on.icon : this.iconSetTemplate.pinned.on.icon,
-            func: this.pin
+            label: props.iconSet !== void 0 && props.iconSet.pinned !== void 0 && props.iconSet.pinned.on !== void 0 && props.iconSet.pinned.on.label !== void 0 ? props.iconSet.pinned.on.label : iconSetTemplate.value.pinned.on.label,
+            icon: props.iconSet !== void 0 && props.iconSet.pinned !== void 0 && props.iconSet.pinned.on !== void 0 && props.iconSet.pinned.on.icon !== void 0 ? props.iconSet.pinned.on.icon : iconSetTemplate.value.pinned.on.icon,
+            func: pin()
           },
           off: {
-            label: this.iconSet !== void 0 && this.iconSet.pinned !== void 0 && this.iconSet.pinned.off !== void 0 && this.iconSet.pinned.off.label !== void 0 ? this.iconSet.pinned.off.label : this.iconSetTemplate.pinned.off.label,
-            icon: this.iconSet !== void 0 && this.iconSet.pinned !== void 0 && this.iconSet.pinned.off !== void 0 && this.iconSet.pinned.off.icon !== void 0 ? this.iconSet.pinned.off.icon : this.iconSetTemplate.pinned.off.icon,
-            func: this.unpin
+            label: props.iconSet !== void 0 && props.iconSet.pinned !== void 0 && props.iconSet.pinned.off !== void 0 && props.iconSet.pinned.off.label !== void 0 ? props.iconSet.pinned.off.label : iconSetTemplate.value.pinned.off.label,
+            icon: props.iconSet !== void 0 && props.iconSet.pinned !== void 0 && props.iconSet.pinned.off !== void 0 && props.iconSet.pinned.off.icon !== void 0 ? props.iconSet.pinned.off.icon : iconSetTemplate.value.pinned.off.icon,
+            func: unpin()
           }
         },
         maximize: {
-          state: this.stateInfo.maximize !== void 0 && this.stateInfo.maximize.state !== void 0 ? this.stateInfo.maximize.state : false,
+          state: stateInfo.value.maximize !== void 0 && stateInfo.value.maximize.state !== void 0 ? stateInfo.value.maximize.state : false,
           on: {
-            label: this.iconSet !== void 0 && this.iconSet.maximize !== void 0 && this.iconSet.maximize.on !== void 0 && this.iconSet.maximize.on.label !== void 0 ? this.iconSet.maximize.on.label : this.iconSetTemplate.maximize.on.label,
-            icon: this.iconSet !== void 0 && this.iconSet.maximize !== void 0 && this.iconSet.maximize.on !== void 0 && this.iconSet.maximize.on.icon !== void 0 ? this.iconSet.maximize.on.icon : this.iconSetTemplate.maximize.on.icon,
-            func: this.maximize
+            label: props.iconSet !== void 0 && props.iconSet.maximize !== void 0 && props.iconSet.maximize.on !== void 0 && props.iconSet.maximize.on.label !== void 0 ? props.iconSet.maximize.on.label : iconSetTemplate.value.maximize.on.label,
+            icon: props.iconSet !== void 0 && props.iconSet.maximize !== void 0 && props.iconSet.maximize.on !== void 0 && props.iconSet.maximize.on.icon !== void 0 ? props.iconSet.maximize.on.icon : iconSetTemplate.value.maximize.on.icon,
+            func: maximize()
           },
           off: {
-            label: this.iconSet !== void 0 && this.iconSet.maximize !== void 0 && this.iconSet.maximize.off !== void 0 && this.iconSet.maximize.off.label !== void 0 ? this.iconSet.maximize.off.label : this.iconSetTemplate.maximize.off.label,
-            icon: this.iconSet !== void 0 && this.iconSet.maximize !== void 0 && this.iconSet.maximize.off !== void 0 && this.iconSet.maximize.off.icon !== void 0 ? this.iconSet.maximize.off.icon : this.iconSetTemplate.maximize.off.icon,
-            func: this.restore
+            label: props.iconSet !== void 0 && props.iconSet.maximize !== void 0 && props.iconSet.maximize.off !== void 0 && props.iconSet.maximize.off.label !== void 0 ? props.iconSet.maximize.off.label : iconSetTemplate.value.maximize.off.label,
+            icon: props.iconSet !== void 0 && props.iconSet.maximize !== void 0 && props.iconSet.maximize.off !== void 0 && props.iconSet.maximize.off.icon !== void 0 ? props.iconSet.maximize.off.icon : iconSetTemplate.value.maximize.off.icon,
+            func: restore()
           }
         },
         // TODO: commenting out until minimize functionality is completed
@@ -1172,20 +1163,19 @@ export default defineComponent({
         //   }
         // },
         fullscreen: {
-          state: this.stateInfo.fullscreen !== void 0 && this.stateInfo.fullscreen.state !== void 0 ? this.stateInfo.fullscreen.state : false,
+          state: stateInfo.value.fullscreen !== void 0 && stateInfo.value.fullscreen.state !== void 0 ? stateInfo.value.fullscreen.state : false,
           on: {
-            label: this.iconSet !== void 0 && this.iconSet.fullscreen !== void 0 && this.iconSet.fullscreen.on !== void 0 && this.iconSet.fullscreen.on.label !== void 0 ? this.iconSet.fullscreen.on.label : this.iconSetTemplate.fullscreen.on.label,
-            icon: this.iconSet !== void 0 && this.iconSet.fullscreen !== void 0 && this.iconSet.fullscreen.on !== void 0 && this.iconSet.fullscreen.on.icon !== void 0 ? this.iconSet.fullscreen.on.icon : this.iconSetTemplate.fullscreen.on.icon,
-            func: this.fullscreenEnter
+            label: props.iconSet !== void 0 && props.iconSet.fullscreen !== void 0 && props.iconSet.fullscreen.on !== void 0 && props.iconSet.fullscreen.on.label !== void 0 ? props.iconSet.fullscreen.on.label : iconSetTemplate.value.fullscreen.on.label,
+            icon: props.iconSet !== void 0 && props.iconSet.fullscreen !== void 0 && props.iconSet.fullscreen.on !== void 0 && props.iconSet.fullscreen.on.icon !== void 0 ? props.iconSet.fullscreen.on.icon : iconSetTemplate.value.fullscreen.on.icon,
+            func: fullscreenEnter()
           },
           off: {
-            label: this.iconSet !== void 0 && this.iconSet.fullscreen !== void 0 && this.iconSet.fullscreen.off !== void 0 && this.iconSet.fullscreen.off.label !== void 0 ? this.iconSet.fullscreen.off.label : this.iconSetTemplate.fullscreen.off.label,
-            icon: this.iconSet !== void 0 && this.iconSet.fullscreen !== void 0 && this.iconSet.fullscreen.off !== void 0 && this.iconSet.fullscreen.off.icon !== void 0 ? this.iconSet.fullscreen.off.icon : this.iconSetTemplate.fullscreen.off.icon,
-            func: this.fullscreenLeave
+            label: props.iconSet !== void 0 && props.iconSet.fullscreen !== void 0 && props.iconSet.fullscreen.off !== void 0 && props.iconSet.fullscreen.off.label !== void 0 ? props.iconSet.fullscreen.off.label : iconSetTemplate.value.fullscreen.off.label,
+            icon: props.iconSet !== void 0 && props.iconSet.fullscreen !== void 0 && props.iconSet.fullscreen.off !== void 0 && props.iconSet.fullscreen.off.icon !== void 0 ? props.iconSet.fullscreen.off.icon : iconSetTemplate.value.fullscreen.off.icon,
+            func: fullscreenLeave()
           }
         }
       }
-      this.stateInfo = stateInfo
     }
 
 
@@ -1211,14 +1201,14 @@ export default defineComponent({
       state.value.bottom = this.$q.screen.height
       state.value.right = this.$q.screen.width
       nextTick(() => {
-        this.$emit('position', this.computedPosition)
+        emit('position', computedPosition.value)
       })
     }
 
     function __setMinimizePosition() {
       const elements = document.getElementsByClassName('q-notifications__list--bottom')
       if (elements.length > 0) {
-        elements[0].appendChild(this.$el)
+        elements[0].appendChild(this.$el) // TODO
       }
     }
 
@@ -1245,7 +1235,7 @@ export default defineComponent({
       __setStateInfo('maximize', restoreState.value.maximixe)
       __setStateInfo('minimize', restoreState.value.minimize)
       nextTick(() => {
-        this.$emit('position', this.computedPosition)
+        emit('position', computedPosition.value)
       })
     }
 
@@ -1273,7 +1263,7 @@ export default defineComponent({
         scrollX.value = window.pageXOffset
         if (isFloating.value === true) {
           nextTick(() => {
-            this.$emit('position', computedPosition.value)
+            emit('position', computedPosition.value)
           })
         }
       }
@@ -1303,7 +1293,7 @@ export default defineComponent({
     function __onMouseDown(e, resizeHandle) {
       __removeEventListeners(resizeHandle)
 
-      this.selected = false
+      selected.value = false
       if (e.touches === void 0 && e.buttons !== 1) {
         return
       }
@@ -1330,26 +1320,26 @@ export default defineComponent({
       // this.selected = true
 
       // save mouse position
-      this.mousePos.x = x
-      this.mousePos.y = y
+      mousePos.value.x = x
+      mousePos.value.y = y
 
       const rect = this.__portal.$el.getBoundingClientRect()
       this.shiftX = getMouseShift(e, rect, 'x')
       this.shiftY = getMouseShift(e, rect, 'y')
 
       // save existing position information
-      this.tmpTop = this.state.top
-      this.tmpLeft = this.state.left
-      this.tmpRight = this.state.right
-      this.tmpBottom = this.state.bottom
+      this.tmpTop = state.value.top
+      this.tmpLeft = state.value.left
+      this.tmpRight = state.value.right
+      this.tmpBottom = state.value.bottom
       this.tmpHeight = this.tmpBottom - this.tmpTop
       this.tmpWidth = this.tmpRight - this.tmpLeft
 
-      this.state.shouldDrag = true
+      state.value.shouldDrag = true
 
-      this.__addEventListeners()
+      __addEventListeners()
       if (e.touches !== void 0) {
-        this.__addClass(document.body, 'q-window__touch-action')
+        __addClass(document.body, 'q-window__touch-action')
       }
 
       // stopAndPrevent(e)
@@ -1378,9 +1368,9 @@ export default defineComponent({
         state.value.top = this.tmpTop
         state.value.left = this.tmpLeft
         state.value.right = this.tmpRight
-        state.value.bottom = this.tmpBottom
+        state.value.bottom = this.tmpBottom // TODO
         this.$nextTick(() => {
-          this.$emit('canceled', computedPosition.value)
+          emit('canceled', computedPosition.value)
         })
       }
     }
@@ -1399,7 +1389,7 @@ export default defineComponent({
       if (state.value.dragging !== true) {
         if (Math.abs(mousePos.value.x - mouseX) >= 3 || Math.abs(mousePos.value.y - mouseY) >= 3) {
           state.value.dragging = true
-          this.$emit('beforeDrag', e)
+          emit('beforeDrag', e)
         } else {
           return
         }
@@ -1408,62 +1398,62 @@ export default defineComponent({
       switch (resizeHandle || this.resizeHandle) {
         case 'top':
           state.value.top = mouseY - window.pageYOffset - this.shiftY
-          this.$nextTick(() => {
-            if (this.computedHeight < this.state.minHeight) {
-              this.state.top = this.tmpBottom - this.state.minHeight
+          nextTick(() => {
+            if (computedHeight.value < state.value.minHeight) {
+              state.value.top = this.tmpBottom - state.value.minHeight // TODO
             }
           })
           break
         case 'left':
-          this.state.left = mouseX - window.pageXOffset - this.shiftX
-          this.$nextTick(() => {
-            if (this.computedWidth < this.state.minWidth) {
-              this.state.left = this.tmpRight - this.state.minWidth
+          state.value.left = mouseX - window.pageXOffset - this.shiftX
+          nextTick(() => {
+            if (computedWidth.value < state.value.minWidth) {
+              state.value.left = this.tmpRight - state.value.minWidth // TODO
             }
           })
           break
         case 'right':
-          this.state.right = mouseX - window.pageXOffset
-          this.$nextTick(() => {
-            if (this.computedWidth < this.state.minWidth) {
-              this.state.right = this.tmpLeft - this.state.minWidth
+          state.value.right = mouseX - window.pageXOffset
+          nextTick(() => {
+            if (computedWidth.value < state.value.minWidth) {
+              state.value.right = this.tmpLeft - state.value.minWidth // TODO
             }
           })
           break
         case 'bottom':
-          this.state.bottom = mouseY - window.pageYOffset
-          this.$nextTick(() => {
-            if (this.computedHeight < this.state.minHeight) {
-              this.state.bottom = this.tmpTop - this.state.minHeight
+          state.value.bottom = mouseY - window.pageYOffset
+          nextTick(() => {
+            if (computedHeight.value < state.value.minHeight) {
+              state.value.bottom = this.tmpTop - state.value.minHeight // TODO
             }
           })
           break
         case 'top-left':
-          this.__onMouseMove(e, 'top')
-          this.__onMouseMove(e, 'left')
+          __onMouseMove(e, 'top')
+          __onMouseMove(e, 'left')
           return
         case 'top-right':
-          this.__onMouseMove(e, 'top')
-          this.__onMouseMove(e, 'right')
+          __onMouseMove(e, 'top')
+          __onMouseMove(e, 'right')
           return
         case 'bottom-left':
-          this.__onMouseMove(e, 'bottom')
-          this.__onMouseMove(e, 'left')
+          __onMouseMove(e, 'bottom')
+          __onMouseMove(e, 'left')
           return
         case 'bottom-right':
-          this.__onMouseMove(e, 'bottom')
-          this.__onMouseMove(e, 'right')
+          __onMouseMove(e, 'bottom')
+          __onMouseMove(e, 'right')
           return
         case 'titlebar':
-          if (this.scrollWithWindow === true) {
-            this.state.top = mouseY - this.shiftY
-            this.state.left = mouseX - this.shiftX
+          if (this.scrollWithWindow === true) { // TODO
+            state.value.top = mouseY - this.shiftY
+            state.value.left = mouseX - this.shiftX
           } else {
-            this.state.top = mouseY - window.pageYOffset - this.shiftY
-            this.state.left = mouseX - window.pageXOffset - this.shiftX
+            state.value.top = mouseY - window.pageYOffset - this.shiftY
+            state.value.left = mouseX - window.pageXOffset - this.shiftX
           }
-          this.state.bottom = this.state.top + this.tmpHeight
-          this.state.right = this.state.left + this.tmpWidth
+          state.value.bottom = state.value.top + this.tmpHeight
+          state.value.right = state.value.left + this.tmpWidth
           break
       }
 
@@ -1472,22 +1462,22 @@ export default defineComponent({
 
 
     function __onMouseUp(e) {
-      if (this.state.dragging === true) {
+      if (state.value.dragging === true) {
         prevent(e)
-        this.__removeEventListeners()
+        __removeEventListeners()
         if (e.touches !== void 0) {
-          this.__removeClass(document.body, 'q-window__touch-action')
+          __removeClass(document.body, 'q-window__touch-action')
         }
-        this.state.shouldDrag = this.state.dragging = false
-        this.$emit('afterDrag', e)
-        this.$emit('position', this.computedPosition)
+        state.value.shouldDrag = state.value.dragging = false
+        emit('afterDrag', e)
+        emit('position', computedPosition.value)
       }
     }
 
 //
     function __onTouchMove(e, resizeHandle) {
       stopAndPrevent(e)
-      this.resizeHandle = resizeHandle
+      this.resizeHandle = resizeHandle // TODO
       // let touchY = e.touches[0].pageY
       // let touchYDelta = touchY - (this.lastTouchY ? this.lastTouchY : 0)
       // if (window.pageYOffset === 0) {
@@ -1499,18 +1489,18 @@ export default defineComponent({
       //   }
       // }
 
-      this.__onMouseMove(e)
+      __onMouseMove(e)
     }
 
     function __onTouchStart(e, resizeHandle) {
       stopAndPrevent(e)
-      this.__onMouseDown(e, resizeHandle)
+      __onMouseDown(e, resizeHandle)
     }
 
     function __onTouchEnd(e, resizeHandle) {
       stopAndPrevent(e)
-      this.resizeHandle = resizeHandle
-      this.__onMouseUp(e)
+      this.resizeHandle = resizeHandle // TODO
+      __onMouseUp(e)
     }
 
 //
@@ -1562,41 +1552,41 @@ export default defineComponent({
 
 
     function __renderMoreItems(h, menuData) {
-      return menuData.map(stateInfo => this.__renderMoreItem(h, stateInfo))
+      return menuData.map(stateInfo => __renderMoreItem(h, stateInfo))
     }
 
     function __renderMoreMenu(h, menuData) {
       // these two issues happen during early render
-      if (this.computedActions.length === 0) {
+      if (computedActions.value.length === 0) {
         return ''
       }
-      if (this.hasStateInfo !== true) {
+      if (hasStateInfo.value !== true) {
         return ''
       }
 
       // let user manipulate menu
-      if (this.menuFunc) {
+      if (this.menuFunc) { // TODO
         this.menuFunc(menuData)
       }
 
       return h(QMenu, [
-        h(QList, this.setBothColors(this.color, this.backgroundColor, {
+        h(QList, this.setBothColors(props.color, props.backgroundColor, { // TODO
           props: {
             highlight: true,
             dense: true
           },
           style: {
-            zIndex: (this.isEmbedded === true) ? void 0 : this.__computedZIndex + 1
+            zIndex: (isEmbedded.value === true) ? void 0 : __computedZIndex.value + 1
           }
         }), [
-          ...this.__renderMoreItems(h, menuData)
+          ...__renderMoreItems(h, menuData)
         ])
       ])
     }
 
 //
     function __renderMoreButton(h, menuData) {
-      if (this.noMenu === true) {
+      if (props.noMenu === true) {
         return ''
       }
 
@@ -1609,66 +1599,66 @@ export default defineComponent({
           icon: 'more_vert'
         }
       }, [
-        this.__renderMoreMenu(h, menuData)
+        __renderMoreMenu(h, menuData)
       ])
     }
 
     function __renderTitle(h) {
       return h('div', {
         staticClass: 'q-window__title col ellipsis'
-      }, this.title)
+      }, props.title)
     }
 
     function __renderTitlebar(h, menuData) {
-      if (this.headless === true) {
+      if (props.headless === true) {
         return ''
       }
 
-      const titlebarSlot = this.$slots.titlebar
+      const titlebarSlot = this.$slots.titlebar // TODO
 
       return h('div', {
-        staticClass: this.__tbStaticClass,
-        class: this.titlebarClass,
-        style: this.__tbStyle
+        staticClass: __tbStaticClass.value,
+        class: props.titlebarClass,
+        style: __tbStyle.value
       }, [
-        titlebarSlot === void 0 ? this.__renderTitle(h) : '',
-        titlebarSlot === void 0 ? this.__renderMoreButton(h, menuData) : '',
+        titlebarSlot === void 0 ? __renderTitle(h) : '',
+        titlebarSlot === void 0 ? __renderMoreButton(h, menuData) : '',
         titlebarSlot !== void 0 ? titlebarSlot(menuData) : '',
-        (this.canDrag === true)
-        && this.__renderResizeHandle(h, 'titlebar', this.noMenu ? 0 : 35) // width of more button
+        (canDrag.value === true)
+        && __renderResizeHandle(h, 'titlebar', props.noMenu ? 0 : 35) // width of more button
       ])
     }
 
     // grippers can visibly be seen
     function __renderGripper(h, resizeHandle) {
-      if (this.__canResize(resizeHandle) === false) {
+      if (__canResize(resizeHandle) === false) {
         return ''
       }
-      const staticClass = 'gripper gripper-' + resizeHandle + (this.roundGrippers === true ? ' gripper-round' : '')
-      return h('div', this.setBorderColor(this.gripperBorderColor, this.setBackgroundColor(this.gripperBackgroundColor, {
+      const staticClass = 'gripper gripper-' + resizeHandle + (props.roundGrippers === true ? ' gripper-round' : '')
+      return h('div', this.setBorderColor(props.gripperBorderColor, this.setBackgroundColor(props.gripperBackgroundColor, { // TODO
         ref: resizeHandle,
         staticClass: staticClass,
         on: {
-          mousedown: (e) => this.__onMouseDown(e, resizeHandle),
-          touchstart: (e) => this.__onTouchStart(e, resizeHandle),
-          touchmove: (e) => this.__onTouchMove(e, resizeHandle),
-          touchend: (e) => this.__onTouchEnd(e, resizeHandle)
+          mousedown: (e) => __onMouseDown(e, resizeHandle),
+          touchstart: (e) => __onTouchStart(e, resizeHandle),
+          touchmove: (e) => __onTouchMove(e, resizeHandle),
+          touchend: (e) => __onTouchEnd(e, resizeHandle)
         }
       })))
     }
 
     // resize handles are for when there are no grippers
     function __renderResizeHandle(h, resizeHandle, actionsWidth) {
-      if (this.noMove && resizeHandle === 'titlebar') {
+      if (props.noMove && resizeHandle === 'titlebar') {
         return ''
       }
-      if (resizeHandle !== 'titlebar' && this.__canResize(resizeHandle) === false) {
+      if (resizeHandle !== 'titlebar' && __canResize(resizeHandle) === false) {
         return ''
       }
       const staticClass = 'q-window__resize-handle ' + 'q-window__resize-handle--' + resizeHandle
-      let width = this.computedWidth
+      let width = computedWidth.value
       const style = {}
-      if (actionsWidth && actionsWidth > 0 && this.canDrag === true) {
+      if (actionsWidth && actionsWidth > 0 && canDrag.value === true) {
         width -= actionsWidth
         style.width = width + 'px'
       }
@@ -1677,55 +1667,55 @@ export default defineComponent({
         staticClass: staticClass,
         style: style,
         on: {
-          mousedown: (e) => this.__onMouseDown(e, resizeHandle),
-          touchstart: (e) => this.__onTouchStart(e, resizeHandle),
-          touchmove: (e) => this.__onTouchMove(e, resizeHandle),
-          touchend: (e) => this.__onTouchEnd(e, resizeHandle)
+          mousedown: (e) => __onMouseDown(e, resizeHandle),
+          touchstart: (e) => __onTouchStart(e, resizeHandle),
+          touchmove: (e) => __onTouchMove(e, resizeHandle),
+          touchend: (e) => __onTouchEnd(e, resizeHandle)
         }
       })
     }
 
     function __renderGrippers(h) {
-      if (this.hideGrippers === true) {
+      if (props.hideGrippers === true) {
         return ''
       }
-      return this.handles.map(resizeHandle => this.__renderGripper(h, resizeHandle))
+      return handles.value.map(resizeHandle => __renderGripper(h, resizeHandle))
     }
 
     function __renderResizeHandles(h) {
-      if (this.hideGrippers !== true) {
+      if (props.hideGrippers !== true) {
         return ''
       }
-      return this.handles.map(resizeHandle => this.__renderResizeHandle(h, resizeHandle))
+      return handles.value.map(resizeHandle => __renderResizeHandle(h, resizeHandle))
     }
 
     function __renderBody(h) {
-      const defaultScopedSlot = this.$slots.default
-      const defaultSlot = this.$slots.default
+      const defaultScopedSlot = this.$slots.default // TODO
+      const defaultSlot = this.$slots.default // TODO
       return h('div', {
         staticClass: 'q-window__body row',
-        style: this.__bodyStyle
+        style: __bodyStyle.value
       }, [
-        defaultSlot || defaultScopedSlot ? defaultScopedSlot({zIndex: this.zIndex}) : '',
-        (this.headless === true && this.canDrag === true)
-        && this.__renderResizeHandle(h, 'titlebar', this.noMenu ? 0 : 44) // width of more button
+        defaultSlot || defaultScopedSlot ? defaultScopedSlot({zIndex: zIndex.value}) : '',
+        (props.headless === true && canDrag.value === true)
+        && __renderResizeHandle(h, 'titlebar', props.noMenu ? 0 : 44) // width of more button
 
       ])
     }
 
     function __render(h) {
       // get stateInfo for each menu item
-      const menuData = [...this.computedMenuData]
+      const menuData = [...computedMenuData.value]
 
-      return h('div', this.setBothColors(this.color, this.backgroundColor, {
-        staticClass: 'q-window ' + this.__classes,
-        class: this.contentClass,
-        style: this.__style
+      return h('div', this.setBothColors(this.color, props.backgroundColor, { // TODO
+        staticClass: 'q-window ' + __classes.value,
+        class: props.contentClass,
+        style: __style.value
       }), [
-        (canDrag === true) && [...__renderResizeHandles(h)],
-        (canDrag === true) && [...__renderGrippers(h)],
-        this.__renderTitlebar(h, menuData),
-        this.isMinimized !== true && this.__renderBody(h)
+        (canDrag.value === true) && [...__renderResizeHandles(h)],
+        (canDrag.value === true) && [...__renderGrippers(h)],
+        __renderTitlebar(h, menuData),
+        isMinimized.value !== true && __renderBody(h)
       ])
     }
 
@@ -1733,61 +1723,41 @@ export default defineComponent({
       const obj = {
         name: 'QWindowPortal',
         parent: this,
-
         inheritAttrs: false,
-
-        render: h => this.__render(h),
-
-        components: this.$options.components,
-        directives: this.$options.directives
+        render: h => __render(h),
+        components: this.$options.components, // TODO
+        directives: this.$options.directives // TODO
       }
 
-      this.__portal = new Vue(obj).$mount()
+      __portal.value = new Vue(obj).$mount() // TODO
     }
 
     function __destroyPortal() {
-      if (this.__portal) {
-        this.__portal.$destroy()
-        this.__portal.$el.remove()
-        this.__portal = void 0
+      if (__portal.value) {
+        __portal.value.$destroy()
+        __portal.value.$el.remove()
+        __portal.value = void 0
       }
     }
 
     function __showPortal() {
-      if (this.__portal !== void 0 && this.__portal.showing !== true) {
+      if (__portal.value !== void 0 && __portal.value.showing !== true) {
         const app = document.getElementById('q-app')
         if (app) {
-          app.appendChild(this.__portal.$el)
+          app.appendChild(__portal.value.$el)
         } else {
-          document.body.appendChild(this.__portal.$el)
+          document.body.appendChild(__portal.value.$el)
         }
-        this.__portal.showing = true
+        __portal.value.showing = true
       }
     }
 
     function __hidePortal() {
-      if (this.__portal !== void 0 && this.__portal.showing === true) {
-        this.__portal.$el.remove()
-        this.__portal.showing = false
+      if (__portal.value !== void 0 && __portal.value.showing === true) {
+        __portal.value.$el.remove()
+        __portal.value.showing = false
       }
     }
-
-
-    onBeforeMount(() => {
-      // this.id = ++QWindowCount
-      // this.$set(layers, this.id, {window: this})
-    })
-//
-    onBeforeUnmount(() => {
-      // just in case
-      // this.__removeClass(document.body, 'q-window__touch-action')
-      //  this.fullscreenLeave()
-
-      //document.removeEventListener('scroll', this.__onScroll, {passive: true})
-      // document.body.removeEventListener('mousedown', this.__onMouseDownBody, {passive: false})
-
-      //this.__destroyPortal()
-    });
 
 
     function render() {
