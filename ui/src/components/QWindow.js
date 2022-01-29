@@ -8,6 +8,8 @@ import {
   onMounted,
   ref,
   nextTick,
+  createApp,
+  getCurrentInstance
 } from 'vue'
 
 import {
@@ -28,6 +30,16 @@ import {
   stopAndPrevent
 } from 'quasar/src/utils/event'
 
+
+// import { QColorizeMixin } from 'q-colorize-mixin'
+// import canRender from 'quasar/src/mixins/can-render'
+//
+// // Utils
+// import { prevent, stopAndPrevent } from 'quasar/src/utils/event'
+//
+// mixins: [QColorizeMixin, canRender],
+
+
 // the starting zIndex for floating windows
 const startingZIndex = 4000
 
@@ -36,7 +48,7 @@ const startingZIndex = 4000
 const maxZIndex = 6000 - 100
 
 // number of windows registered globally
-const QWindowCount = 0
+let QWindowCount = 0
 
 // layered windows
 const layers = {}
@@ -51,9 +63,9 @@ const defaultY = 20
 const getMousePosition = function (e, type = 'x') {
   if (e.touches !== void 0) {
     if (type === 'x') {
-      return e.touches[0].pageX
+      return e.touches[ 0 ].pageX
     }
-    return e.touches[0].pageY
+    return e.touches[ 0 ].pageY
   } else {
     if (type === 'x') {
       return e.pageX
@@ -64,9 +76,9 @@ const getMousePosition = function (e, type = 'x') {
 const getMouseShift = function (e, rect, type = 'x') {
   if (e.touches !== void 0) {
     if (type === 'x') {
-      return e.touches[0].clientX - rect.left
+      return e.touches[ 0 ].clientX - rect.left
     }
-    return e.touches[0].clientY - rect.top
+    return e.touches[ 0 ].clientY - rect.top
   } else {
     if (type === 'x') {
       return e.clientX - rect.left
@@ -138,32 +150,32 @@ export default defineComponent({
       default: 'solid'
     },
 
-    startX: [Number, String],
-    startY: [Number, String],
+    startX: [ Number, String ],
+    startY: [ Number, String ],
     width: {
-      type: [Number, String],
+      type: [ Number, String ],
       default: 400
     },
     height: {
-      type: [Number, String],
+      type: [ Number, String ],
       default: 400
     },
     actions: {
       type: Array,
-      default: () => (['pin', 'embedded', 'close']),
+      default: () => ([ 'pin', 'embedded', 'close' ]),
       validator: (v) => v.some(action => [
         'pin',
         'embedded',
         'minimize',
         'maximize',
         'close',
-        'fullscreen'].includes(action))
+        'fullscreen' ].includes(action))
     },
     menuFunc: Function,
-    titlebarStyle: [String, Object, Array],
-    titlebarClass: [String, Object, Array],
-    contentClass: [String, Object, Array],
-    contentStyle: [String, Object, Array]
+    titlebarStyle: [ String, Object, Array ],
+    titlebarClass: [ String, Object, Array ],
+    contentClass: [ String, Object, Array ],
+    contentStyle: [ String, Object, Array ]
   },
 
   emits: [
@@ -180,98 +192,9 @@ export default defineComponent({
     'afterDrag'
   ],
 
-  setup(props, {slots, emit, expose}) {
+  setup(props, { slots, emit }) {
 
-
-    onBeforeMount(() => {
-      this.id = ++QWindowCount
-      this.$set(layers, this.id, {window: this})
-    })
-
-    onBeforeUnmount(() => {
-      // just in case
-      __removeClass(document.body, 'q-window__touch-action')
-      fullscreenLeave()
-
-      document.removeEventListener('scroll', __onScroll, {passive: true})
-      document.body.removeEventListener('mousedown', __onMouseDownBody, {passive: false})
-
-      __destroyPortal()
-    })
-
-    onMounted(() => {
-      __updateStateInfo()
-
-      // calculate left starting position
-      if (props.startX > 0) {
-        state.value.left = props.startX
-      } else {
-        state.value.left = defaultX * QWindowCount
-      }
-
-      // calculate top starting position
-      if (props.startY > 0) {
-        state.value.top = props.startY
-      } else {
-        state.value.top = defaultY * QWindowCount
-      }
-
-      // calculate right and bottom starting positions
-      state.value.right = state.value.left + props.width
-      state.value.bottom = state.value.top + props.height
-
-      // adjust initial user states
-      if (this.value !== void 0) {
-        if (this.value === true) {
-          __setStateInfo('visible', true)
-        } else {
-          __setStateInfo('visible', false)
-        }
-      }
-      if (props.embedded !== void 0) {
-        if (props.embedded === true) {
-          __setStateInfo('embedded', true)
-        } else {
-          __setStateInfo('embedded', false)
-        }
-      }
-      if (props.pinned !== void 0) {
-        if (props.pinned === true) {
-          if (canDo('pinned', true)) {
-            __setStateInfo('pinned', true)
-          }
-        } else {
-          if (canDo('pinned', false)) {
-            __setStateInfo('pinned', false)
-          }
-        }
-      }
-      if (props.fullscreen !== void 0) {
-        if (props.fullscreen === true) {
-          fullscreenEnter()
-        }
-      }
-      if (maximize() !== void 0) {
-        if (maximize() === true && __getStateInfo('fullscreen') !== true) {
-          __setStateInfo('maximize', true)
-        } else {
-          __setStateInfo('maximize', false)
-        }
-      }
-      if (minimize() !== void 0) {
-        if (minimize() === true && __getStateInfo('fullscreen') !== true) {
-          __setStateInfo('minimize', true)
-        } else {
-          __setStateInfo('minimize', false)
-        }
-      }
-
-      // set up scroll handler
-      document.addEventListener('scroll', __onScroll, {passive: true})
-      // set up mousedown on body (so windows can deselect themselves on outside click)
-      document.body.addEventListener('mousedown', __onMouseDownBody, {passive: false})
-    })
-
+    const $q = useQuasar();
 
     // ======= REACTIVE DATA
 
@@ -299,9 +222,9 @@ export default defineComponent({
     })
 
     const zIndex = ref(4000)
-    const mouseOffsetX = ref(-1)
-    const mouseOffsetY = ref(-1)
-    const mousePos = ref({x: 0, y: 0})
+    const mouseOffsetX = ref(-1) // FIXME unused ?
+    const mouseOffsetY = ref(-1) // FIXME unused ?
+    const mousePos = ref({ x: 0, y: 0 })
     const scrollX = ref(0)
     const scrollY = ref(0)
     const selected = ref(false)
@@ -316,7 +239,7 @@ export default defineComponent({
       'bottom-left',
       'bottom-right'
     ])
-    const stateInfo = ref() // filled in mounted
+    const stateInfo = ref({}) // filled in mounted
     const iconSetTemplate = ref({ // uses material design icons
       visible: {
         on: {
@@ -370,19 +293,127 @@ export default defineComponent({
       }
     })
     const __portal = ref()
+    const id = ref(0)
 
 
-    //   value (val) {
-//     this.stateInfo.visible.state = val
-//   },
+    const shiftX = ref()
+    const shiftY = ref()
+
+    // save existing position information
+    const tmpTop = ref()
+    const tmpLeft = ref()
+    const tmpRight = ref()
+    const tmpBottom = ref()
+    const tmpHeight = ref()
+    const tmpWidth = ref()
+    const resizeHandle = ref()
+
+    onBeforeMount(() => {
+      const internalInstance = getCurrentInstance() // Correct for this ?
+      console.log('Internal Instance')
+      console.log(internalInstance)
+      id.value = ++QWindowCount
+      layers[ id.value ] = { window: internalInstance } // TODO this
+    })
+
+    onBeforeUnmount(() => {
+      // just in case
+      __removeClass(document.body, 'q-window__touch-action')
+      fullscreenLeave()
+
+      document.removeEventListener('scroll', __onScroll, { passive: true })
+      document.body.removeEventListener('mousedown', __onMouseDownBody, { passive: false })
+
+      __destroyPortal()
+    })
+
+    onMounted(() => {
+      console.log('onMounted')
+      __updateStateInfo()
+
+      // calculate left starting position
+      if (props.startX > 0) {
+        state.value.left = props.startX
+      } else {
+        state.value.left = defaultX * QWindowCount
+      }
+
+      // calculate top starting position
+      if (props.startY > 0) {
+        state.value.top = props.startY
+      } else {
+        state.value.top = defaultY * QWindowCount
+      }
+
+      // calculate right and bottom starting positions
+      state.value.right = state.value.left + props.width
+      state.value.bottom = state.value.top + props.height
+
+      // adjust initial user states
+      if (props.value !== void 0) {
+        if (props.value === true) {
+          __setStateInfo('visible', true)
+        } else {
+          __setStateInfo('visible', false)
+        }
+      }
+      if (props.embedded !== void 0) {
+        if (props.embedded === true) {
+          __setStateInfo('embedded', true)
+        } else {
+          __setStateInfo('embedded', false)
+        }
+      }
+      if (props.pinned !== void 0) {
+        if (props.pinned === true) {
+          if (canDo('pinned', true)) {
+            __setStateInfo('pinned', true)
+          }
+        } else {
+          if (canDo('pinned', false)) {
+            __setStateInfo('pinned', false)
+          }
+        }
+      }
+      if (props.fullscreen !== void 0) {
+        if (props.fullscreen === true) {
+          fullscreenEnter()
+        }
+      }
+      if (maximize() !== void 0) {
+        if (maximize() === true && __getStateInfo('fullscreen') !== true) {
+          __setStateInfo('maximize', true)
+        } else {
+          __setStateInfo('maximize', false)
+        }
+      }
+      if (minimize() !== void 0) {
+        if (minimize() === true && __getStateInfo('fullscreen') !== true) {
+          __setStateInfo('minimize', true)
+        } else {
+          __setStateInfo('minimize', false)
+        }
+      }
+
+      // set up scroll handler
+      document.addEventListener('scroll', __onScroll, { passive: true })
+      // set up mousedown on body (so windows can deselect themselves on outside click)
+      document.body.addEventListener('mousedown', __onMouseDownBody, { passive: false })
+    })
+
+
+    watch(() => props.value, (val) => {
+      stateInfo.value.visible.state = val
+    })
+
     watch(() => props.iconSet, () => {
-      // handler () {
+      //  handler () {
       __updateStateInfo()
       //}
 
-    }, {deep: true})
+    }, { deep: true })
 
-    watch(() => selected, (val) => {
+    watch(() => selected.value, (val) => {
       if (props.autoPin === true) {
         if (val === true) {
           unpin()
@@ -394,28 +425,29 @@ export default defineComponent({
     })
 
 
-    watch(() => 'stateInfo.visible.state', (val) => {
+    watch(() => 'stateInfo.value.visible.state', (val) => {
       emit('input', val)
     })
 
-    watch(() => 'stateInfo.embedded.state', (val) => {
+    watch(() => 'stateInfo.value.embedded.state', (val) => {
+      console.log('CREATE PORTAL')
       if (val !== true) {
         __createPortal()
         nextTick(() => {
           __showPortal()
-          this.$forceUpdate()
+          // this.$forceUpdate() // TODO
         })
       } else {
-        this.__hidePortal()
+        __hidePortal()
         nextTick(() => {
           __destroyPortal()
-          this.$forceUpdate()
+          //this.$forceUpdate() // TODO
         })
       }
     })
 
 
-    watch(() => 'stateInfo.maximize.state', (val, oldVal) => {
+    watch(() => 'stateInfo.value.maximize.state', (val, oldVal) => {
       if (oldVal === void 0) {
         // during initialization
         return
@@ -425,7 +457,7 @@ export default defineComponent({
       }
     })
 
-    watch(() => 'stateInfo.minimize.state', (val, oldVal) => {
+    watch(() => 'stateInfo.value.minimize.state', (val, oldVal) => {
       if (oldVal === void 0) {
         // during initialization
         return
@@ -435,7 +467,7 @@ export default defineComponent({
       }
     })
 
-    watch(() => 'stateInfo.fullscreen.state', (val, oldVal) => {
+    watch(() => 'stateInfo.value.fullscreen.state', (val, oldVal) => {
       if (oldVal === void 0) {
         return
       }
@@ -449,11 +481,11 @@ export default defineComponent({
       emit('fullscreen', val)
     })
 
-    watch(() => '$q.fullscreen.isActive', (val) => {
-      if (fullscreenInitiated.value === true) {
-        __setStateInfo('fullscreen', val)
-      }
-    })
+    // watch(() => '$q.fullscreen.isActive', (val) => {
+    //   if (fullscreenInitiated.value === true) {
+    //     __setStateInfo('fullscreen', val)
+    //   }
+    // })
     watch(() => '$q.screen.height', (val) => {
       if (isFullscreen.value === true) {
         state.value.bottom = val
@@ -495,7 +527,7 @@ export default defineComponent({
     })
 
     const isDisabled = computed(() => {
-      return disabled === true
+      return props.disabled === true
     })
 
     const isEnabled = computed(() => {
@@ -565,8 +597,8 @@ export default defineComponent({
     })
 
     const __computedZIndex = computed(() => {
-      //let extra = 0
-      //if (this.isDragging) extra = 100
+      let extra = 0
+      if (isDragging.value) extra = 100
       return zIndex.value + extra
     })
 
@@ -597,7 +629,7 @@ export default defineComponent({
       if (props.actions.includes('maximize') && (canDo('maximize', true) || canDo('maximize', false))) {
         actions.push('maximize')
       }
-      // if (this.actions.includes('minimize') && (this.canDo('minimize', true) || this.canDo('minimize', false))) {
+      // if (props.actions.includes('minimize') && (canDo('minimize', true) || canDo('minimize', false))) {
       //   actions.push('maximize')
       // }
       if (props.actions.includes('close') && canDo('close', true)) {
@@ -611,8 +643,8 @@ export default defineComponent({
       // get stateInfo for each menu item
       const menuData = []
       computedActions.value.map(key => {
-        if (stateInfo.value[key]) {
-          menuData.push({...stateInfo.value[key], key: key})
+        if (stateInfo.value[ key ]) {
+          menuData.push({ ...stateInfo.value[ key ], key: key })
         }
       })
       return menuData
@@ -627,7 +659,7 @@ export default defineComponent({
           height: computedToolbarHeight.value + 'px',
           borderWidth: '1px',
           borderStyle: 'solid',
-          color: props.color, // TODO
+         // color: props.color, // TODO
           backgroundColor: props.backgroundColor,
           minWidth: '100px'
         }
@@ -668,23 +700,23 @@ export default defineComponent({
       if (props.contentStyle) {
         const type = Object.prototype.toString.call(props.contentStyle)
         if (type === '[object Object]') {
-          style = {...style, ...props.contentStyle}
+          style = { ...style, ...props.contentStyle }
         } else if ((type === '[object Array]')) {
           props.contentStyle.forEach(item => {
-            style = {...style, ...item}
+            style = { ...style, ...item }
           })
         } else if (typeof props.contentStyle === 'string') {
           const items = props.contentStyle.split(';')
           items.forEach(item => {
             const props = item.split(':')
-            style[props[0].trim()] = props[1].trim()
+            style[ props[ 0 ].trim() ] = props[ 1 ].trim()
           })
         }
       }
 
       return style
     })
-//
+
     const __tbStaticClass = computed(() => {
       return 'q-window__titlebar'
         + (props.hideToolbarDivider !== true ? ' q-window__titlebar--divider' : '')
@@ -695,8 +727,8 @@ export default defineComponent({
     })
 
     const __tbStyle = computed(() => {
-      const titleHeight = `${computedToolbarHeight.value}px`
-      let style = {height: titleHeight}
+      const titleHeight = `${ computedToolbarHeight.value }px`
+      let style = { height: titleHeight }
 
       if (props.titlebarStyle) {
         if (typeof props.titlebarStyle === 'object') {
@@ -705,7 +737,7 @@ export default defineComponent({
           style = props.titlebarStyle + '; height:' + titleHeight
         } else if (Array.isArray(props.titlebarStyle)) {
           style = props.titlebarStyle
-          style.push({height: titleHeight})
+          style.push({ height: titleHeight })
         }
       }
       return style
@@ -720,7 +752,7 @@ export default defineComponent({
       if (isFullscreen.value === true) {
         return {
           position: 'fixed',
-          height: `calc(100% - ${computedToolbarHeight.value}px`,
+          height: `calc(100% - ${ computedToolbarHeight.value }px`,
           top: computedToolbarHeight.value + 'px'
         }
       }
@@ -743,7 +775,6 @@ export default defineComponent({
 
     // ============ PUBLIC FUNCTIONS
 
-    //
     // show the component
     function show() {
       if (canDo('visible', true)) {
@@ -764,8 +795,8 @@ export default defineComponent({
       return false
     }
 
-//
-//   // embedded
+
+    // embedded
     function lock() {
       if (canDo('embedded', true)) {
         __setStateInfo('embedded', true)
@@ -853,7 +884,7 @@ export default defineComponent({
     function fullscreenEnter() {
       if (canDo('fullscreen', true)) {
         fullscreenInitiated.value = true
-        this.$q.fullscreen.request() // TODO
+       // $q.fullscreen.request()
         return true
       }
       return false
@@ -862,7 +893,7 @@ export default defineComponent({
     // leave fullscreen mode
     function fullscreenLeave() {
       if (canDo('fullscreen', false)) {
-        this.$q.fullscreen.exit() // TODO
+      // $q.fullscreen.exit()
         return true
       }
       return false
@@ -874,15 +905,15 @@ export default defineComponent({
         // not allowed
         return
       }
-      this.$q.fullscreen.isActive ? fullscreenLeave() : fullscreenEnter() // TODO
+    //  $q.fullscreen.isActive ? fullscreenLeave() : fullscreenEnter() // TODO
     }
 
     // bring this window to the front
     function bringToFront() {
-      // const sortedLayers = this.__computedSortedLayers
+      // const sortedLayers = __computedSortedLayers
       const sortedLayers = __sortedLayers()
       for (let index = 0; index < sortedLayers.length; ++index) {
-        const layer = sortedLayers[index]
+        const layer = sortedLayers[ index ]
         layer.zIndex = startingZIndex + index
       }
       // this window gets highest zIndex
@@ -891,10 +922,10 @@ export default defineComponent({
 
     // send this window to the back
     function sendToBack() {
-      // const sortedLayers = this.__computedSortedLayers
+      // const sortedLayers = __computedSortedLayers
       const sortedLayers = __sortedLayers()
       for (let index = 0; index < sortedLayers.length; ++index) {
-        const layer = sortedLayers[index]
+        const layer = sortedLayers[ index ]
         layer.zIndex = startingZIndex + index + 1
       }
       // this window gets lowest zIndex
@@ -934,9 +965,9 @@ export default defineComponent({
       state.value.bottom = state.value.top + height
     }
 
-    //   // function that returns true/false if
-//   // passed in mode/state can be done
-//   // where state = [true = 'on', false = 'off']
+    // function that returns true/false if
+    // passed in mode/state can be done
+    // where state = [true = 'on', false = 'off']
     function canDo(mode, state) {
       switch (mode) {
         case 'visible':
@@ -1040,18 +1071,18 @@ export default defineComponent({
           }
           return false
       }
-      console.error(`QWindow unknown mode: ${mode}`)
+      console.error(`QWindow unknown mode: ${ mode }`)
     }
 
     // ============ PRIVATE  FUNCTIONS
 
     function __canBeSelected(x, y) { // TODO
-      // const sortedLayers = this.__computedSortedLayers
+      // const sortedLayers = __computedSortedLayers
       const sortedLayers = __sortedLayers()
       for (let index = sortedLayers.length - 1; index >= 0; --index) {
-        if (sortedLayers[index].__portal.value !== void 0) {
-          if (__isPointInRect(x, y, sortedLayers[index].__portal.value.$el)) {
-            if (sortedLayers[index].id === this.id) {
+        if (sortedLayers[ index ].__portal.value !== void 0) {
+          if (__isPointInRect(x, y, sortedLayers[ index ].__portal.value.$el)) {
+            if (sortedLayers[ index ].id === id.value) {
               return true
             } else {
               return false
@@ -1076,7 +1107,7 @@ export default defineComponent({
       const sortedLayers = []
       const keys = Object.keys(layers)
       for (let index = 0; index < keys.length; ++index) {
-        sortedLayers.push(layers[keys[index]].window)
+        sortedLayers.push(layers[ keys[ index ] ].window)
       }
 
       function sort(a, b) {
@@ -1090,7 +1121,7 @@ export default defineComponent({
 
     function __canResize(resizeHandle) {
       if (props.noResize === true) return false
-      const missing = this.handles.filter(handle => !props.resizable.includes(handle))
+      const missing = handles.value.filter(handle => !props.resizable.includes(handle))
       return missing.includes(resizeHandle) !== true
     }
 
@@ -1101,12 +1132,12 @@ export default defineComponent({
           on: {
             label: props.iconSet !== void 0 && props.iconSet.visible !== void 0 && props.iconSet.visible.on !== void 0 && props.iconSet.visible.on.label !== void 0 ? props.iconSet.visible.on.label : iconSetTemplate.value.visible.on.label,
             icon: props.iconSet !== void 0 && props.iconSet.visible !== void 0 && props.iconSet.visible.on !== void 0 && props.iconSet.visible.on.icon !== void 0 ? props.iconSet.visible.on.icon : iconSetTemplate.value.visible.on.icon,
-            func: show()
+            func: show
           },
           off: {
             label: props.iconSet !== void 0 && props.iconSet.visible !== void 0 && props.iconSet.visible.off !== void 0 && props.iconSet.visible.off.label !== void 0 ? props.iconSet.visible.off.label : iconSetTemplate.value.visible.off.label,
             icon: props.iconSet !== void 0 && props.iconSet.visible !== void 0 && props.iconSet.visible.off !== void 0 && props.iconSet.visible.off.icon !== void 0 ? props.iconSet.visible.off.icon : iconSetTemplate.value.visible.off.icon,
-            func: hide()
+            func: hide
           }
         },
         embedded: {
@@ -1114,12 +1145,12 @@ export default defineComponent({
           on: {
             label: props.iconSet !== void 0 && props.iconSet.embedded !== void 0 && props.iconSet.embedded.on !== void 0 && props.iconSet.embedded.on.label !== void 0 ? props.iconSet.embedded.on.label : iconSetTemplate.value.embedded.on.label,
             icon: props.iconSet !== void 0 && props.iconSet.embedded !== void 0 && props.iconSet.embedded.on !== void 0 && props.iconSet.embedded.on.icon !== void 0 ? props.iconSet.embedded.on.icon : iconSetTemplate.value.embedded.on.icon,
-            func: lock()
+            func: lock
           },
           off: {
             label: props.iconSet !== void 0 && props.iconSet.embedded !== void 0 && props.iconSet.embedded.off !== void 0 && props.iconSet.embedded.off.label !== void 0 ? props.iconSet.embedded.off.label : iconSetTemplate.value.embedded.off.label,
             icon: props.iconSet !== void 0 && props.iconSet.embedded !== void 0 && props.iconSet.embedded.off !== void 0 && props.iconSet.embedded.off.icon !== void 0 ? props.iconSet.embedded.off.icon : iconSetTemplate.value.embedded.off.icon,
-            func: unlock()
+            func: unlock
           }
         },
         pinned: {
@@ -1127,12 +1158,12 @@ export default defineComponent({
           on: {
             label: props.iconSet !== void 0 && props.iconSet.pinned !== void 0 && props.iconSet.pinned.on !== void 0 && props.iconSet.pinned.on.label !== void 0 ? props.iconSet.pinned.on.label : iconSetTemplate.value.pinned.on.label,
             icon: props.iconSet !== void 0 && props.iconSet.pinned !== void 0 && props.iconSet.pinned.on !== void 0 && props.iconSet.pinned.on.icon !== void 0 ? props.iconSet.pinned.on.icon : iconSetTemplate.value.pinned.on.icon,
-            func: pin()
+            func: pin
           },
           off: {
             label: props.iconSet !== void 0 && props.iconSet.pinned !== void 0 && props.iconSet.pinned.off !== void 0 && props.iconSet.pinned.off.label !== void 0 ? props.iconSet.pinned.off.label : iconSetTemplate.value.pinned.off.label,
             icon: props.iconSet !== void 0 && props.iconSet.pinned !== void 0 && props.iconSet.pinned.off !== void 0 && props.iconSet.pinned.off.icon !== void 0 ? props.iconSet.pinned.off.icon : iconSetTemplate.value.pinned.off.icon,
-            func: unpin()
+            func: unpin
           }
         },
         maximize: {
@@ -1140,26 +1171,26 @@ export default defineComponent({
           on: {
             label: props.iconSet !== void 0 && props.iconSet.maximize !== void 0 && props.iconSet.maximize.on !== void 0 && props.iconSet.maximize.on.label !== void 0 ? props.iconSet.maximize.on.label : iconSetTemplate.value.maximize.on.label,
             icon: props.iconSet !== void 0 && props.iconSet.maximize !== void 0 && props.iconSet.maximize.on !== void 0 && props.iconSet.maximize.on.icon !== void 0 ? props.iconSet.maximize.on.icon : iconSetTemplate.value.maximize.on.icon,
-            func: maximize()
+            func: maximize
           },
           off: {
             label: props.iconSet !== void 0 && props.iconSet.maximize !== void 0 && props.iconSet.maximize.off !== void 0 && props.iconSet.maximize.off.label !== void 0 ? props.iconSet.maximize.off.label : iconSetTemplate.value.maximize.off.label,
             icon: props.iconSet !== void 0 && props.iconSet.maximize !== void 0 && props.iconSet.maximize.off !== void 0 && props.iconSet.maximize.off.icon !== void 0 ? props.iconSet.maximize.off.icon : iconSetTemplate.value.maximize.off.icon,
-            func: restore()
+            func: restore
           }
         },
         // TODO: commenting out until minimize functionality is completed
         // minimize: {
-        //   state: this.stateInfo.minimize !== void 0 && this.stateInfo.minimize.state !== void 0 ? this.stateInfo.minimize.state : false,
+        //   state: stateInfo.value.minimize !== void 0 && stateInfo.value.minimize.state !== void 0 ? stateInfo.value.minimize.state : false,
         //   on: {
-        //     label: this.iconSet !== void 0 && this.iconSet.minimize !== void 0 && this.iconSet.minimize.on !== void 0 && this.iconSet.minimize.on.label !== void 0 ? this.iconSet.minimize.on.label : this.iconSetTemplate.minimize.on.label,
-        //     icon: this.iconSet !== void 0 && this.iconSet.minimize !== void 0 && this.iconSet.minimize.on !== void 0 && this.iconSet.minimize.on.icon !== void 0 ? this.iconSet.minimize.on.icon : this.iconSetTemplate.minimize.on.icon,
-        //     func: this.minimize
+        //     label: props.iconSet !== void 0 && props.iconSet.minimize !== void 0 && props.iconSet.minimize.on !== void 0 && props.iconSet.minimize.on.label !== void 0 ? props.iconSet.minimize.on.label : props.iconSetTemplate.minimize.on.label,
+        //     icon: props.iconSet !== void 0 && props.iconSet.minimize !== void 0 && props.iconSet.minimize.on !== void 0 && props.iconSet.minimize.on.icon !== void 0 ? props.iconSet.minimize.on.icon : props.iconSetTemplate.minimize.on.icon,
+        //     func: minimize
         //   },
         //   off: {
-        //     label: this.iconSet !== void 0 && this.iconSet.minimize !== void 0 && this.iconSet.minimize.off !== void 0 && this.iconSet.minimize.off.label !== void 0 ? this.iconSet.minimize.off.label : this.iconSetTemplate.minimize.off.label,
-        //     icon: this.iconSet !== void 0 && this.iconSet.minimize !== void 0 && this.iconSet.minimize.off !== void 0 && this.iconSet.minimize.off.icon !== void 0 ? this.iconSet.minimize.off.icon : this.iconSetTemplate.minimize.off.icon,
-        //     func: this.restore
+        //     label: props.iconSet !== void 0 && props.iconSet.minimize !== void 0 && props.iconSet.minimize.off !== void 0 && props.iconSet.minimize.off.label !== void 0 ? props.iconSet.minimize.off.label : props.iconSetTemplate.minimize.off.label,
+        //     icon: props.iconSet !== void 0 && props.iconSet.minimize !== void 0 && props.iconSet.minimize.off !== void 0 && props.iconSet.minimize.off.icon !== void 0 ? props.iconSet.minimize.off.icon : props.iconSetTemplate.minimize.off.icon,
+        //     func: restore
         //   }
         // },
         fullscreen: {
@@ -1181,7 +1212,7 @@ export default defineComponent({
 
     function __setStateInfo(id, val) {
       if (id in stateInfo.value) {
-        stateInfo.value[id].state = val
+        stateInfo.value[ id ].state = val
         return true
       }
       return false
@@ -1190,7 +1221,7 @@ export default defineComponent({
 //
     function __getStateInfo(id) {
       if (id in stateInfo.value) {
-        return stateInfo.value[id].state
+        return stateInfo.value[ id ].state
       }
       return false
     }
@@ -1198,8 +1229,8 @@ export default defineComponent({
     function __setFullWindowPosition() {
       state.value.top = 0
       state.value.left = 0
-      state.value.bottom = this.$q.screen.height
-      state.value.right = this.$q.screen.width
+      state.value.bottom = $q.screen.height
+      state.value.right = $q.screen.width
       nextTick(() => {
         emit('position', computedPosition.value)
       })
@@ -1208,7 +1239,7 @@ export default defineComponent({
     function __setMinimizePosition() {
       const elements = document.getElementsByClassName('q-notifications__list--bottom')
       if (elements.length > 0) {
-        elements[0].appendChild(this.$el) // TODO
+        // elements[ 0 ].appendChild(this.$el) // TODO
       }
     }
 
@@ -1232,7 +1263,7 @@ export default defineComponent({
       zIndex.value = restoreState.value.zIndex
       __setStateInfo('pinned', restoreState.value.pinned)
       __setStateInfo('embedded', restoreState.value.embedded)
-      __setStateInfo('maximize', restoreState.value.maximixe)
+      __setStateInfo('maximize', restoreState.value.maximize)
       __setStateInfo('minimize', restoreState.value.minimize)
       nextTick(() => {
         emit('position', computedPosition.value)
@@ -1283,7 +1314,7 @@ export default defineComponent({
         const y = getMousePosition(e, 'y')
 
         selected.value = __canBeSelected(x - scrollX.value, y - scrollY.value)
-        if (this.selected) {
+        if (selected.value) {
           bringToFront()
         }
       }
@@ -1316,24 +1347,24 @@ export default defineComponent({
       bringToFront()
 
 
-      this.resizeHandle = resizeHandle
-      // this.selected = true
+      resizeHandle.value = resizeHandle
+      //selected.value = true
 
       // save mouse position
       mousePos.value.x = x
       mousePos.value.y = y
 
-      const rect = this.__portal.$el.getBoundingClientRect()
-      this.shiftX = getMouseShift(e, rect, 'x')
-      this.shiftY = getMouseShift(e, rect, 'y')
+      const rect = __portal.value.$el.getBoundingClientRect()
+      shiftX.value = getMouseShift(e, rect, 'x')
+      shiftY.value = getMouseShift(e, rect, 'y')
 
       // save existing position information
-      this.tmpTop = state.value.top
-      this.tmpLeft = state.value.left
-      this.tmpRight = state.value.right
-      this.tmpBottom = state.value.bottom
-      this.tmpHeight = this.tmpBottom - this.tmpTop
-      this.tmpWidth = this.tmpRight - this.tmpLeft
+      tmpTop.value = state.value.top
+      tmpLeft.value = state.value.left
+      tmpRight.value = state.value.right
+      tmpBottom.value = state.value.bottom
+      tmpHeight.value = tmpBottom.value - tmpTop.value
+      tmpWidth.value = tmpRight.value - tmpLeft.value
 
       state.value.shouldDrag = true
 
@@ -1347,15 +1378,15 @@ export default defineComponent({
     }
 
     function __addEventListeners() {
-      document.body.addEventListener('mousemove', __onMouseMove, {capture: true})
-      document.body.addEventListener('mouseup', __onMouseUp, {capture: true})
-      document.body.addEventListener('keyup', __onKeyUp, {capture: true})
+      document.body.addEventListener('mousemove', __onMouseMove, { capture: true })
+      document.body.addEventListener('mouseup', __onMouseUp, { capture: true })
+      document.body.addEventListener('keyup', __onKeyUp, { capture: true })
     }
 
     function __removeEventListeners() {
-      document.body.removeEventListener('mousemove', __onMouseMove, {capture: true})
-      document.body.removeEventListener('mouseup', __onMouseUp, {capture: true})
-      document.body.removeEventListener('keyup', __onKeyUp, {capture: true})
+      document.body.removeEventListener('mousemove', __onMouseMove, { capture: true })
+      document.body.removeEventListener('mouseup', __onMouseUp, { capture: true })
+      document.body.removeEventListener('keyup', __onKeyUp, { capture: true })
     }
 
 
@@ -1365,11 +1396,11 @@ export default defineComponent({
         prevent(e)
         __removeEventListeners()
         state.value.shouldDrag = state.value.dragging = false
-        state.value.top = this.tmpTop
-        state.value.left = this.tmpLeft
-        state.value.right = this.tmpRight
-        state.value.bottom = this.tmpBottom // TODO
-        this.$nextTick(() => {
+        state.value.top = tmpTop.value
+        state.value.left = tmpLeft.value
+        state.value.right = tmpRight.value
+        state.value.bottom = tmpBottom.value
+        nextTick(() => {
           emit('canceled', computedPosition.value)
         })
       }
@@ -1395,20 +1426,20 @@ export default defineComponent({
         }
       }
 
-      switch (resizeHandle || this.resizeHandle) {
+      switch (resizeHandle || resizeHandle.value) {
         case 'top':
-          state.value.top = mouseY - window.pageYOffset - this.shiftY
+          state.value.top = mouseY - window.pageYOffset - shiftY.value
           nextTick(() => {
             if (computedHeight.value < state.value.minHeight) {
-              state.value.top = this.tmpBottom - state.value.minHeight // TODO
+              state.value.top = tmpBottom.value - state.value.minHeight // TODO
             }
           })
           break
         case 'left':
-          state.value.left = mouseX - window.pageXOffset - this.shiftX
+          state.value.left = mouseX - window.pageXOffset - shiftX.value
           nextTick(() => {
             if (computedWidth.value < state.value.minWidth) {
-              state.value.left = this.tmpRight - state.value.minWidth // TODO
+              state.value.left = tmpRight.value - state.value.minWidth // TODO
             }
           })
           break
@@ -1416,7 +1447,7 @@ export default defineComponent({
           state.value.right = mouseX - window.pageXOffset
           nextTick(() => {
             if (computedWidth.value < state.value.minWidth) {
-              state.value.right = this.tmpLeft - state.value.minWidth // TODO
+              state.value.right = tmpLeft.value - state.value.minWidth // TODO
             }
           })
           break
@@ -1424,7 +1455,7 @@ export default defineComponent({
           state.value.bottom = mouseY - window.pageYOffset
           nextTick(() => {
             if (computedHeight.value < state.value.minHeight) {
-              state.value.bottom = this.tmpTop - state.value.minHeight // TODO
+              state.value.bottom = tmpTop.value - state.value.minHeight // TODO
             }
           })
           break
@@ -1445,15 +1476,15 @@ export default defineComponent({
           __onMouseMove(e, 'right')
           return
         case 'titlebar':
-          if (this.scrollWithWindow === true) { // TODO
-            state.value.top = mouseY - this.shiftY
-            state.value.left = mouseX - this.shiftX
+          if (props.scrollWithWindow === true) {
+            state.value.top = mouseY - shiftY.value
+            state.value.left = mouseX - shiftX.value
           } else {
-            state.value.top = mouseY - window.pageYOffset - this.shiftY
-            state.value.left = mouseX - window.pageXOffset - this.shiftX
+            state.value.top = mouseY - window.pageYOffset - shiftY.value
+            state.value.left = mouseX - window.pageXOffset - shiftX.value
           }
-          state.value.bottom = state.value.top + this.tmpHeight
-          state.value.right = state.value.left + this.tmpWidth
+          state.value.bottom = state.value.top + tmpHeight.value
+          state.value.right = state.value.left + tmpWidth.value
           break
       }
 
@@ -1477,9 +1508,9 @@ export default defineComponent({
 //
     function __onTouchMove(e, resizeHandle) {
       stopAndPrevent(e)
-      this.resizeHandle = resizeHandle // TODO
+      resizeHandle.value = resizeHandle
       // let touchY = e.touches[0].pageY
-      // let touchYDelta = touchY - (this.lastTouchY ? this.lastTouchY : 0)
+      // let touchYDelta = touchY - (lastTouchY ? lastTouchY : 0)
       // if (window.pageYOffset === 0) {
       //   // to supress pull-to-refresh preventDefault
       //   // on the overscrolling touchmove when
@@ -1499,12 +1530,12 @@ export default defineComponent({
 
     function __onTouchEnd(e, resizeHandle) {
       stopAndPrevent(e)
-      this.resizeHandle = resizeHandle // TODO
+      resizeHandle.value = resizeHandle // TODO
       __onMouseUp(e)
     }
 
 //
-    function __renderMoreItem(h, stateInfo) {
+    function __renderMoreItem(stateInfo) {
       if (stateInfo === void 0) {
         return ''
       }
@@ -1514,45 +1545,34 @@ export default defineComponent({
       }
 
       return h(QItem, {
-        attrs: {
-          key: stateInfo.key
-        },
-        directives: [
-          {
-            name: 'close-popup',
-            value: true
-          }
-        ],
-        props: {
-          clickable: true,
-          dense: this.dense
-        },
-        on: {
-          click: () => (stateInfo.state === true ? stateInfo.off.func() : stateInfo.on.func())
-        }
+        key: stateInfo.key,
+        // TODO
+        // directives: [
+        //   {
+        //     name: 'close-popup',
+        //     value: true
+        //   }
+        // ],
+        clickable: true,
+        dense: props.dense,
+        onClick: () => (stateInfo.state === true ? stateInfo.off.func() : stateInfo.on.func())
       }, [
         h(QItemSection, {
-          props: {
-            noWrap: true
-          }
+          noWrap: true
         }, stateInfo.state === true ? stateInfo.off.label : stateInfo.on.label),
         h(QItemSection, {
-          props: {
-            avatar: true
-          }
+          avatar: true
         }, [
           h(QIcon, {
-            props: {
-              name: stateInfo.state === true ? stateInfo.off.icon : stateInfo.on.icon
-            }
+            name: stateInfo.state === true ? stateInfo.off.icon : stateInfo.on.icon
           })
         ])
       ])
     }
 
 
-    function __renderMoreItems(h, menuData) {
-      return menuData.map(stateInfo => __renderMoreItem(h, stateInfo))
+    function __renderMoreItems(menuData) {
+      return menuData.map(stateInfo => __renderMoreItem(stateInfo))
     }
 
     function __renderMoreMenu(h, menuData) {
@@ -1565,97 +1585,92 @@ export default defineComponent({
       }
 
       // let user manipulate menu
-      if (this.menuFunc) { // TODO
-        this.menuFunc(menuData)
+      if (props.menuFunc) {
+        props.menuFunc(menuData)
       }
 
+      // this.setBothColors(props.color, props.backgroundColor, // TODO
       return h(QMenu, [
-        h(QList, this.setBothColors(props.color, props.backgroundColor, { // TODO
-          props: {
-            highlight: true,
-            dense: true
-          },
-          style: {
-            zIndex: (isEmbedded.value === true) ? void 0 : __computedZIndex.value + 1
-          }
-        }), [
-          ...__renderMoreItems(h, menuData)
+        h(QList, {
+          highlight: true,
+          dense: true,
+          style: [{ zIndex: (isEmbedded.value === true) ? void 0 : __computedZIndex.value + 1 }]
+        }, [
+          ...__renderMoreItems(menuData)
         ])
       ])
     }
 
 //
-    function __renderMoreButton(h, menuData) {
+    function __renderMoreButton(menuData) {
       if (props.noMenu === true) {
         return ''
       }
 
       return h(QBtn, {
-        staticClass: 'q-window__titlebar--actions',
-        props: {
-          flat: true,
-          round: true,
-          dense: true,
-          icon: 'more_vert'
-        }
+        class: 'q-window__titlebar--actions',
+        flat: true,
+        round: true,
+        dense: true,
+        icon: 'more_vert'
       }, [
-        __renderMoreMenu(h, menuData)
+        __renderMoreMenu(menuData)
       ])
     }
 
     function __renderTitle(h) {
       return h('div', {
-        staticClass: 'q-window__title col ellipsis'
+        class: 'q-window__title col ellipsis'
       }, props.title)
     }
 
-    function __renderTitlebar(h, menuData) {
+    function __renderTitlebar(menuData) {
       if (props.headless === true) {
         return ''
       }
 
-      const titlebarSlot = this.$slots.titlebar // TODO
+      const titlebarSlot = (slots.titlebar && slots.titlebar())
 
       return h('div', {
-        staticClass: __tbStaticClass.value,
-        class: props.titlebarClass,
+        class: [ __tbStaticClass.value,props.titlebarClass ],
         style: __tbStyle.value
       }, [
-        titlebarSlot === void 0 ? __renderTitle(h) : '',
-        titlebarSlot === void 0 ? __renderMoreButton(h, menuData) : '',
+        titlebarSlot === void 0 ? __renderTitle() : '',
+        titlebarSlot === void 0 ? __renderMoreButton(menuData) : '',
         titlebarSlot !== void 0 ? titlebarSlot(menuData) : '',
         (canDrag.value === true)
-        && __renderResizeHandle(h, 'titlebar', props.noMenu ? 0 : 35) // width of more button
+        && __renderResizeHandle('titlebar', props.noMenu ? 0 : 35) // width of more button
       ])
     }
 
     // grippers can visibly be seen
-    function __renderGripper(h, resizeHandle) {
+    function __renderGripper(resizeHandle) {
       if (__canResize(resizeHandle) === false) {
         return ''
       }
       const staticClass = 'gripper gripper-' + resizeHandle + (props.roundGrippers === true ? ' gripper-round' : '')
-      return h('div', this.setBorderColor(props.gripperBorderColor, this.setBackgroundColor(props.gripperBackgroundColor, { // TODO
+      // this.setBorderColor(props.gripperBorderColor, this.setBackgroundColor(props.gripperBackgroundColor,
+      return h('div', { // TODO
         ref: resizeHandle,
-        staticClass: staticClass,
+        class: staticClass,
         on: {
           mousedown: (e) => __onMouseDown(e, resizeHandle),
           touchstart: (e) => __onTouchStart(e, resizeHandle),
           touchmove: (e) => __onTouchMove(e, resizeHandle),
           touchend: (e) => __onTouchEnd(e, resizeHandle)
         }
-      })))
+      })
     }
 
     // resize handles are for when there are no grippers
-    function __renderResizeHandle(h, resizeHandle, actionsWidth) {
+    function __renderResizeHandle(resizeHandle, actionsWidth) {
       if (props.noMove && resizeHandle === 'titlebar') {
         return ''
       }
       if (resizeHandle !== 'titlebar' && __canResize(resizeHandle) === false) {
         return ''
       }
-      const staticClass = 'q-window__resize-handle ' + 'q-window__resize-handle--' + resizeHandle
+      const staticClass = 'q-window__resize-handle q-window__resize-handle--' + resizeHandle
       let width = computedWidth.value
       const style = {}
       if (actionsWidth && actionsWidth > 0 && canDrag.value === true) {
@@ -1664,7 +1679,7 @@ export default defineComponent({
       }
       return h('div', {
         ref: resizeHandle,
-        staticClass: staticClass,
+        class: staticClass,
         style: style,
         on: {
           mousedown: (e) => __onMouseDown(e, resizeHandle),
@@ -1675,30 +1690,30 @@ export default defineComponent({
       })
     }
 
-    function __renderGrippers(h) {
+    function __renderGrippers() {
       if (props.hideGrippers === true) {
         return ''
       }
-      return handles.value.map(resizeHandle => __renderGripper(h, resizeHandle))
+      return handles.value.map(resizeHandle => __renderGripper(resizeHandle))
     }
 
-    function __renderResizeHandles(h) {
+    function __renderResizeHandles() {
       if (props.hideGrippers !== true) {
         return ''
       }
-      return handles.value.map(resizeHandle => __renderResizeHandle(h, resizeHandle))
+      return handles.value.map(resizeHandle => __renderResizeHandle(resizeHandle))
     }
 
-    function __renderBody(h) {
-      const defaultScopedSlot = this.$slots.default // TODO
-      const defaultSlot = this.$slots.default // TODO
+    function __renderBody() {
+      const defaultScopedSlot = slots.default()
+      const defaultSlot = slots.default()
       return h('div', {
-        staticClass: 'q-window__body row',
+        class: 'q-window__body row',
         style: __bodyStyle.value
       }, [
-        defaultSlot || defaultScopedSlot ? defaultScopedSlot({zIndex: zIndex.value}) : '',
+        defaultSlot || defaultScopedSlot ? defaultScopedSlot({ zIndex: zIndex.value }) : '',
         (props.headless === true && canDrag.value === true)
-        && __renderResizeHandle(h, 'titlebar', props.noMenu ? 0 : 44) // width of more button
+        && __renderResizeHandle('titlebar', props.noMenu ? 0 : 44) // width of more button
 
       ])
     }
@@ -1706,16 +1721,15 @@ export default defineComponent({
     function __render(h) {
       // get stateInfo for each menu item
       const menuData = [...computedMenuData.value]
-
-      return h('div', this.setBothColors(this.color, props.backgroundColor, { // TODO
-        staticClass: 'q-window ' + __classes.value,
-        class: props.contentClass,
+    console.log(menuData)
+      return h('div', {
+        class: [ 'q-window ' + __classes.value,props.contentClass ],
         style: __style.value
-      }), [
-        (canDrag.value === true) && [...__renderResizeHandles(h)],
-        (canDrag.value === true) && [...__renderGrippers(h)],
+      }, [
+        (canDrag.value === true) && [...__renderResizeHandles()],
+        (canDrag.value === true) && [...__renderGrippers()],
         __renderTitlebar(h, menuData),
-        isMinimized.value !== true && __renderBody(h)
+        isMinimized.value !== true && __renderBody()
       ])
     }
 
@@ -1725,11 +1739,12 @@ export default defineComponent({
         parent: this,
         inheritAttrs: false,
         render: h => __render(h),
-        components: this.$options.components, // TODO
-        directives: this.$options.directives // TODO
+        //components: this.$options.components, // TODO
+        //directives: this.$options.directives // TODO
       }
 
-      __portal.value = new Vue(obj).$mount() // TODO
+      // TODO FIXME
+      __portal.value = createApp(obj).mount()
     }
 
     function __destroyPortal() {
@@ -1759,22 +1774,16 @@ export default defineComponent({
       }
     }
 
-
-    function render() {
-      return h('div', {
-        style: 'background-color: black;'
-      })
+    function renderComp() {
+      console.log(__portal.value)
+      if (__portal.value === void 0) {
+        //return __render(h)
+      }
+      return ''
     }
 
-    return () => render()
+    return renderComp()
   }
 })
 
-// import { QColorizeMixin } from 'q-colorize-mixin'
-// import canRender from 'quasar/src/mixins/can-render'
-//
-// // Utils
-// import { prevent, stopAndPrevent } from 'quasar/src/utils/event'
-//
-// mixins: [QColorizeMixin, canRender],
 

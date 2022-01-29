@@ -52,7 +52,7 @@ module.exports = {
 
   // add your custom rules here
   rules: {
-    'brace-style': [ 'error', 'stroustrup', { allowSingleLine: true } ],
+   // 'brace-style': [ 'error', 'stroustrup', { allowSingleLine: true } ],
     'prefer-const': 'error',
     'prefer-promise-reject-errors': 'off',
     'multiline-ternary': 'off',
