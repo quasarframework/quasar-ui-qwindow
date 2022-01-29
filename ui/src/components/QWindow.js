@@ -25,6 +25,7 @@ import {
   useQuasar
 } from 'quasar'
 
+
 import {
   prevent,
   stopAndPrevent
@@ -195,9 +196,6 @@ export default defineComponent({
   setup(props, { slots, emit }) {
 
     const $q = useQuasar();
-
-    // ======= REACTIVE DATA
-
     const state = ref({
       top: 10,
       left: 10,
@@ -308,8 +306,10 @@ export default defineComponent({
     const tmpWidth = ref()
     const resizeHandle = ref()
 
+    const internalInstance = getCurrentInstance() // Correct for this ?
+
     onBeforeMount(() => {
-      const internalInstance = getCurrentInstance() // Correct for this ?
+
       console.log('Internal Instance')
       console.log(internalInstance)
       id.value = ++QWindowCount
@@ -327,9 +327,12 @@ export default defineComponent({
       __destroyPortal()
     })
 
+    // Initialize here for watchers
+    __updateStateInfo()
+
     onMounted(() => {
       console.log('onMounted')
-      __updateStateInfo()
+      // __updateStateInfo()
 
       // calculate left starting position
       if (props.startX > 0) {
@@ -425,29 +428,29 @@ export default defineComponent({
     })
 
 
-    watch(() => 'stateInfo.value.visible.state', (val) => {
+    watch(() => stateInfo.value.visible.state, (val) => {
       emit('input', val)
     })
 
-    watch(() => 'stateInfo.value.embedded.state', (val) => {
-      console.log('CREATE PORTAL')
+
+    watch(() => stateInfo.value.embedded.state, (val) => {
       if (val !== true) {
         __createPortal()
         nextTick(() => {
           __showPortal()
           // this.$forceUpdate() // TODO
-        })
+        }).catch(e => console.error(e))
       } else {
         __hidePortal()
         nextTick(() => {
           __destroyPortal()
           //this.$forceUpdate() // TODO
-        })
+        }).catch(e => console.error(e))
       }
     })
 
 
-    watch(() => 'stateInfo.value.maximize.state', (val, oldVal) => {
+    watch(() => stateInfo.value.maximize.state, (val, oldVal) => {
       if (oldVal === void 0) {
         // during initialization
         return
@@ -457,17 +460,19 @@ export default defineComponent({
       }
     })
 
-    watch(() => 'stateInfo.value.minimize.state', (val, oldVal) => {
-      if (oldVal === void 0) {
-        // during initialization
-        return
-      }
-      if (val === false) {
-        __restorePositionAndState()
-      }
-    })
+    // FIXME throw error
+    // FOUND:  TODO: commenting out until minimize functionality is completed
+    // watch(() => 'stateInfo.value.minimize.state', (val, oldVal) => {
+    //   if (oldVal === void 0) {
+    //     // during initialization
+    //     return
+    //   }
+    //   if (val === false) {
+    //     __restorePositionAndState()
+    //   }
+    // })
 
-    watch(() => 'stateInfo.value.fullscreen.state', (val, oldVal) => {
+    watch(() => stateInfo.value.fullscreen.state, (val, oldVal) => {
       if (oldVal === void 0) {
         return
       }
@@ -481,17 +486,18 @@ export default defineComponent({
       emit('fullscreen', val)
     })
 
-    // watch(() => '$q.fullscreen.isActive', (val) => {
-    //   if (fullscreenInitiated.value === true) {
-    //     __setStateInfo('fullscreen', val)
-    //   }
-    // })
-    watch(() => '$q.screen.height', (val) => {
+    // FIXME: How to add AppFullscreen to lib ?
+    watch(() => $q.fullscreen.isActive, (val) => {
+      if (fullscreenInitiated.value === true) {
+        __setStateInfo('fullscreen', val)
+      }
+    })
+    watch(() => $q.screen.height, (val) => {
       if (isFullscreen.value === true) {
         state.value.bottom = val
       }
     })
-    watch(() => '$q.screen.width', (val) => {
+    watch(() => $q.screen.width, (val) => {
       if (isFullscreen.value === true) {
         state.value.right = val
       }
@@ -850,7 +856,7 @@ export default defineComponent({
         nextTick(() => {
           __setStateInfo('maximize', true)
           emit('maximize', true)
-        })
+        }).catch(e => console.error(e))
         return true
       }
       return false
@@ -887,7 +893,7 @@ export default defineComponent({
     function fullscreenEnter() {
       if (canDo('fullscreen', true)) {
         fullscreenInitiated.value = true
-        // $q.fullscreen.request()
+        // $q.fullscreen.request().catch(e  => console.error(e)) FIXME
         return true
       }
       return false
@@ -896,7 +902,7 @@ export default defineComponent({
     // leave fullscreen mode
     function fullscreenLeave() {
       if (canDo('fullscreen', false)) {
-        // $q.fullscreen.exit()
+        $q.fullscreen.exit().catch(e => console.error(e))
         return true
       }
       return false
@@ -908,7 +914,7 @@ export default defineComponent({
         // not allowed
 
       }
-      //  $q.fullscreen.isActive ? fullscreenLeave() : fullscreenEnter() // TODO
+      $q.fullscreen.isActive ? fullscreenLeave() : fullscreenEnter()
     }
 
     // bring this window to the front
@@ -1079,12 +1085,13 @@ export default defineComponent({
 
     // ============ PRIVATE  FUNCTIONS
 
-    function __canBeSelected(x, y) { // TODO
+    function __canBeSelected(x, y) {
+      return true  // FIXME sorted layer refs
       // const sortedLayers = __computedSortedLayers
       const sortedLayers = __sortedLayers()
       for (let index = sortedLayers.length - 1; index >= 0; --index) {
-        if (sortedLayers[ index ].__portal.value !== void 0) {
-          if (__isPointInRect(x, y, sortedLayers[ index ].__portal.value.$el)) {
+        if (sortedLayers[ index ].ctx.$refs.__portal.value !== void 0) { // TODO
+          if (__isPointInRect(x, y, sortedLayers[ index ].ctx.$refs.__portal.value.$el)) {
             if (sortedLayers[ index ].id === id.value) {
               return true
             } else {
@@ -1238,13 +1245,13 @@ export default defineComponent({
       state.value.right = $q.screen.width
       nextTick(() => {
         emit('position', computedPosition.value)
-      })
+      }).catch(e => console.error(e))
     }
 
     function __setMinimizePosition() {
       const elements = document.getElementsByClassName('q-notifications__list--bottom')
       if (elements.length > 0) {
-        // elements[ 0 ].appendChild(this.$el) // TODO
+        // elements[ 0 ].appendChild(this.$el) // FIXME
       }
     }
 
@@ -1272,7 +1279,7 @@ export default defineComponent({
       __setStateInfo('minimize', restoreState.value.minimize)
       nextTick(() => {
         emit('position', computedPosition.value)
-      })
+      }).catch(e => console.error(e))
     }
 
     function __addClass(el, name) {
@@ -1300,7 +1307,7 @@ export default defineComponent({
         if (isFloating.value === true) {
           nextTick(() => {
             emit('position', computedPosition.value)
-          })
+          }).catch(e => console.error(e))
         }
       }
     }
@@ -1308,6 +1315,7 @@ export default defineComponent({
 
     // mousedown for document.body
     function __onMouseDownBody(e) {
+      console.log('__onMouseDownBody')
       if (isEmbedded.value) {
         state.value.shouldDrag = state.value.dragging = false
         return
@@ -1326,8 +1334,10 @@ export default defineComponent({
     }
 
     // mousedown for element
-    function __onMouseDown(e, resizeHandle) {
-      __removeEventListeners(resizeHandle)
+    function __onMouseDown(e, resize) {
+      console.log('__onMouseDown')
+      console.log(resize)
+      __removeEventListeners(resize)
 
       selected.value = false
       if (e.touches === void 0 && e.buttons !== 1) {
@@ -1352,7 +1362,7 @@ export default defineComponent({
       bringToFront()
 
 
-      resizeHandle.value = resizeHandle
+      resizeHandle.value = resize
       //selected.value = true
 
       // save mouse position
@@ -1407,7 +1417,7 @@ export default defineComponent({
         state.value.bottom = tmpBottom.value
         nextTick(() => {
           emit('canceled', computedPosition.value)
-        })
+        }).catch(e => console.error(e))
       }
     }
 
@@ -1436,33 +1446,33 @@ export default defineComponent({
           state.value.top = mouseY - window.pageYOffset - shiftY.value
           nextTick(() => {
             if (computedHeight.value < state.value.minHeight) {
-              state.value.top = tmpBottom.value - state.value.minHeight // TODO
+              state.value.top = tmpBottom.value - state.value.minHeight
             }
-          })
+          }).catch(e => console.error(e))
           break
         case 'left':
           state.value.left = mouseX - window.pageXOffset - shiftX.value
           nextTick(() => {
             if (computedWidth.value < state.value.minWidth) {
-              state.value.left = tmpRight.value - state.value.minWidth // TODO
+              state.value.left = tmpRight.value - state.value.minWidth
             }
-          })
+          }).catch(e => console.error(e))
           break
         case 'right':
           state.value.right = mouseX - window.pageXOffset
           nextTick(() => {
             if (computedWidth.value < state.value.minWidth) {
-              state.value.right = tmpLeft.value - state.value.minWidth // TODO
+              state.value.right = tmpLeft.value - state.value.minWidth
             }
-          })
+          }).catch(e => console.error(e))
           break
         case 'bottom':
           state.value.bottom = mouseY - window.pageYOffset
           nextTick(() => {
             if (computedHeight.value < state.value.minHeight) {
-              state.value.bottom = tmpTop.value - state.value.minHeight // TODO
+              state.value.bottom = tmpTop.value - state.value.minHeight
             }
-          })
+          }).catch(e => console.error(e))
           break
         case 'top-left':
           __onMouseMove(e, 'top')
@@ -1511,9 +1521,9 @@ export default defineComponent({
     }
 
 //
-    function __onTouchMove(e, resizeHandle) {
+    function __onTouchMove(e, resize) {
       stopAndPrevent(e)
-      resizeHandle.value = resizeHandle
+      resizeHandle.value = resize
       // let touchY = e.touches[0].pageY
       // let touchYDelta = touchY - (lastTouchY ? lastTouchY : 0)
       // if (window.pageYOffset === 0) {
@@ -1533,9 +1543,9 @@ export default defineComponent({
       __onMouseDown(e, resizeHandle)
     }
 
-    function __onTouchEnd(e, resizeHandle) {
+    function __onTouchEnd(e, resize) {
       stopAndPrevent(e)
-      resizeHandle.value = resizeHandle // TODO
+      resizeHandle.value = resize
       __onMouseUp(e)
     }
 
@@ -1551,12 +1561,12 @@ export default defineComponent({
 
       return h(QItem, {
         key: stateInfo.key,
-         directives: [
-           {
-             name: 'close-popup',
-             value: true
-           }
-         ],
+        directives: [
+          {
+            name: 'close-popup',
+            value: true
+          }
+        ],
         clickable: true,
         dense: props.dense,
         onClick: () => (stateInfo.state === true ? stateInfo.off.func() : stateInfo.on.func())
@@ -1575,11 +1585,11 @@ export default defineComponent({
     }
 
 
-    function __renderMoreItems(menuData) {
+    function __renderMoreItems(h, menuData) {
       return menuData.map(stateInfo => __renderMoreItem(stateInfo))
     }
 
-    function __renderMoreMenu(menuData) {
+    function __renderMoreMenu(h, menuData) {
       // these two issues happen during early render
       if (computedActions.value.length === 0) {
         return ''
@@ -1593,20 +1603,20 @@ export default defineComponent({
         props.menuFunc(menuData)
       }
 
-      // this.setBothColors(props.color, props.backgroundColor, // TODO
-      return h(QMenu, () =>[
+      // this.setBothColors(props.color// FIXME
+      return h(QMenu, () => [
         h(QList, {
           highlight: true,
           dense: true,
-          style: [{ zIndex: (isEmbedded.value === true) ? void 0 : __computedZIndex.value + 1 }]
+          style: [ { zIndex: (isEmbedded.value === true) ? void 0 : __computedZIndex.value + 1 }, 'background-color:' + props.backgroundColor ]
         }, () => [
-          ...__renderMoreItems(menuData)
+          ...__renderMoreItems(h, menuData)
         ])
       ])
     }
 
 //
-    function __renderMoreButton(menuData) {
+    function __renderMoreButton(h, menuData) {
       if (props.noMenu === true) {
         return ''
       }
@@ -1617,18 +1627,18 @@ export default defineComponent({
         round: true,
         dense: true,
         icon: 'more_vert'
-      },  () => [
-         __renderMoreMenu(menuData)
+      }, () => [
+        __renderMoreMenu(h, menuData)
       ])
     }
 
-    function __renderTitle() {
+    function __renderTitle(h) {
       return h('div', {
         class: 'q-window__title col ellipsis'
-      },  props.title)
+      }, props.title)
     }
 
-    function __renderTitlebar(menuData) {
+    function __renderTitlebar(h, menuData) {
       if (props.headless === true) {
         return ''
       }
@@ -1639,35 +1649,32 @@ export default defineComponent({
         class: [ __tbStaticClass.value, props.titlebarClass ],
         style: __tbStyle.value
       }, [
-        titlebarSlot === void 0 ? __renderTitle() : '',
-        titlebarSlot === void 0 ? __renderMoreButton(menuData) : '',
+        titlebarSlot === void 0 ? __renderTitle(h) : '',
+        titlebarSlot === void 0 ? __renderMoreButton(h, menuData) : '',
         titlebarSlot !== void 0 ? titlebarSlot(menuData) : '',
-       (canDrag.value === true) && __renderResizeHandle('titlebar', props.noMenu ? 0 : 35) // width of more button
+        (canDrag.value === true) && __renderResizeHandle(h, 'titlebar', props.noMenu ? 0 : 35) // width of more button
       ])
     }
 
     // grippers can visibly be seen
-    function __renderGripper(resizeHandle) {
+    function __renderGripper(h, resizeHandle) {
       if (__canResize(resizeHandle) === false) {
         return ''
       }
       const staticClass = 'gripper gripper-' + resizeHandle + (props.roundGrippers === true ? ' gripper-round' : '')
-      // this.setBorderColor(props.gripperBorderColor, this.setBackgroundColor(props.gripperBackgroundColor,
       return h('div', {
         ref: resizeHandle,
         class: staticClass,
-        style: 'background-color: #000; border: 1px solid #000',
-        on: {
-          mousedown: (e) => __onMouseDown(e, resizeHandle),
-          touchstart: (e) => __onTouchStart(e, resizeHandle),
-          touchmove: (e) => __onTouchMove(e, resizeHandle),
-          touchend: (e) => __onTouchEnd(e, resizeHandle)
-        }
+        style: 'background-color: #000; border: 1px solid #000', // FIXME
+        onMousedown: (e) => __onMouseDown(e, resizeHandle),
+        onTouchstart: (e) => __onTouchStart(e, resizeHandle),
+        onTouchmove: (e) => __onTouchMove(e, resizeHandle),
+        onTouchend: (e) => __onTouchEnd(e, resizeHandle)
       })
     }
 
     // resize handles are for when there are no grippers
-    function __renderResizeHandle(resizeHandle, actionsWidth) {
+    function __renderResizeHandle(h, resizeHandle, actionsWidth) {
       if (props.noMove && resizeHandle === 'titlebar') {
         return ''
       }
@@ -1685,33 +1692,29 @@ export default defineComponent({
         ref: resizeHandle,
         class: staticClass,
         style: style,
-        on: {
-          mousedown: (e) => __onMouseDown(e, resizeHandle),
-          touchstart: (e) => __onTouchStart(e, resizeHandle),
-          touchmove: (e) => __onTouchMove(e, resizeHandle),
-          touchend: (e) => __onTouchEnd(e, resizeHandle)
-        }
+        onMousedown: (e) => __onMouseDown(e, resizeHandle),
+        onTouchstart: (e) => __onTouchStart(e, resizeHandle),
+        onTouchmove: (e) => __onTouchMove(e, resizeHandle),
+        onTouchend: (e) => __onTouchEnd(e, resizeHandle)
       })
     }
 
-    function __renderGrippers() {
+    function __renderGrippers(h) {
       if (props.hideGrippers === true) {
         return ''
       }
-      return handles.value.map(resizeHandle => __renderGripper(resizeHandle))
+      return handles.value.map(resizeHandle => __renderGripper(h, resizeHandle))
     }
 
-    function __renderResizeHandles() {
+    function __renderResizeHandles(h) {
       if (props.hideGrippers !== true) {
         return ''
       }
-      return handles.value.map(resizeHandle => __renderResizeHandle(resizeHandle))
+      return handles.value.map(resizeHandle => __renderResizeHandle(h, resizeHandle))
     }
 
     function __renderBody() {
       const slot = slots && slots.default
-      console.log('SLOT:')
-      console.log(slot)
       return h('div', {
         class: 'q-window__body row',
         style: __bodyStyle.value
@@ -1723,36 +1726,38 @@ export default defineComponent({
       ])
     }
 
-    function __render() {
+    function __render(h) {
       // get stateInfo for each menu item
       const menuData = [...computedMenuData.value]
-      console.log(menuData)
       return h('div', {
         class: [ 'q-window ' + __classes.value, props.contentClass ],
         style: __style.value
       }, [
-        (canDrag.value === true) && [...__renderResizeHandles()],
-        (canDrag.value === true) && [...__renderGrippers()],
-        __renderTitlebar(menuData),
-        isMinimized.value !== true && __renderBody()
+        (canDrag.value === true) && [...__renderResizeHandles(h)],
+        (canDrag.value === true) && [...__renderGrippers(h)],
+        __renderTitlebar(h, menuData),
+        isMinimized.value !== true && __renderBody(h)
       ])
     }
 
     function __createPortal() {
       const obj = {
         name: 'QWindowPortal',
-        parent: this,
+        parent: internalInstance.parent,
         inheritAttrs: false,
         render: h => __render(h),
-        //components: this.$options.components, // TODO
-        //directives: this.$options.directives // TODO
+       // components: this.$options.components, // TODO
+      //  directives: this.$options.directives // TODO
       }
 
-      // TODO FIXME
-      __portal.value = createApp(obj).mount()
+      // TODO FIXME FIXME FIXME
+      const app = createApp(obj).mount()
+      //  Saved in portal the deleted?
+      __portal.value = app
     }
 
     function __destroyPortal() {
+      console.log('DESTROY PORTAL')
       if (__portal.value) {
         __portal.value.$destroy()
         __portal.value.$el.remove()
@@ -1782,7 +1787,7 @@ export default defineComponent({
     function renderComp() {
       console.log(__portal.value)
       if (__portal.value === void 0) {
-        return __render()
+        return __render(h)
       }
       return {}
     }
