@@ -12,7 +12,7 @@ export default {
   QWindow,
 
   install (Vue) {
-    console.log('WAJJJJJJJJJ')
+    console.log('WAJJJJJJdasdadadsdfsdfsdfsdfdasddasdJJJ')
     Vue.component(QWindow.name, QWindow)
   }
 }

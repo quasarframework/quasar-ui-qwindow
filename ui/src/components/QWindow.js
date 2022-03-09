@@ -9,7 +9,8 @@ import {
   ref,
   nextTick,
   createApp,
-  getCurrentInstance
+  getCurrentInstance,
+  reactive
 } from 'vue'
 
 import {
@@ -192,7 +193,6 @@ export default defineComponent({
     'beforeDrag',
     'afterDrag'
   ],
-
   setup(props, { slots, emit }) {
 
     const $q = useQuasar();
@@ -290,7 +290,7 @@ export default defineComponent({
         }
       }
     })
-    const __portal = ref()
+    const portal = ref()
     const id = ref(0)
 
 
@@ -306,14 +306,15 @@ export default defineComponent({
     const tmpWidth = ref()
     const resizeHandle = ref()
 
-    const internalInstance = getCurrentInstance() // Correct for this ?
+    const internalInstance = getCurrentInstance()
+
 
     onBeforeMount(() => {
-
+      console.log("WAJHJJGHHJJKBHJB")
       console.log('Internal Instance')
       console.log(internalInstance)
       id.value = ++QWindowCount
-      layers[ id.value ] = { window: internalInstance } // TODO this
+      layers[ id.value ] = { window: internalInstance }
     })
 
     onBeforeUnmount(() => {
@@ -332,7 +333,7 @@ export default defineComponent({
 
     onMounted(() => {
       console.log('onMounted')
-      // __updateStateInfo()
+       __updateStateInfo()
 
       // calculate left starting position
       if (props.startX > 0) {
@@ -1086,21 +1087,36 @@ export default defineComponent({
     // ============ PRIVATE  FUNCTIONS
 
     function __canBeSelected(x, y) {
-      return true  // FIXME sorted layer refs
+      return true
+      // const sortedLayers = __sortedLayers()
+      // for (let index = sortedLayers.length - 1; index >= 0; --index) {
+      //   if (sortedLayers[ index ].__portal.value !== void 0) {
+      //     if (__isPointInRect(x, y, sortedLayers[ index ].__portal.value.$el)) {
+      //       if (sortedLayers[ index ].id === id.value) {
+      //         return true
+      //       }
+      //       else {
+      //         return false
+      //       }
+      //     }
+      //   }
+      // }
+      // return false
+      //
       // const sortedLayers = __computedSortedLayers
-      const sortedLayers = __sortedLayers()
-      for (let index = sortedLayers.length - 1; index >= 0; --index) {
-        if (sortedLayers[ index ].ctx.$refs.__portal.value !== void 0) { // TODO
-          if (__isPointInRect(x, y, sortedLayers[ index ].ctx.$refs.__portal.value.$el)) {
-            if (sortedLayers[ index ].id === id.value) {
-              return true
-            } else {
-              return false
-            }
-          }
-        }
-      }
-      return false
+      // const sortedLayers = __sortedLayers()
+      // for (let index = sortedLayers.length - 1; index >= 0; --index) {
+      //   if (sortedLayers[ index ].ctx.$refs.__portal.value !== void 0) { // TODO
+      //     if (__isPointInRect(x, y, sortedLayers[ index ].ctx.$refs.__portal.value.$el)) {
+      //       if (sortedLayers[ index ].id === id.value) {
+      //         return true
+      //       } else {
+      //         return false
+      //       }
+      //     }
+      //   }
+      // }
+      // return false
     }
 
     function __isPointInRect(x, y, el) {
@@ -1251,7 +1267,7 @@ export default defineComponent({
     function __setMinimizePosition() {
       const elements = document.getElementsByClassName('q-notifications__list--bottom')
       if (elements.length > 0) {
-        // elements[ 0 ].appendChild(this.$el) // FIXME
+         elements[ 0 ].appendChild(internalInstance.ctx.$el)
       }
     }
 
@@ -1369,7 +1385,7 @@ export default defineComponent({
       mousePos.value.x = x
       mousePos.value.y = y
 
-      const rect = __portal.value.$el.getBoundingClientRect()
+      const rect = portal.value.$el.getBoundingClientRect()
       shiftX.value = getMouseShift(e, rect, 'x')
       shiftY.value = getMouseShift(e, rect, 'y')
 
@@ -1423,6 +1439,8 @@ export default defineComponent({
 
 
     function __onMouseMove(e, resizeHandle) {
+      console.log('__onMouseDown')
+      console.log(resizeHandle)
       if (state.value.shouldDrag !== true || (e.touches === void 0 && e.buttons !== 1)) {
         __removeEventListeners()
         return
@@ -1549,7 +1567,6 @@ export default defineComponent({
       __onMouseUp(e)
     }
 
-//
     function __renderMoreItem(stateInfo) {
       if (stateInfo === void 0) {
         return ''
@@ -1743,50 +1760,69 @@ export default defineComponent({
     function __createPortal() {
       const obj = {
         name: 'QWindowPortal',
-        parent: internalInstance.parent,
+        parent: internalInstance.ctx,
         inheritAttrs: false,
-        render: h => __render(h),
-       // components: this.$options.components, // TODO
-      //  directives: this.$options.directives // TODO
+        $q: $q,
+
+        render() {
+          return __render(h)
+        },
+        components: internalInstance.ctx.$options.components,
+        directives: internalInstance.ctx.$options.directives
       }
 
-      // TODO FIXME FIXME FIXME
-      const app = createApp(obj).mount()
+      // TODO FIXME
+      const app = createApp(obj)
+      app.config.globalProperties.$q = $q
+      app.config.errorHandler = (err) => {
+       console.error(err)
+      }
       //  Saved in portal the deleted?
-      __portal.value = app
+
+      const component = app.mount("#q-app")
+      portal.value = component
+
+      console.log('VM:')
+      console.log(internalInstance.appContext)
+
+
+      console.log(app)
+      console.log('========================PORTAL')
+      console.log(portal.value)
     }
 
     function __destroyPortal() {
       console.log('DESTROY PORTAL')
-      if (__portal.value) {
-        __portal.value.$destroy()
-        __portal.value.$el.remove()
-        __portal.value = void 0
+      if (portal.value) {
+        portal.value.$destroy()
+        portal.value.$el.remove()
+        portal.value = void 0
       }
     }
 
     function __showPortal() {
-      if (__portal.value !== void 0 && __portal.value.showing !== true) {
-        const app = document.getElementById('q-app')
+      if (portal.value !== void 0 && portal.value.showing !== true) {
+        const app = document.getElementById('#qwindow')
         if (app) {
-          app.appendChild(__portal.value.$el)
+          app.appendChild(portal.value.$el)
         } else {
-          document.body.appendChild(__portal.value.$el)
+          document.body.appendChild(portal.value.$el)
         }
-        __portal.value.showing = true
+        portal.value.showing = true
       }
     }
 
     function __hidePortal() {
-      if (__portal.value !== void 0 && __portal.value.showing === true) {
-        __portal.value.$el.remove()
-        __portal.value.showing = false
+      if (portal.value !== void 0 && portal.value.showing === true) {
+        portal.value.$el.remove()
+        portal.value.showing = false
       }
     }
 
     function renderComp() {
-      console.log(__portal.value)
-      if (__portal.value === void 0) {
+      console.log(portal.value)
+      if (portal.value === void 0) {
+        console.log(h)
         return __render(h)
       }
       return {}
@@ -1794,6 +1830,8 @@ export default defineComponent({
 
     return () => renderComp()
   }
+
+
 })
 
 

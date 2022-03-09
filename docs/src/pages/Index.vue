@@ -8,7 +8,7 @@
 
 <script>
 import { defineComponent } from 'vue';
-import Actions from "components/Actions";
+import Actions from "components/ActionView";
 
 export default defineComponent({
   name: 'PageIndex',

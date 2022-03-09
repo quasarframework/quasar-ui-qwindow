@@ -1,5 +1,9 @@
 <template>
   <div class="q-ma-md" style="max-width: 800px; width: 100%">
+    <div id="qwindow">
+
+    </div>
+
     <q-window
       v-model="visible"
       title="QWindow Actions"
