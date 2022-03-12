@@ -48,7 +48,10 @@
     "attributes": "dist/vetur/attributes.json"
   },
   "dependencies": {
-    "q-colorize-mixin": "^1.0.10"
+    "@xstate/fsm": "^1.6.5",
+    "@xstate/vue": "^1.0.0",
+    "q-colorize-mixin": "^1.0.10",
+    "xstate": "^4.30.5"
   },
   "devDependencies": {
     "@babel/core": "^7.15.8",
@@ -60,8 +63,8 @@
     "@rollup/plugin-node-resolve": "^13.0.6",
     "@rollup/plugin-replace": "^3.0.0",
     "@types/node": "^16.11.5",
-    "@typescript-eslint/parser": "^5.1.0",
     "@typescript-eslint/eslint-plugin": "^5.1.0",
+    "@typescript-eslint/parser": "^5.1.0",
     "autoprefixer": "^10.3.7",
     "babel-eslint": "^10.1.0",
     "chalk": "^4.1.0",
