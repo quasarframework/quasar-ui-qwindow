@@ -50,8 +50,25 @@ export const qWindowMachine = createMachine({
         RESTORE: {
           actions: [ 'restore', 'menu' ],
           target: 'idle',
+        },
+        mousedown: {
+          target: 'dragging',
+          actions: ['onMouseDown']
         }
+
       }
+    },
+    dragging: {
+        on: {
+          mousemove: {
+            target: 'dragging',
+            actions: 'onMouseMove'
+          },
+          mouseup: {
+            target: 'idle',
+            actions: ['onMouseUp']
+          }
+        }
     },
     requestFullscreen: {
       invoke: {

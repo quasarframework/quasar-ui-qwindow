@@ -28,6 +28,7 @@ import useBody from "./composables/useBody";
 import { qWindowMachine } from "./composables/machine";
 import { assign } from "@xstate/fsm";
 import useResize from "./composables/useResize";
+import useStyle from "./composables/useStyle";
 
 
 // import { QColorizeMixin } from 'q-colorize-mixin'
@@ -290,31 +291,24 @@ export default defineComponent({
     QWindowCount = QWindowCount + 1
     const $q = useQuasar()
     const windowRef = ref(null)
-    onMounted(() => {
-      send('UPDATE_MENU_ACTIONS', { value: props.actions })
-      // calculate left starting position
-      if (props.startX > 0) {
-        states.value.left = props.startX
-      } else {
-        state.left = defaultX * QWindowCount
-      }
+    const zIndex = ref(4000)
+    const mouseOffsetX = ref(-1) // FIXME unused ?
+    const mouseOffsetY = ref(-1) // FIXME unused ?
+    const mousePos = ref({ x: 0, y: 0 })
+    const scrollX = ref(0)
+    const scrollY = ref(0)
+    const selected = ref(false)
+    const fullscreenInitiated = ref(false)
 
-      // calculate top starting position
-      if (props.startY > 0) {
-        states.value.top = props.startY
-      } else {
-        states.value.top = defaultY * QWindowCount
-      }
-
-      // calculate right and bottom starting positions
-      states.value.right = states.value.left + props.width
-      states.value.bottom = states.value.top + props.height
-    })
-
+    const {removeClass,addClass} = useStyle()
 
     let context;
     const { state, send, service } = useMachine(qWindowMachine, {
         context: {
+          mX: 0,
+          mY: 0,
+          mOffsetX: 0,
+          mOffsetY: 0,
           menuData: [],
           actions: {
             visible: {
@@ -459,7 +453,7 @@ export default defineComponent({
               }
             }
           }),
-          minimize: assign((ctx, evt) => {
+          minimize: assign((ctx) => {
             savePositionAndState()
 
             // TODO LOGIC
@@ -476,18 +470,18 @@ export default defineComponent({
               }
             }
           }),
-          fullscreenLeave: assign((ctx, evt) => {
+          fullscreenLeave: assign((ctx) => {
             restorePositionAndState()
             return emitAndAssign(MENU_ITEM_FULLSCREEN, false, ctx)
           }),
-          fullScreenEnter: assign(async (ctx, evt) => {
+          fullScreenEnter: assign(async (ctx) => {
             fullscreenInitiated.value = true
             savePositionAndState()
             zIndex.value = maxZIndex
             return emitAndAssign(MENU_ITEM_FULLSCREEN, true, ctx)
           }),
-          restore: assign((ctx, evt) => {
-            if (ctx.actions[ MENU_ITEM_VISIBLE ].state) {
+          restore: assign((ctx) => {
+            if (ctx.actions[ MENU_ITEM_VISIBLE ].state !== true) {
               return ctx
             }
 
@@ -498,12 +492,114 @@ export default defineComponent({
               return emitAndAssign(MENU_ITEM_MAXIMIZE, false, ctx)
             }
           }),
+          onMouseDown: assign((ctx, evt) => {
+            //this.__removeEventListeners(resizeHandle)
+
+            // this.selected = false
+            if (evt.touches === void 0 && evt.buttons !== 1) {
+              return
+            }
+
+            if (ctx.actions.embedded.state === true) {
+              states.value.shouldDrag = states.value.dragging = false
+              return
+            }
+
+            const x = getMousePosition(evt, 'x')
+            const y = getMousePosition(evt, 'y')
+
+            //  can window be selected
+            //this.selected = this.__canBeSelected(x - this.scrollX, y - this.scrollY)
+            //if (!this.selected) {
+            //  return
+            //}
+
+            // bring window to front
+            //this.bringToFront()
+
+
+            //  this.resizeHandle = resizeHandle
+            // this.selected = true
+
+
+            //const rect = this.__portal.$el.getBoundingClientRect()
+            //shiftX = getMouseShift(e, rect, 'x')
+            //this.shiftY = getMouseShift(e, rect, 'y')
+
+            // save existing position information
+            // tmpTop = this.state.top
+            // this.tmpLeft = this.state.left
+            //this.tmpRight = this.state.right
+            // this.tmpBottom = this.state.bottom
+            // this.tmpHeight = this.tmpBottom - this.tmpTop
+            //this.tmpWidth = this.tmpRight - this.tmpLeft
+
+            states.value.shouldDrag = true
+
+            addEventListeners()
+            if (evt.touches !== void 0) {
+              addClass(document.body, 'q-window__touch-action')
+            }
+
+            // stopAndPrevent(e)
+            // prevent(e) TODO whewre i call it ?
+
+
+            return {
+              ...ctx,
+              mX: x,
+              mY: y,
+
+            }
+          }),
+          onMouseMove: assign((ctx, evt) => {
+            if (states.value.shouldDrag !== true || (evt.touches === void 0 && evt.buttons !== 1)) {
+              removeEventListeners()
+              return
+            }
+
+            const mouseX = getMousePosition(evt, 'x')
+            const mouseY = getMousePosition(evt, 'y')
+
+
+            // wait 3 pixel move to initiate drag
+            if (states.value.dragging !== true) {
+              if (Math.abs(ctx.mX - mouseX) >= 3 || Math.abs(ctx.mY - mouseY) >= 3) {
+                states.value.dragging = true
+              }
+              else {
+                return
+              }
+            }
+
+
+            console.info('ON MOUSE EVENT')
+            return {
+              ...ctx,
+              mX: mouseX,
+              mY: mouseY
+            }
+          }),
+          onMouseUp: assign((ctx, evt) => {
+            console.info('REMOVE EVENT LISTENER')
+            //removeEventListeners()
+            if (states.value.dragging === true) {
+              //prevent(e)
+              removeEventListeners()
+              if (evt.touches !== void 0) {
+                removeClass(document.body, 'q-window__touch-action')
+              }
+              states.value.shouldDrag = states.value.dragging = false
+            }
+
+
+          })
         },
         services: {
-          openFullscreen: (context, event) => {
+          openFullscreen: () => {
             return AppFullscreen.request(windowRef.value)
           },
-          closeFullscreen: (context, event) => {
+          closeFullscreen: () => {
             return AppFullscreen.exit()
           }
         },
@@ -527,6 +623,9 @@ export default defineComponent({
         }
       }
     }
+
+
+
 
     function setFullWindowPosition() {
       states.value.top = 0
@@ -634,10 +733,53 @@ export default defineComponent({
       return false
     }
 
+
     service.onTransition((state) => {
       context = state.context
-      console.log(state)
+      // console.log(state)
+      console.log(state.context)
     })
+
+
+    onMounted(() => {
+      send('UPDATE_MENU_ACTIONS', { value: props.actions })
+      // calculate left starting position
+      if (props.startX > 0) {
+        states.value.left = props.startX
+      } else {
+        state.left = defaultX * QWindowCount
+      }
+
+      // calculate top starting position
+      if (props.startY > 0) {
+        states.value.top = props.startY
+      } else {
+        states.value.top = defaultY * QWindowCount
+      }
+
+      // calculate right and bottom starting positions
+      states.value.right = states.value.left + props.width
+      states.value.bottom = states.value.top + props.height
+
+
+      // document.addEventListener('scroll', this.__onScroll, { passive: true })
+      // set up mousedown on body (so windows can deselect themselves on outside click)
+      // document.body.addEventListener('mousedown', this.__onMouseDownBody, { passive: false })
+
+    })
+
+    function addEventListeners() {
+      document.body.addEventListener('mousemove', (evt) => send(evt), { capture: true })
+      document.body.addEventListener('mouseup', (evt) => send(evt), { capture: true })
+      document.body.addEventListener('keyup', (evt) => send(evt), { capture: true })
+    }
+
+    function removeEventListeners() {
+      document.body.removeEventListener('mousemove', (evt) => send(evt), { capture: true })
+      document.body.removeEventListener('mouseup', (evt) => send(evt), { capture: true })
+      document.body.removeEventListener('keyup', (evt) => send(evt), { capture: true })
+    }
+
 
     watch(() => $q.fullscreen.isActive, (isActive) => {
       if (isActive === false && state.value.context.actions.fullscreen.state === true) {
@@ -680,23 +822,13 @@ export default defineComponent({
     }
 
     const canDrag = () => {
-      return true;
-      //this.isVisible === true &&
-      //this.isEmbedded !== true &&
-      // this.isPinned !== true &&
-      // this.isFullscreen !== true &&
-      // this.isMaximized !== true &&
-      // this.isMinimized !== true
+      return state.value.context.actions.visible.state === true
+        && state.value.context.actions.embedded.state !== true
+        && state.value.context.actions.pinned.state !== true
+        && state.value.context.actions.fullscreen.state !== true
+        && state.value.context.actions.maximize.state !== true
+        && state.value.context.actions.minimize.state !== true;
     }
-
-    const zIndex = ref(4000)
-    const mouseOffsetX = ref(-1) // FIXME unused ?
-    const mouseOffsetY = ref(-1) // FIXME unused ?
-    const mousePos = ref({ x: 0, y: 0 })
-    const scrollX = ref(0)
-    const scrollY = ref(0)
-    const selected = ref(false)
-    const fullscreenInitiated = ref(false)
 
 
     const isDisabled = computed(() => {
@@ -853,13 +985,14 @@ export default defineComponent({
       return classStyle
     })
 
-
-    const { renderTitleBar } = useToolbar(props, slots, state, send, __computedZIndex)
-    const { renderBody } = useBody(props, slots, computedHeight, computedToolbarHeight, zIndex, state)
     const {
       renderGrippers,
-      renderResizeHandles
-    } = useResize(props, slots, computedHeight, computedToolbarHeight, zIndex, state, canDrag, computedWidth)
+      renderResizeHandles,
+      renderResizeHandle
+    } = useResize(props, slots, computedHeight, computedToolbarHeight, zIndex, state, canDrag, computedWidth, send)
+    const { renderTitleBar } = useToolbar(props, slots, state, send, __computedZIndex, renderResizeHandle, canDrag)
+    const { renderBody } = useBody(props, slots, computedHeight, computedToolbarHeight, zIndex, state)
+
 
     function renderWindow() {
       return h('div', {
@@ -868,8 +1001,6 @@ export default defineComponent({
         to: '#q-app',
         disabled: props.modelValue,
         ref: windowRef,
-        refInFor: true,
-        key: QWindowCount
       }, [
         (canDrag() === true) && [...renderResizeHandles()],
         (canDrag() === true) && [...renderGrippers()],
@@ -880,11 +1011,11 @@ export default defineComponent({
 
     function render() {
       return h(Teleport, {
-        key: QWindowCount,
         to: 'body',
         disabled: props.modelValue
       }, [renderWindow()])
     }
+
     return () => render()
   }
 })

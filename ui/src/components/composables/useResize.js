@@ -1,8 +1,8 @@
 import { h, ref } from "vue";
+import { prevent, stopAndPrevent } from 'quasar/src/utils/event'
 
 
-
-export default function useResize(props, slots, computedHeight, computedToolbarHeight, zIndex, state, canDrag, computedWidth) {
+export default function useResize(props, slots, computedHeight, computedToolbarHeight, zIndex, state, canDrag, computedWidth, send) {
 
   const handles = ref([
     'top',
@@ -46,7 +46,7 @@ export default function useResize(props, slots, computedHeight, computedToolbarH
 
 // resize handles are for when there are no grippers
   function renderResizeHandle(resizeHandle, actionsWidth) {
-    if (this.noMove && resizeHandle === 'titlebar') {
+    if (props.noMove && resizeHandle === 'titlebar') {
       return ''
     }
     if (resizeHandle !== 'titlebar' && canResize(resizeHandle) === false) {
@@ -61,9 +61,9 @@ export default function useResize(props, slots, computedHeight, computedToolbarH
     }
     return h('div', {
       ref: resizeHandle,
-      class: `q-window__resize-handle ' + 'q-window__resize-handle--${ resizeHandle }`,
+      class: [ 'q-window__resize-handle', `q-window__resize-handle--${ resizeHandle }` ],
       style: style,
-      onMousedown: (e) => console.log(`MouseDown: ${ e }`),
+      onMousedown: (e) => send(e),
       onTouchstart: (e) => console.log(`Touchstart: ${ e }`),
       onTouchmove: (e) => console.log(`Touchmove: ${ e }`),
       onTouchend: (e) => console.log(`Touchend: ${ e }`)
@@ -94,6 +94,7 @@ export default function useResize(props, slots, computedHeight, computedToolbarH
 
   return {
     renderGrippers,
-    renderResizeHandles
+    renderResizeHandles,
+    renderResizeHandle
   }
 }

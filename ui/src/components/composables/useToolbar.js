@@ -3,7 +3,7 @@ import { computed, h, withDirectives, resolveDirective } from "vue";
 import { MENU_ITEM_SEPARATOR } from "../QWindow";
 
 const CLOSE_POPUP_DIRECTIVE_NAME = 'close-popup';
-export default function useToolbar(props, slots, state, send, __computedZIndex) {
+export default function useToolbar(props, slots, state, send, __computedZIndex, renderResizeHandle, canDrag) {
 
   const tbHeight = computed(() => {
     return props.headless === true ? 0 : props.dense === true ? 28 : 40
@@ -119,7 +119,7 @@ export default function useToolbar(props, slots, state, send, __computedZIndex) 
       titlebarSlot === void 0 ? renderTitle() : '',
       titlebarSlot === void 0 ? renderMenuButton(menuData) : '',
       titlebarSlot !== void 0 ? titlebarSlot(menuData) : '',
-      //  (canDrag.value === true) && __renderResizeHandle(h, 'titlebar', props.noMenu ? 0 : 35) // width of more button
+      (canDrag() === true) && renderResizeHandle('titlebar', props.noMenu ? 0 : 35) // width of more button
     ])
   }
 
