@@ -13,7 +13,7 @@ export default function useToolbar(props, slots, state, send, __computedZIndex) 
     return 'q-window__titlebar'
       + (props.hideToolbarDivider !== true ? ' q-window__titlebar--divider' : '')
       + (props.dense === true ? ' q-window__titlebar--dense' : '')
-      + (state.value.context.actions.embedded.state !== true && state.value.context.actions.minimized.state !== true ? ' absolute' : '')
+      + (state.value.context.actions.embedded.state !== true && state.value.context.actions.minimize.state !== true ? ' absolute' : '')
       // + (isDragging.value === true ? ' q-window__touch-action' : '')
       + ' row justify-between items-center'
   })
@@ -45,7 +45,7 @@ export default function useToolbar(props, slots, state, send, __computedZIndex) 
       key: stateInfo.key,
       clickable: true,
       dense: props.dense,
-      onClick: () => (stateInfo.state === true ? send(stateInfo.off.action) : send(stateInfo.on.action))
+      onClick: () => send(stateInfo.name)
     }, () => [
       h(QItemSection, {
         noWrap: true

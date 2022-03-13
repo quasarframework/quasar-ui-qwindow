@@ -27,7 +27,7 @@ import useToolbar from "./composables/useToolbar";
 import useBody from "./composables/useBody";
 import { qWindowMachine } from "./composables/machine";
 import { assign } from "@xstate/fsm";
-
+import useResize from "./composables/useResize";
 
 
 // import { QColorizeMixin } from 'q-colorize-mixin'
@@ -47,7 +47,7 @@ const startingZIndex = 4000
 const maxZIndex = 6000 - 100
 
 // number of windows registered globally
-const QWindowCount = 0
+let QWindowCount = 0
 
 // layered windows
 const layers = {}
@@ -205,11 +205,11 @@ export default defineComponent({
     const iconSetTemplate = ref({
       visible: {
         on: {
-          icon: MENU_ITEM_CLOSE,
+          icon: 'close',
           label: 'Show'
         },
         off: {
-          icon: MENU_ITEM_CLOSE,
+          icon: 'close',
           label: 'Hide'
         }
       },
@@ -245,14 +245,24 @@ export default defineComponent({
       },
       fullscreen: {
         on: {
-          icon: MENU_ITEM_FULLSCREEN,
+          icon: 'fullscreen',
           label: 'Enter fullscreen'
         },
         off: {
           icon: 'fullscreen_exit',
           label: 'Leave fullscreen'
         }
-      }
+      },
+      minimize: {
+        on: {
+          icon: 'arrow_downward',
+          label: 'Minimize'
+        },
+        off: {
+          icon: 'restore',
+          label: 'Restore'
+        }
+      },
     })
 
     const states = ref({
@@ -277,22 +287,22 @@ export default defineComponent({
       maximize: false,
       minimize: false
     })
+    QWindowCount = QWindowCount + 1
     const $q = useQuasar()
-   const windowRef = ref()
+    const windowRef = ref(null)
     onMounted(() => {
+      send('UPDATE_MENU_ACTIONS', { value: props.actions })
       // calculate left starting position
       if (props.startX > 0) {
         states.value.left = props.startX
-      }
-      else {
+      } else {
         state.left = defaultX * QWindowCount
       }
 
       // calculate top starting position
       if (props.startY > 0) {
         states.value.top = props.startY
-      }
-      else {
+      } else {
         states.value.top = defaultY * QWindowCount
       }
 
@@ -302,104 +312,91 @@ export default defineComponent({
     })
 
 
-
     let context;
     const { state, send, service } = useMachine(qWindowMachine, {
         context: {
           menuData: [],
           actions: {
-            menu: [],
-            floating: {
-              state: false
-            },
             visible: {
               state: true,
+              name: 'VISIBLE',
               on: {
                 label: props.iconSet !== void 0 && props.iconSet.visible !== void 0 && props.iconSet.visible.on !== void 0 && props.iconSet.visible.on.label !== void 0 ? this.iconSet.visible.on.label : iconSetTemplate.value.visible.on.label,
                 icon: props.iconSet !== void 0 && props.iconSet.visible !== void 0 && props.iconSet.visible.on !== void 0 && props.iconSet.visible.on.icon !== void 0 ? this.iconSet.visible.on.icon : iconSetTemplate.value.visible.on.icon,
-                action: 'SHOW'
               },
               off: {
                 label: props.iconSet !== void 0 && props.iconSet.visible !== void 0 && props.iconSet.visible.off !== void 0 && props.iconSet.visible.off.label !== void 0 ? this.iconSet.visible.off.label : iconSetTemplate.value.visible.off.label,
                 icon: props.iconSet !== void 0 && props.iconSet.visible !== void 0 && props.iconSet.visible.off !== void 0 && props.iconSet.visible.off.icon !== void 0 ? this.iconSet.visible.off.icon : iconSetTemplate.value.visible.off.icon,
-                action: 'HIDE'
               }
             },
             embedded: {
               state: true,
+              name: 'EMBED',
               on: {
-                action: 'LOCK',
                 label: props.iconSet !== void 0 && props.iconSet.embedded !== void 0 && props.iconSet.embedded.on !== void 0 && props.iconSet.embedded.on.label !== void 0 ? props.iconSet.embedded.on.label : iconSetTemplate.value.embedded.on.label,
                 icon: props.iconSet !== void 0 && props.iconSet.embedded !== void 0 && props.iconSet.embedded.on !== void 0 && props.iconSet.embedded.on.icon !== void 0 ? props.iconSet.embedded.on.icon : iconSetTemplate.value.embedded.on.icon,
               },
               off: {
                 label: props.iconSet !== void 0 && props.iconSet.embedded !== void 0 && props.iconSet.embedded.off !== void 0 && props.iconSet.embedded.off.label !== void 0 ? props.iconSet.embedded.off.label : iconSetTemplate.value.embedded.off.label,
                 icon: props.iconSet !== void 0 && props.iconSet.embedded !== void 0 && props.iconSet.embedded.off !== void 0 && props.iconSet.embedded.off.icon !== void 0 ? props.iconSet.embedded.off.icon : iconSetTemplate.value.embedded.off.icon,
-                action: 'UNLOCK',
               }
             },
             pinned: {
               state: false,
+              name: 'PIN',
               on: {
                 label: props.iconSet !== void 0 && props.iconSet.pinned !== void 0 && props.iconSet.pinned.on !== void 0 && props.iconSet.pinned.on.label !== void 0 ? props.iconSet.pinned.on.label : iconSetTemplate.value.pinned.on.label,
                 icon: props.iconSet !== void 0 && props.iconSet.pinned !== void 0 && props.iconSet.pinned.on !== void 0 && props.iconSet.pinned.on.icon !== void 0 ? props.iconSet.pinned.on.icon : iconSetTemplate.value.pinned.on.icon,
-                action: 'PIN',
               },
               off: {
                 label: props.iconSet !== void 0 && props.iconSet.pinned !== void 0 && props.iconSet.pinned.off !== void 0 && props.iconSet.pinned.off.label !== void 0 ? props.iconSet.pinned.off.label : iconSetTemplate.value.pinned.off.label,
                 icon: props.iconSet !== void 0 && props.iconSet.pinned !== void 0 && props.iconSet.pinned.off !== void 0 && props.iconSet.pinned.off.icon !== void 0 ? props.iconSet.pinned.off.icon : iconSetTemplate.value.pinned.off.icon,
-                action: 'UNPIN',
               }
             },
             fullscreen: {
               state: false,
+              name: 'FULLSCREEN',
               on: {
                 label: props.iconSet !== void 0 && props.iconSet.fullscreen !== void 0 && props.iconSet.fullscreen.on !== void 0 && props.iconSet.fullscreen.on.label !== void 0 ? props.iconSet.fullscreen.on.label : iconSetTemplate.value.fullscreen.on.label,
                 icon: props.iconSet !== void 0 && props.iconSet.fullscreen !== void 0 && props.iconSet.fullscreen.on !== void 0 && props.iconSet.fullscreen.on.icon !== void 0 ? props.iconSet.fullscreen.on.icon : iconSetTemplate.value.fullscreen.on.icon,
-                action: 'FULLSCREEN_ENTER'
               },
               off: {
                 label: props.iconSet !== void 0 && props.iconSet.fullscreen !== void 0 && props.iconSet.fullscreen.off !== void 0 && props.iconSet.fullscreen.off.label !== void 0 ? props.iconSet.fullscreen.off.label : iconSetTemplate.value.fullscreen.off.label,
                 icon: props.iconSet !== void 0 && props.iconSet.fullscreen !== void 0 && props.iconSet.fullscreen.off !== void 0 && props.iconSet.fullscreen.off.icon !== void 0 ? props.iconSet.fullscreen.off.icon : iconSetTemplate.value.fullscreen.off.icon,
-                action: 'FULLSCREEN_LEAVE'
               }
             },
-            maximized: {
+            maximize: {
               state: false,
+              name: 'MAXIMIZE',
               on: {
                 label: props.iconSet !== void 0 && props.iconSet.maximize !== void 0 && props.iconSet.maximize.on !== void 0 && props.iconSet.maximize.on.label !== void 0 ? props.iconSet.maximize.on.label : iconSetTemplate.value.maximize.on.label,
                 icon: props.iconSet !== void 0 && props.iconSet.maximize !== void 0 && props.iconSet.maximize.on !== void 0 && props.iconSet.maximize.on.icon !== void 0 ? props.iconSet.maximize.on.icon : iconSetTemplate.value.maximize.on.icon,
-                action: 'MAXIMIZE'
+
               },
               off: {
                 label: props.iconSet !== void 0 && props.iconSet.maximize !== void 0 && props.iconSet.maximize.off !== void 0 && props.iconSet.maximize.off.label !== void 0 ? props.iconSet.maximize.off.label : iconSetTemplate.value.maximize.off.label,
                 icon: props.iconSet !== void 0 && props.iconSet.maximize !== void 0 && props.iconSet.maximize.off !== void 0 && props.iconSet.maximize.off.icon !== void 0 ? props.iconSet.maximize.off.icon : iconSetTemplate.value.maximize.off.icon,
-                action: 'RESTORE'
               }
             },
-            minimized: {
+            minimize: {
               state: false,
-                on: {
-                //  label: props.iconSet !== void 0 && props.iconSet.minimize !== void 0 && props.iconSet.minimize.on !== void 0 && props.iconSet.minimize.on.label !== void 0 ? props.iconSet.minimize.on.label : iconSetTemplate.value.minimize.on.label,
-                 // icon: props.iconSet !== void 0 && props.iconSet.minimize !== void 0 && props.iconSet.minimize.on !== void 0 && props.iconSet.minimize.on.icon !== void 0 ? props.iconSet.minimize.on.icon : iconSetTemplate.value.minimize.on.icon,
-                  action: 'MINIMIZE'
-                },
-                off: {
-                 // label: props.iconSet !== void 0 && props.iconSet.minimize !== void 0 && props.iconSet.minimize.off !== void 0 && props.iconSet.minimize.off.label !== void 0 ? props.iconSet.minimize.off.label : iconSetTemplate.value.minimize.off.label,
-                //  icon: props.iconSet !== void 0 && props.iconSet.minimize !== void 0 && props.iconSet.minimize.off !== void 0 && props.iconSet.minimize.off.icon !== void 0 ? props.iconSet.minimize.off.icon : iconSetTemplate.value.minimize.off.icon,
-                  func: 'RESTORE'
-                }
+              name: 'MINIMIZE',
+              on: {
+                label: props.iconSet !== void 0 && props.iconSet.minimize !== void 0 && props.iconSet.minimize.on !== void 0 && props.iconSet.minimize.on.label !== void 0 ? props.iconSet.minimize.on.label : iconSetTemplate.value.minimize.on.label,
+                icon: props.iconSet !== void 0 && props.iconSet.minimize !== void 0 && props.iconSet.minimize.on !== void 0 && props.iconSet.minimize.on.icon !== void 0 ? props.iconSet.minimize.on.icon : iconSetTemplate.value.minimize.on.icon,
+
+              },
+              off: {
+                label: props.iconSet !== void 0 && props.iconSet.minimize !== void 0 && props.iconSet.minimize.off !== void 0 && props.iconSet.minimize.off.label !== void 0 ? props.iconSet.minimize.off.label : iconSetTemplate.value.minimize.off.label,
+                icon: props.iconSet !== void 0 && props.iconSet.minimize !== void 0 && props.iconSet.minimize.off !== void 0 && props.iconSet.minimize.off.icon !== void 0 ? props.iconSet.minimize.off.icon : iconSetTemplate.value.minimize.off.icon,
+              }
             }
           }
         },
         actions: {
           menu: assign((ctx, evt) => {
-
-            console.log(evt.value)
-
-            evt.value.map(v => console.log(v))
-
-            const menu = evt.value
+            console.log(props.actions)
+            const menu = props.actions
             const filteredActions = []
             if (menu.includes(MENU_ITEM_EMBEDDED) && (checkActions(MENU_ITEM_EMBEDDED, true, ctx) || checkActions(MENU_ITEM_EMBEDDED, false, ctx))) {
               filteredActions.push(MENU_ITEM_EMBEDDED)
@@ -413,9 +410,9 @@ export default defineComponent({
             if (menu.includes(MENU_ITEM_MAXIMIZE) && (checkActions(MENU_ITEM_MAXIMIZE, true, ctx) || checkActions(MENU_ITEM_MAXIMIZE, false, ctx))) {
               filteredActions.push(MENU_ITEM_MAXIMIZE)
             }
-            // if (props.actions.includes('minimize') && (canDo('minimize', true) || canDo('minimize', false))) {
-            //   actions.push('maximize')
-            // }
+            if (props.actions.includes(MENU_ITEM_MINIMIZE) && (checkActions(MENU_ITEM_MINIMIZE, true) || checkActions(MENU_ITEM_MINIMIZE, false))) {
+              filteredActions.push(MENU_ITEM_MINIMIZE)
+            }
             if (menu.includes(MENU_ITEM_CLOSE) && checkActions(MENU_ITEM_CLOSE, true, ctx)) {
               filteredActions.push(MENU_ITEM_VISIBLE)
             }
@@ -428,96 +425,98 @@ export default defineComponent({
             })
 
 
-            console.warn(menuData)
+            console.info(menuData)
             return {
               menuData: menuData,
               actions: {
                 ...ctx.actions,
                 menu: evt.value,
-
               }
             }
           }),
-
-          lock: assign((ctx, evt) => {
-            console.log('lock...');
-            return checkEmitAndAssign(MENU_ITEM_EMBEDDED, true, ctx)
+          embed: assign((ctx) => {
+            if (ctx.actions.embedded.state === true) {
+              return emitAndAssign(MENU_ITEM_EMBEDDED, false, ctx)
+            } else {
+              return emitAndAssign(MENU_ITEM_EMBEDDED, true, ctx)
+            }
           }),
-          unlock: assign((ctx, evt) => {
-            console.log('unlock...');
-            return checkEmitAndAssign(MENU_ITEM_EMBEDDED, false, ctx)
+          visible: assign((ctx) => {
+            if (ctx.actions.visible.state === true) {
+              return emitAndAssign(MENU_ITEM_VISIBLE, true, ctx)
+            } else {
+              return emitAndAssign(MENU_ITEM_VISIBLE, false, ctx)
+            }
           }),
-          show: assign((ctx, evt) => {
-            console.log('show...');
-            return checkEmitAndAssign(MENU_ITEM_VISIBLE, true, ctx)
-          }),
-          hide: assign((ctx, evt) => {
-            console.log('hide...');
-            return checkEmitAndAssign(MENU_ITEM_VISIBLE, false, ctx)
-          }),
-          pin: assign((ctx, evt) => {
-            console.log('pin...');
-            return checkEmitAndAssign(MENU_ITEM_PINNED, true, ctx)
-          }),
-          unpin: assign((ctx, evt) => {
-            console.log('unpin...');
-            return checkEmitAndAssign(MENU_ITEM_PINNED, false, ctx)
-          }),
-          maximize: assign((ctx, evt) => {
-            console.log('maximize...');
-            if (checkActions(MENU_ITEM_MAXIMIZE, true, ctx)) {
-
-              emit('maximize', true)
+          maximize: assign((ctx) => {
+            savePositionAndState()
+            setFullWindowPosition()
+            return {
+              actions: {
+                ...ctx.actions,
+                ...ctx.actions[ 'embedded' ].state = false,
+                ...ctx.actions[ 'maximize' ].state = true
+              }
             }
           }),
           minimize: assign((ctx, evt) => {
-            console.log('minimize...');
-            // TODO
-          }),
-          fullscreenLeave:  assign((ctx, evt) => {
-            if (checkActions(MENU_ITEM_FULLSCREEN, false, ctx)) {
-              AppFullscreen.exit()
-                .then(() => {
-                  console.log('SUCCESSS')
-                })
-                .catch(err => {
-                  console.error(err)
-                })
-            }
-          }),
-          fullScreenEnter:  assign(async (ctx, evt) => {
-            if (checkActions(MENU_ITEM_FULLSCREEN, true, ctx)) {
-              fullscreenInitiated.value = true
-               AppFullscreen.request(windowRef.value)
-                .then(() => {
-                  console.log('SUCCESSS')
-                })
-                .catch(err => {
-                  console.error(err)
-                })
-            }
-          }),
+            savePositionAndState()
 
+            // TODO LOGIC
+            const elements = document.getElementsByClassName('q-notifications__list--bottom')
+            if (elements.length > 0) {
+              //elements[0].appendChild(this.$el)
+            }
+
+            return {
+              actions: {
+                ...ctx.actions,
+                ...ctx.actions[ 'embedded' ].state = true,
+                ...ctx.actions[ 'minimize' ].state = true
+              }
+            }
+          }),
+          fullscreenLeave: assign((ctx, evt) => {
+            restorePositionAndState()
+            return emitAndAssign(MENU_ITEM_FULLSCREEN, false, ctx)
+          }),
+          fullScreenEnter: assign(async (ctx, evt) => {
+            fullscreenInitiated.value = true
+            savePositionAndState()
+            zIndex.value = maxZIndex
+            return emitAndAssign(MENU_ITEM_FULLSCREEN, true, ctx)
+          }),
           restore: assign((ctx, evt) => {
-            console.log('restore...');
-            if (ctx.action[ MENU_ITEM_VISIBLE ].state) {
+            if (ctx.actions[ MENU_ITEM_VISIBLE ].state) {
               return ctx
             }
-            if (ctx.action[ MENU_ITEM_MAXIMIZE ].state) {
+
+            if (ctx.actions.maximize.state === true) {
+              restorePositionAndState()
               return emitAndAssign(MENU_ITEM_MAXIMIZE, false, ctx)
-            } else if (ctx.action[ MENU_ITEM_MINIMIZE ].state) {
+            } else if (ctx.actions[ MENU_ITEM_MINIMIZE ].state) {
               return emitAndAssign(MENU_ITEM_MAXIMIZE, false, ctx)
             }
           }),
         },
-      },
-    );
-
-    function checkEmitAndAssign(name, state, ctx) {
-      if (checkActions(name, state, ctx)) {
-        return emitAndAssign(name, state, ctx)
+        services: {
+          openFullscreen: (context, event) => {
+            return AppFullscreen.request(windowRef.value)
+          },
+          closeFullscreen: (context, event) => {
+            return AppFullscreen.exit()
+          }
+        },
+        guards: {
+          isRestoreState: (ctx) => {
+            return (ctx.actions.maximize.state === true)
+          },
+          isFullscreen: (ctx) => {
+            return (ctx.actions.fullscreen.state === true)
+          }
+        }
       }
-    }
+    );
 
     function emitAndAssign(name, state, ctx) {
       emit(name, state)
@@ -529,11 +528,14 @@ export default defineComponent({
       }
     }
 
+    function setFullWindowPosition() {
+      states.value.top = 0
+      states.value.left = 0
+      states.value.bottom = $q.screen.height
+      states.value.right = $q.screen.width
+    }
+
     function checkActions(mode, state, ctx) {
-      console.log('CHECK  ACTIONS')
-      console.log(mode)
-      console.log(state)
-      console.log(ctx.actions)
       let active = false
       switch (mode) {
         case MENU_ITEM_VISIBLE:
@@ -588,9 +590,9 @@ export default defineComponent({
               active = true
             }
           } else {
-            if (isActive(MENU_ITEM_MINIMIZE) === true
+            if (isActive(MENU_ITEM_MAXIMIZE) === true
               && isActive(MENU_ITEM_EMBEDDED) !== true
-              && isActive(MENU_ITEM_MAXIMIZE) !== true
+              && isActive(MENU_ITEM_MINIMIZE) !== true
               && isActive(MENU_ITEM_FULLSCREEN) !== true) {
               active = true
             }
@@ -602,14 +604,13 @@ export default defineComponent({
               && isActive(MENU_ITEM_EMBEDDED) !== true) {
               active = true
             }
-          }
-          else {
+          } else {
             if (isActive(MENU_ITEM_FULLSCREEN) === true
               && isActive(MENU_ITEM_EMBEDDED) !== true) {
               active = true
             }
           }
-        break
+          break
         case MENU_ITEM_CLOSE:
           if (state === true) {
             if (isActive(MENU_ITEM_EMBEDDED) !== true) {
@@ -638,28 +639,55 @@ export default defineComponent({
       console.log(state)
     })
 
-    console.log(state.value.context)
-    console.log(context)
-
-
-    watchEffect(() => send('UPDATE_MENU_ACTIONS', { value: props.actions }))
-
-
-
-    watch(() => $q.fullscreen.isActive,  (val) => {
-        if (fullscreenInitiated.value === true) {
-          state.value.context.actions.fullscreen.state = val
-        }
-      })
-
-    watch([ () =>  $q.screen.height,() => $q.screen.width ], ([ height, width ]) => {
-      if(state.value.context.actions.fullscreen.state === true) {
-        states.value.bottom = height
-        states.value.right = width
+    watch(() => $q.fullscreen.isActive, (isActive) => {
+      if (isActive === false && state.value.context.actions.fullscreen.state === true) {
+        send('FULLSCREEN')
       }
     })
 
+    // TODO ?
+    watch([ () => $q.screen.height, () => $q.screen.width ], ([ height, width ]) => {
+      //if (state.value.context.actions.fullscreen.state === true) {
+      // states.value.bottom = height
+      // states.value.right = width
+      // }
+    })
 
+
+    const savePositionAndState = () => {
+      restoreState.value.top = states.value.top
+      restoreState.value.left = states.value.left
+      restoreState.value.bottom = states.value.bottom
+      restoreState.value.right = states.value.right
+      restoreState.value.zIndex = __computedZIndex.value
+
+      restoreState.value.pinned = state.value.context.actions.pinned.state
+      restoreState.value.embedded = state.value.context.actions.embedded.state
+      restoreState.value.maximize = state.value.context.actions.maximize.state
+      restoreState.value.minimize = state.value.context.actions.minimize.state
+    }
+
+    const restorePositionAndState = () => {
+      states.value.top = restoreState.value.top
+      states.value.left = restoreState.value.left
+      states.value.bottom = restoreState.value.bottom
+      states.value.right = restoreState.value.right
+      zIndex.value = restoreState.value.zIndex
+      state.value.context.actions.pinned.state = restoreState.value.pinned
+      state.value.context.actions.embedded.state = restoreState.value.embedded
+      state.value.context.actions.maximize.state = restoreState.value.maximize
+      state.value.context.actions.minimize.state = restoreState.value.minimize
+    }
+
+    const canDrag = () => {
+      return true;
+      //this.isVisible === true &&
+      //this.isEmbedded !== true &&
+      // this.isPinned !== true &&
+      // this.isFullscreen !== true &&
+      // this.isMaximized !== true &&
+      // this.isMinimized !== true
+    }
 
     const zIndex = ref(4000)
     const mouseOffsetX = ref(-1) // FIXME unused ?
@@ -669,16 +697,7 @@ export default defineComponent({
     const scrollY = ref(0)
     const selected = ref(false)
     const fullscreenInitiated = ref(false)
-    const handles = ref([
-      'top',
-      'left',
-      'right',
-      'bottom',
-      'top-left',
-      'top-right',
-      'bottom-left',
-      'bottom-right'
-    ])
+
 
     const isDisabled = computed(() => {
       return props.disabled === true
@@ -698,7 +717,7 @@ export default defineComponent({
 
 
     const __computedVisibility = computed(() => {
-      return state.value.context.actions.visible.state === true ? MENU_ITEM_VISIBLE : 'hidden'
+      return state.value.context.actions.visible.state === true ? 'visible' : 'hidden'
     })
 
     const computedToolbarHeight = computed(() => {
@@ -756,7 +775,7 @@ export default defineComponent({
 
     const __style = computed(() => {
       let style
-      if (state.value.context.actions.minimized.state === true) {
+      if (state.value.context.actions.minimize.state === true) {
         style = {
           position: 'relative',
           visibility: __computedVisibility.value,
@@ -792,7 +811,7 @@ export default defineComponent({
           left: left + 'px',
           zIndex: __computedZIndex.value
         }
-        if (state.value.context.actions.maximized.state) {
+        if (state.value.context.actions.maximize.state) {
           style.width = '100%'
           style.height = '100%'
         } else {
@@ -822,12 +841,10 @@ export default defineComponent({
     })
 
 
-
-
     const __classes = computed(() => {
       const classStyle = ''
         + (isEnabled.value === true ? ' q-focusable q-hoverable' : ' disabled')
-        + (state.value.context.actions.floating.state === true && state.value.context.actions.fullscreen.state !== true ? ' q-window__floating' : '')
+        + (state.value.context.actions.embedded.state !== true && state.value.context.actions.fullscreen.state !== true ? ' q-window__floating' : '')
         + (state.value.context.actions.fullscreen.state === true ? ' q-window__fullscreen' : '')
         + (isSelected.value === true && state.value.context.actions.embedded.state !== true && state.value.context.actions.fullscreen.state !== true ? ' q-window__selected' : '')
         + (isDragging.value === true ? ' q-window__dragging q-window__touch-action' : '');
@@ -837,39 +854,39 @@ export default defineComponent({
     })
 
 
-
     const { renderTitleBar } = useToolbar(props, slots, state, send, __computedZIndex)
-    const { renderBody } = useBody(props,slots, computedHeight,computedToolbarHeight, zIndex, state)
+    const { renderBody } = useBody(props, slots, computedHeight, computedToolbarHeight, zIndex, state)
+    const {
+      renderGrippers,
+      renderResizeHandles
+    } = useResize(props, slots, computedHeight, computedToolbarHeight, zIndex, state, canDrag, computedWidth)
 
-
-
-
-    function renderWinbdow() {
-      // const menuData = [...computedMenuData.value]
+    function renderWindow() {
       return h('div', {
         class: [ 'q-window', __classes.value, props.contentClass ],
         style: __style.value,
         to: '#q-app',
         disabled: props.modelValue,
-        ref: windowRef
+        ref: windowRef,
+        refInFor: true,
+        key: QWindowCount
       }, [
+        (canDrag() === true) && [...renderResizeHandles()],
+        (canDrag() === true) && [...renderGrippers()],
         renderTitleBar(),
-        renderBody()
+        state.value.context.actions.minimize.state !== true && renderBody()
       ])
     }
 
     function render() {
       return h(Teleport, {
+        key: QWindowCount,
         to: 'body',
         disabled: props.modelValue
-      }, [renderWinbdow()])
+      }, [renderWindow()])
     }
-
-
     return () => render()
   }
-
-
 })
 
 

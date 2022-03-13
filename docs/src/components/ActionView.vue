@@ -9,9 +9,10 @@ dasdad
       title="QWindow Actions"
       :height="150"
       :width="350"
+      key="1"
       :actions="showModal ? actions1 : actions1"
       embedded
-      content-class="bg-grey-1"
+      content-class="bg-grey-2"
     >
       <div class="q-pa-md fit">
         This is the "default" slot content
@@ -26,7 +27,7 @@ dasdad
     </div>
 
     <q-window
-
+      key="2"
       v-model="showModal"
       title="QWindow Actions"
       :height="150"

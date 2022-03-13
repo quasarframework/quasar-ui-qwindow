@@ -1,8 +1,6 @@
 import { createMachine } from "xstate";
 
 
-
-
 export const qWindowMachine = createMachine({
   id: 'qwindow',
   initial: 'idle',
@@ -12,40 +10,72 @@ export const qWindowMachine = createMachine({
         UPDATE_MENU_ACTIONS: {
           actions: ['menu']
         },
-        SHOW: {
-          actions: ['show']
+        VISIBLE: {
+          actions: [ 'visible', 'menu' ],
+          target: 'idle',
         },
-        HIDE: {
-          actions: ['hide']
-        },
-        LOCK: {
-          actions: ['lock']
-        },
-        UNLOCK: {
-          actions: ['unlock']
+        EMBED: {
+          actions: [ 'embed', 'menu' ],
+          target: 'idle',
         },
         PIN: {
-          actions: ['pin']
+          actions: [ 'pin', 'menu' ],
+          target: 'idle',
         },
-        UNPIN: {
-          actions: ['unpin']
-        },
-        MAXIMIZE: {
-          actions: ['maximize']
-        },
+        FULLSCREEN: [
+          {
+            actions: [ 'fullscreenLeave', 'menu' ],
+            target: 'exitFullscreen',
+            cond: 'isFullscreen'
+          }, {
+            actions: [ 'fullScreenEnter', 'menu' ],
+            target: 'requestFullscreen',
+          }
+        ],
+        MAXIMIZE: [
+          {
+            actions: [ 'restore', 'menu' ],
+            target: 'idle',
+            cond: 'isRestoreState'
+          },
+          {
+            actions: [ 'maximize', 'menu' ],
+            target: 'idle',
+          }
+        ],
         MINIMIZE: {
-          actions: ['minimize']
+          actions: [ 'minimize', 'menu' ],
+          target: 'idle',
         },
         RESTORE: {
-          actions: ['restore']
-        },
-        FULLSCREEN_LEAVE: {
-          actions: ['fullscreenLeave']
-        },
-        FULLSCREEN_ENTER: {
-          actions: ['fullScreenEnter']
+          actions: [ 'restore', 'menu' ],
+          target: 'idle',
         }
       }
-    }
+    },
+    requestFullscreen: {
+      invoke: {
+        id: 'openFullscreen',
+        src: 'openFullscreen',
+        onDone: {
+          target: 'idle'
+        },
+        onError: {
+          target: 'idle'
+        }
+      }
+    },
+    exitFullscreen: {
+      invoke: {
+        id: 'closeFullscreen',
+        src: 'closeFullscreen',
+        onDone: {
+          target: 'idle'
+        },
+        onError: {
+          target: 'idle'
+        }
+      }
+    },
   }
 });
