@@ -7,22 +7,22 @@ export const qWindowMachine = createMachine({
   states: {
     idle: {
       on: {
-        UPDATE_MENU_ACTIONS: {
+        update_menu_actions: {
           actions: ['menu']
         },
-        VISIBLE: {
+        visible: {
           actions: [ 'visible', 'menu' ],
           target: 'idle',
         },
-        EMBED: {
+        embedded: {
           actions: [ 'embed', 'menu' ],
           target: 'idle',
         },
-        PIN: {
+        pin: {
           actions: [ 'pin', 'menu' ],
           target: 'idle',
         },
-        FULLSCREEN: [
+        fullscreen: [
           {
             actions: [ 'fullscreenLeave', 'menu' ],
             target: 'exitFullscreen',
@@ -32,7 +32,7 @@ export const qWindowMachine = createMachine({
             target: 'requestFullscreen',
           }
         ],
-        MAXIMIZE: [
+        maximize: [
           {
             actions: [ 'restore', 'menu' ],
             target: 'idle',
@@ -43,11 +43,11 @@ export const qWindowMachine = createMachine({
             target: 'idle',
           }
         ],
-        MINIMIZE: {
+        minimize: {
           actions: [ 'minimize', 'menu' ],
           target: 'idle',
         },
-        RESTORE: {
+        restore: {
           actions: [ 'restore', 'menu' ],
           target: 'idle',
         },

@@ -3,7 +3,7 @@ import { computed, h, withDirectives, resolveDirective } from "vue";
 import { MENU_ITEM_SEPARATOR } from "../QWindow";
 
 const CLOSE_POPUP_DIRECTIVE_NAME = 'close-popup';
-export default function useToolbar(props, slots, state, send, __computedZIndex, renderResizeHandle, canDrag) {
+export default function useToolbar(props, slots, state, send, __computedZIndex, renderResizeHandle, canDrag, isDragging) {
 
   const tbHeight = computed(() => {
     return props.headless === true ? 0 : props.dense === true ? 28 : 40
@@ -14,7 +14,7 @@ export default function useToolbar(props, slots, state, send, __computedZIndex, 
       + (props.hideToolbarDivider !== true ? ' q-window__titlebar--divider' : '')
       + (props.dense === true ? ' q-window__titlebar--dense' : '')
       + (state.value.context.actions.embedded.state !== true && state.value.context.actions.minimize.state !== true ? ' absolute' : '')
-      // + (isDragging.value === true ? ' q-window__touch-action' : '')
+      + (isDragging.value === true ? ' q-window__touch-action' : '')
       + ' row justify-between items-center'
   })
 
@@ -45,7 +45,7 @@ export default function useToolbar(props, slots, state, send, __computedZIndex, 
       key: stateInfo.key,
       clickable: true,
       dense: props.dense,
-      onClick: () => send(stateInfo.name)
+      onClick: () => send(stateInfo.key)
     }, () => [
       h(QItemSection, {
         noWrap: true

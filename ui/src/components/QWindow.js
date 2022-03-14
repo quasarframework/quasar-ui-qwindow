@@ -29,7 +29,7 @@ import { qWindowMachine } from "./composables/machine";
 import { assign } from "@xstate/fsm";
 import useResize from "./composables/useResize";
 import useStyle from "./composables/useStyle";
-
+import { prevent, stopAndPrevent } from 'quasar/src/utils/event'
 
 // import { QColorizeMixin } from 'q-colorize-mixin'
 // import canRender from 'quasar/src/mixins/can-render'
@@ -267,7 +267,7 @@ export default defineComponent({
     })
 
     const states = ref({
-      top: 10,
+      top: 150,
       left: 10,
       bottom: 400,
       right: 400,
@@ -292,28 +292,46 @@ export default defineComponent({
     const $q = useQuasar()
     const windowRef = ref(null)
     const zIndex = ref(4000)
-    const mouseOffsetX = ref(-1) // FIXME unused ?
-    const mouseOffsetY = ref(-1) // FIXME unused ?
-    const mousePos = ref({ x: 0, y: 0 })
     const scrollX = ref(0)
     const scrollY = ref(0)
     const selected = ref(false)
+    const resizeH = ref()
     const fullscreenInitiated = ref(false)
 
-    const {removeClass,addClass} = useStyle()
+    const { removeClass, addClass } = useStyle()
 
     let context;
     const { state, send, service } = useMachine(qWindowMachine, {
         context: {
-          mX: 0,
-          mY: 0,
+
+          // the position of the box
+          x: 0,
+          y: 0,
+
+          // the click position
+          pointerX: 0,
+          pointerY: 0,
+
+          // how far from where you clicked
+          dx: 0, // how far: x
+          dy: 0, // how far: y
+
+
+          tmpTop: 0,
+          tmpLeft: 0,
+          tmpRight: 0,
+          tmpBottom: 0,
+          tmpHeight: 0,
+          tmpWidth: 0,
+          shiftX: 0,
+          shiftY: 0,
+
           mOffsetX: 0,
           mOffsetY: 0,
           menuData: [],
           actions: {
             visible: {
               state: true,
-              name: 'VISIBLE',
               on: {
                 label: props.iconSet !== void 0 && props.iconSet.visible !== void 0 && props.iconSet.visible.on !== void 0 && props.iconSet.visible.on.label !== void 0 ? this.iconSet.visible.on.label : iconSetTemplate.value.visible.on.label,
                 icon: props.iconSet !== void 0 && props.iconSet.visible !== void 0 && props.iconSet.visible.on !== void 0 && props.iconSet.visible.on.icon !== void 0 ? this.iconSet.visible.on.icon : iconSetTemplate.value.visible.on.icon,
@@ -325,7 +343,6 @@ export default defineComponent({
             },
             embedded: {
               state: true,
-              name: 'EMBED',
               on: {
                 label: props.iconSet !== void 0 && props.iconSet.embedded !== void 0 && props.iconSet.embedded.on !== void 0 && props.iconSet.embedded.on.label !== void 0 ? props.iconSet.embedded.on.label : iconSetTemplate.value.embedded.on.label,
                 icon: props.iconSet !== void 0 && props.iconSet.embedded !== void 0 && props.iconSet.embedded.on !== void 0 && props.iconSet.embedded.on.icon !== void 0 ? props.iconSet.embedded.on.icon : iconSetTemplate.value.embedded.on.icon,
@@ -337,7 +354,6 @@ export default defineComponent({
             },
             pinned: {
               state: false,
-              name: 'PIN',
               on: {
                 label: props.iconSet !== void 0 && props.iconSet.pinned !== void 0 && props.iconSet.pinned.on !== void 0 && props.iconSet.pinned.on.label !== void 0 ? props.iconSet.pinned.on.label : iconSetTemplate.value.pinned.on.label,
                 icon: props.iconSet !== void 0 && props.iconSet.pinned !== void 0 && props.iconSet.pinned.on !== void 0 && props.iconSet.pinned.on.icon !== void 0 ? props.iconSet.pinned.on.icon : iconSetTemplate.value.pinned.on.icon,
@@ -349,7 +365,6 @@ export default defineComponent({
             },
             fullscreen: {
               state: false,
-              name: 'FULLSCREEN',
               on: {
                 label: props.iconSet !== void 0 && props.iconSet.fullscreen !== void 0 && props.iconSet.fullscreen.on !== void 0 && props.iconSet.fullscreen.on.label !== void 0 ? props.iconSet.fullscreen.on.label : iconSetTemplate.value.fullscreen.on.label,
                 icon: props.iconSet !== void 0 && props.iconSet.fullscreen !== void 0 && props.iconSet.fullscreen.on !== void 0 && props.iconSet.fullscreen.on.icon !== void 0 ? props.iconSet.fullscreen.on.icon : iconSetTemplate.value.fullscreen.on.icon,
@@ -361,11 +376,9 @@ export default defineComponent({
             },
             maximize: {
               state: false,
-              name: 'MAXIMIZE',
               on: {
                 label: props.iconSet !== void 0 && props.iconSet.maximize !== void 0 && props.iconSet.maximize.on !== void 0 && props.iconSet.maximize.on.label !== void 0 ? props.iconSet.maximize.on.label : iconSetTemplate.value.maximize.on.label,
                 icon: props.iconSet !== void 0 && props.iconSet.maximize !== void 0 && props.iconSet.maximize.on !== void 0 && props.iconSet.maximize.on.icon !== void 0 ? props.iconSet.maximize.on.icon : iconSetTemplate.value.maximize.on.icon,
-
               },
               off: {
                 label: props.iconSet !== void 0 && props.iconSet.maximize !== void 0 && props.iconSet.maximize.off !== void 0 && props.iconSet.maximize.off.label !== void 0 ? props.iconSet.maximize.off.label : iconSetTemplate.value.maximize.off.label,
@@ -374,7 +387,6 @@ export default defineComponent({
             },
             minimize: {
               state: false,
-              name: 'MINIMIZE',
               on: {
                 label: props.iconSet !== void 0 && props.iconSet.minimize !== void 0 && props.iconSet.minimize.on !== void 0 && props.iconSet.minimize.on.label !== void 0 ? props.iconSet.minimize.on.label : iconSetTemplate.value.minimize.on.label,
                 icon: props.iconSet !== void 0 && props.iconSet.minimize !== void 0 && props.iconSet.minimize.on !== void 0 && props.iconSet.minimize.on.icon !== void 0 ? props.iconSet.minimize.on.icon : iconSetTemplate.value.minimize.on.icon,
@@ -492,9 +504,14 @@ export default defineComponent({
               return emitAndAssign(MENU_ITEM_MAXIMIZE, false, ctx)
             }
           }),
-          onMouseDown: assign((ctx, evt) => {
-            //this.__removeEventListeners(resizeHandle)
+          onMouseDown: assign((ctx, event) => {
+            const [ resizeHandle, evt ] = event.value
+            console.log(evt)
+            removeEventListeners()
 
+
+            console.log('WAHHHHHHHHHHHHHHHHHHHHHH')
+            console.log(evt)
             // this.selected = false
             if (evt.touches === void 0 && evt.buttons !== 1) {
               return
@@ -508,31 +525,11 @@ export default defineComponent({
             const x = getMousePosition(evt, 'x')
             const y = getMousePosition(evt, 'y')
 
-            //  can window be selected
-            //this.selected = this.__canBeSelected(x - this.scrollX, y - this.scrollY)
-            //if (!this.selected) {
-            //  return
-            //}
+            const rect = windowRef.value.getBoundingClientRect()
+            const shiftX = getMouseShift(evt, rect, 'x')
+            const shiftY = getMouseShift(evt, rect, 'y')
 
-            // bring window to front
-            //this.bringToFront()
-
-
-            //  this.resizeHandle = resizeHandle
-            // this.selected = true
-
-
-            //const rect = this.__portal.$el.getBoundingClientRect()
-            //shiftX = getMouseShift(e, rect, 'x')
-            //this.shiftY = getMouseShift(e, rect, 'y')
-
-            // save existing position information
-            // tmpTop = this.state.top
-            // this.tmpLeft = this.state.left
-            //this.tmpRight = this.state.right
-            // this.tmpBottom = this.state.bottom
-            // this.tmpHeight = this.tmpBottom - this.tmpTop
-            //this.tmpWidth = this.tmpRight - this.tmpLeft
+            console.log(`x: ${ x } y: ${ y } shiftX: ${ shiftX } shiftY: ${ shiftY } rectLeft: ${ rect.left } rectTop: ${ rect.top }`)
 
             states.value.shouldDrag = true
 
@@ -540,23 +537,36 @@ export default defineComponent({
             if (evt.touches !== void 0) {
               addClass(document.body, 'q-window__touch-action')
             }
+            resizeH.value = resizeHandle
 
-            // stopAndPrevent(e)
-            // prevent(e) TODO whewre i call it ?
+            prevent(evt)
 
 
             return {
               ...ctx,
               mX: x,
               mY: y,
-
+              tmpTop: states.value.top,
+              tmpLeft: states.value.left,
+              tmpRight: states.value.right,
+              tmpBottom: states.value.bottom,
+              tmpHeight: states.value.bottom - states.value.top,
+              tmpWidth: states.value.right - states.value.left,
+              shiftY: shiftY,
+              shiftX: shiftX
             }
           }),
-          onMouseMove: assign((ctx, evt) => {
+
+
+          onMouseMove: assign((ctx, event) => {
+            const [ resizeHandle, evt ] = event.value
+            console.log('----------------------------------')
+            console.log(resizeHandle)
             if (states.value.shouldDrag !== true || (evt.touches === void 0 && evt.buttons !== 1)) {
               removeEventListeners()
               return
             }
+
 
             const mouseX = getMousePosition(evt, 'x')
             const mouseY = getMousePosition(evt, 'y')
@@ -566,25 +576,61 @@ export default defineComponent({
             if (states.value.dragging !== true) {
               if (Math.abs(ctx.mX - mouseX) >= 3 || Math.abs(ctx.mY - mouseY) >= 3) {
                 states.value.dragging = true
-              }
-              else {
+              } else {
                 return
               }
             }
 
 
+            switch (resizeHandle || resizeH.value) {
+              case 'top':
+                states.value.top = mouseY - window.pageYOffset - ctx.shiftY
+                if (computedHeight.value < states.value.minHeight) {
+                  states.value.top = ctx.tmpBottom - states.value.minHeight
+                }
+                break
+              case 'left':
+                states.value.left = mouseX - window.pageXOffset - ctx.shiftX
+                if (computedWidth.value < states.value.minWidth) {
+                  states.value.left = ctx.tmpRight - states.value.minWidth
+                }
+                break
+              case 'right':
+                states.value.right = mouseX - window.pageXOffset
+                if (computedWidth.value < states.value.minWidth) {
+                  states.value.right = ctx.tmpLeft - states.value.minWidth
+                }
+                break
+              case 'bottom':
+                states.value.bottom = mouseY - window.pageYOffset
+                if (computedHeight.value < states.value.minHeight) {
+                  states.value.bottom = ctx.tmpTop - states.value.minHeight
+                }
+
+                break
+              case 'titlebar':
+                states.value.top = mouseY - window.pageYOffset - ctx.shiftY
+                states.value.left = mouseX - window.pageXOffset - ctx.shiftX
+                states.value.bottom = states.value.top - ctx.tmpHeight
+                states.value.right = states.value.left - ctx.tmpWidth
+                break
+
+
+            }
+
+
             console.info('ON MOUSE EVENT')
+              stopAndPrevent(evt)
             return {
               ...ctx,
               mX: mouseX,
               mY: mouseY
             }
           }),
-          onMouseUp: assign((ctx, evt) => {
-            console.info('REMOVE EVENT LISTENER')
-            //removeEventListeners()
+          onMouseUp: assign((ctx, event) => {
+            const [ _, evt ] = event.value
             if (states.value.dragging === true) {
-              //prevent(e)
+              prevent(evt)
               removeEventListeners()
               if (evt.touches !== void 0) {
                 removeClass(document.body, 'q-window__touch-action')
@@ -623,8 +669,6 @@ export default defineComponent({
         }
       }
     }
-
-
 
 
     function setFullWindowPosition() {
@@ -735,21 +779,25 @@ export default defineComponent({
 
 
     service.onTransition((state) => {
-      context = state.context
-      // console.log(state)
-      console.log(state.context)
+      if (state.changed) {
+        context = state.context
+        console.log(state.value)
+        console.log(state.context)
+        console.log(states.value)
+      }
+      // console.log(states.value)
     })
 
 
     onMounted(() => {
-      send('UPDATE_MENU_ACTIONS', { value: props.actions })
+      send('update_menu_actions', { value: props.actions })
       // calculate left starting position
       if (props.startX > 0) {
         states.value.left = props.startX
       } else {
         state.left = defaultX * QWindowCount
       }
-
+      //
       // calculate top starting position
       if (props.startY > 0) {
         states.value.top = props.startY
@@ -768,31 +816,38 @@ export default defineComponent({
 
     })
 
+    function sendEvent(evt) {
+      send({
+        type: evt.type,
+        value: [ void 0, evt ]
+      })
+    }
+
     function addEventListeners() {
-      document.body.addEventListener('mousemove', (evt) => send(evt), { capture: true })
-      document.body.addEventListener('mouseup', (evt) => send(evt), { capture: true })
-      document.body.addEventListener('keyup', (evt) => send(evt), { capture: true })
+      document.body.addEventListener('mousemove', sendEvent, { capture: true })
+      document.body.addEventListener('mouseup', sendEvent, { capture: true })
+      document.body.addEventListener('keyup', sendEvent, { capture: true })
     }
 
     function removeEventListeners() {
-      document.body.removeEventListener('mousemove', (evt) => send(evt), { capture: true })
-      document.body.removeEventListener('mouseup', (evt) => send(evt), { capture: true })
-      document.body.removeEventListener('keyup', (evt) => send(evt), { capture: true })
+      document.body.removeEventListener('mousemove', sendEvent, { capture: true })
+      document.body.removeEventListener('mouseup', sendEvent, { capture: true })
+      document.body.removeEventListener('keyup', sendEvent, { capture: true })
     }
 
 
     watch(() => $q.fullscreen.isActive, (isActive) => {
       if (isActive === false && state.value.context.actions.fullscreen.state === true) {
-        send('FULLSCREEN')
+        send('fullscreen')
       }
     })
 
     // TODO ?
     watch([ () => $q.screen.height, () => $q.screen.width ], ([ height, width ]) => {
-      //if (state.value.context.actions.fullscreen.state === true) {
-      // states.value.bottom = height
-      // states.value.right = width
-      // }
+      if (state.value.context.actions.fullscreen.state === true) {
+        states.value.bottom = height
+        states.value.right = width
+      }
     })
 
 
@@ -894,17 +949,6 @@ export default defineComponent({
       return zIndex.value + extra
     })
 
-    const computedPosition = computed(() => {
-      return {
-        left: states.value.left,
-        top: states.value.top,
-        width: computedWidth.value,
-        height: computedHeight.value,
-        scrollX: computedScrollX.value,
-        scrollY: computedScrollY.value
-      }
-    })
-
     const __style = computed(() => {
       let style
       if (state.value.context.actions.minimize.state === true) {
@@ -928,8 +972,10 @@ export default defineComponent({
           height: '100%'
         }
       } else {
-        const top = states.value.top + (props.scrollWithWindow !== true ? scrollY.value : 0)
+        const top = states.value.top
         const left = states.value.left + (props.scrollWithWindow !== true ? scrollX.value : 0)
+        console.log(top)
+        console.log(left)
         style = {
           position: 'absolute',
           display: 'inline-block',
@@ -943,6 +989,8 @@ export default defineComponent({
           left: left + 'px',
           zIndex: __computedZIndex.value
         }
+
+
         if (state.value.context.actions.maximize.state) {
           style.width = '100%'
           style.height = '100%'
@@ -974,15 +1022,12 @@ export default defineComponent({
 
 
     const __classes = computed(() => {
-      const classStyle = ''
+      return ''
         + (isEnabled.value === true ? ' q-focusable q-hoverable' : ' disabled')
         + (state.value.context.actions.embedded.state !== true && state.value.context.actions.fullscreen.state !== true ? ' q-window__floating' : '')
         + (state.value.context.actions.fullscreen.state === true ? ' q-window__fullscreen' : '')
         + (isSelected.value === true && state.value.context.actions.embedded.state !== true && state.value.context.actions.fullscreen.state !== true ? ' q-window__selected' : '')
         + (isDragging.value === true ? ' q-window__dragging q-window__touch-action' : '');
-
-      console.log(classStyle)
-      return classStyle
     })
 
     const {
@@ -990,8 +1035,8 @@ export default defineComponent({
       renderResizeHandles,
       renderResizeHandle
     } = useResize(props, slots, computedHeight, computedToolbarHeight, zIndex, state, canDrag, computedWidth, send)
-    const { renderTitleBar } = useToolbar(props, slots, state, send, __computedZIndex, renderResizeHandle, canDrag)
-    const { renderBody } = useBody(props, slots, computedHeight, computedToolbarHeight, zIndex, state)
+    const { renderTitleBar } = useToolbar(props, slots, state, send, __computedZIndex, renderResizeHandle, canDrag, isDragging)
+    const { renderBody } = useBody(props, slots, computedHeight, computedToolbarHeight, zIndex, state, renderResizeHandle, canDrag)
 
 
     function renderWindow() {

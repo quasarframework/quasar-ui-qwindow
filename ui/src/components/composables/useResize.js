@@ -15,7 +15,15 @@ export default function useResize(props, slots, computedHeight, computedToolbarH
     'bottom-right'
   ])
 
-  function canResize (resizeHandle) {
+  function onSend(evt, resizeHandle) {
+    console.log(evt.type, resizeHandle)
+    send({
+      type: evt.type,
+      value: [ resizeHandle,evt ]
+    })
+  }
+
+  function canResize(resizeHandle) {
     if (props.noResize === true) return false
     const missing = handles.value.filter(handle => !props.resizable.includes(handle))
     return missing.includes(resizeHandle) !== true
@@ -28,24 +36,19 @@ export default function useResize(props, slots, computedHeight, computedToolbarH
 
     return h('div', {
       ref: resizeHandle,
-      style:  `border-color: ${ props.gripperBorderColor }`,
+      style: `border-color: ${ props.gripperBorderColor }`,
       class: `gripper gripper-${ resizeHandle }${ props.roundGrippers === true ? ' gripper-round' : '' }`,
-      onMousedown: (e) => console.log(`MouseDown: ${ e }`),
+      onMousedown: (e) => onSend(e, resizeHandle),
       onTouchstart: (e) => console.log(`Touchstart: ${ e }`),
       onTouchmove: (e) => console.log(`Touchmove: ${ e }`),
       onTouchend: (e) => console.log(`Touchend: ${ e }`)
 
     })
   }
-  // on: {
-  //   mousedown: (e) => this.__onMouseDown(e, resizeHandle),
-  //     touchstart: (e) => this.__onTouchStart(e, resizeHandle),
-  //     touchmove: (e) => this.__onTouchMove(e, resizeHandle),
-  //     touchend: (e) => this.__onTouchEnd(e, resizeHandle)
-  // }
 
 // resize handles are for when there are no grippers
   function renderResizeHandle(resizeHandle, actionsWidth) {
+    console.log(resizeHandle)
     if (props.noMove && resizeHandle === 'titlebar') {
       return ''
     }
@@ -63,19 +66,12 @@ export default function useResize(props, slots, computedHeight, computedToolbarH
       ref: resizeHandle,
       class: [ 'q-window__resize-handle', `q-window__resize-handle--${ resizeHandle }` ],
       style: style,
-      onMousedown: (e) => send(e),
+      onMousedown: (e) => onSend(e, resizeHandle),
       onTouchstart: (e) => console.log(`Touchstart: ${ e }`),
       onTouchmove: (e) => console.log(`Touchmove: ${ e }`),
       onTouchend: (e) => console.log(`Touchend: ${ e }`)
     })
   }
-
-  // on: {
-  //   mousedown: (e) => this.__onMouseDown(e, resizeHandle),
-  //     touchstart: (e) => this.__onTouchStart(e, resizeHandle),
-  //     touchmove: (e) => this.__onTouchMove(e, resizeHandle),
-  //     touchend: (e) => this.__onTouchEnd(e, resizeHandle)
-  // }
 
   function renderGrippers() {
     if (props.hideGrippers === true) {

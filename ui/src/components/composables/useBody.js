@@ -1,6 +1,6 @@
 import { computed, h } from "vue";
 
-export default function useBody(props, slots, computedHeight, computedToolbarHeight, zIndex, state) {
+export default function useBody(props, slots, computedHeight, computedToolbarHeight, zIndex, state,renderResizeHandle,canDrag) {
 
   const bodyStyle = computed(() => {
     if (state.value.context.actions.embedded.state === true) {
@@ -28,7 +28,9 @@ export default function useBody(props, slots, computedHeight, computedToolbarHei
       class: 'q-window__body row',
       style: bodyStyle.value
     }, [
-      slot ? slot({ zIndex: zIndex.value }) : ''
+      slot ? slot({ zIndex: zIndex.value }) : '',
+      (props.headless === true && canDrag() === true)
+      && renderResizeHandle('titlebar', props.noMenu ? 0 : 44)
     ])
   }
 

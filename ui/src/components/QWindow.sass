@@ -15,8 +15,15 @@
 body
   overscroll-behavior-y: contain
 
+
 .q-window
   color: currentColor
+
+  .disabled, [disabled]
+  &, *
+    outline: 0 !important
+    cursor: default !important
+    opacity: 1 !important
 
   &__touch-action
     touch-action: none
@@ -90,7 +97,7 @@ body
         height: 6px
         user-drag: none
         &:hover
-          cursor: n-resize
+          cursor: n-resize !important
 
         &-left
           top: -3px
@@ -99,7 +106,7 @@ body
           height: 6px
           user-drag: none
           &:hover
-            cursor: nw-resize
+            cursor: nw-resize !important
 
         &-right
           top: -3px
@@ -108,7 +115,7 @@ body
           height: 6px
           user-drag: none
           &:hover
-            cursor: ne-resize
+            cursor: ne-resize !important
 
       &--right
         top: 0
@@ -117,7 +124,7 @@ body
         height: 100%
         user-drag: none
         &:hover
-          cursor: e-resize
+          cursor: e-resize !important
 
       &--bottom
         bottom: -3px
@@ -126,7 +133,7 @@ body
         height: 6px
         user-drag: none
         &:hover
-          cursor: s-resize
+          cursor: s-resize !important
 
         &-left
           bottom: -3px
@@ -135,7 +142,7 @@ body
           height: 6px
           user-drag: none
           &:hover
-            cursor: sw-resize
+            cursor: sw-resize !important
 
         &-right
           bottom: -3px
@@ -144,7 +151,7 @@ body
           height: 6px
           user-drag: none
           &:hover
-            cursor: se-resize
+            cursor: se-resize !important
 
       &--left
           top: 0
@@ -153,7 +160,7 @@ body
           height: 100%
           user-drag: none
           &:hover
-            cursor: w-resize
+            cursor: w-resize !important
 
       &--titlebar
         top: 0
@@ -162,7 +169,7 @@ body
         height: 100%
         user-drag: none
         &:hover
-          cursor: move
+          cursor: move !important
 
 .gripper
   position: absolute
@@ -185,7 +192,7 @@ body
     user-drag: none
 
     &:hover
-      cursor: n-resize
+      cursor: n-resize !important
 
     &-left
       top: -($gripper-size)
@@ -193,7 +200,7 @@ body
       user-drag: none
 
       &:hover
-        cursor: nw-resize
+        cursor: nw-resize !important
 
     &-right
       top: -($gripper-size)
@@ -201,7 +208,7 @@ body
       user-drag: none
 
       &:hover
-        cursor: ne-resize
+        cursor: ne-resize !important
 
   &-left
     left: -($gripper-size)
@@ -210,7 +217,7 @@ body
     user-drag: none
 
     &:hover
-      cursor: w-resize
+      cursor: w-resize !important
 
   &-right
     right: -($gripper-size)
@@ -219,7 +226,7 @@ body
     user-drag: none
 
     &:hover
-      cursor: e-resize
+      cursor: e-resize !important
 
   &-bottom
     bottom: -($gripper-size)
@@ -228,7 +235,7 @@ body
     user-drag: none
 
     &:hover
-      cursor: s-resize
+      cursor: s-resize !important
 
     &-left
       bottom: -($gripper-size)
@@ -236,7 +243,7 @@ body
       user-drag: none
 
       &:hover
-        cursor: sw-resize
+        cursor: sw-resize !important
 
     &-right
       bottom: -($gripper-size)
@@ -244,7 +251,7 @@ body
       user-drag: none
 
       &:hover
-        cursor: se-resize
+        cursor: se-resize !important
 
 .q-dark div,
 .body--dark div,
