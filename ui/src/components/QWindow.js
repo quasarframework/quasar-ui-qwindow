@@ -31,14 +31,6 @@ import useResize from "./composables/useResize";
 import useStyle from "./composables/useStyle";
 import { prevent, stopAndPrevent } from 'quasar/src/utils/event'
 
-// import { QColorizeMixin } from 'q-colorize-mixin'
-// import canRender from 'quasar/src/mixins/can-render'
-//
-// // Utils
-// import { prevent, stopAndPrevent } from 'quasar/src/utils/event'
-//
-// mixins: [QColorizeMixin, canRender],
-
 
 // the starting zIndex for floating windows
 const startingZIndex = 4000
@@ -303,20 +295,6 @@ export default defineComponent({
     let context;
     const { state, send, service } = useMachine(qWindowMachine, {
         context: {
-
-          // the position of the box
-          x: 0,
-          y: 0,
-
-          // the click position
-          pointerX: 0,
-          pointerY: 0,
-
-          // how far from where you clicked
-          dx: 0, // how far: x
-          dy: 0, // how far: y
-
-
           tmpTop: 0,
           tmpLeft: 0,
           tmpRight: 0,
@@ -541,7 +519,7 @@ export default defineComponent({
 
             prevent(evt)
 
-
+console.log(states.value.right)
             return {
               ...ctx,
               mX: x,
@@ -560,8 +538,8 @@ export default defineComponent({
 
           onMouseMove: assign((ctx, event) => {
             const [ resizeHandle, evt ] = event.value
-            console.log('----------------------------------')
-            console.log(resizeHandle)
+
+
             if (states.value.shouldDrag !== true || (evt.touches === void 0 && evt.buttons !== 1)) {
               removeEventListeners()
               return
@@ -584,33 +562,39 @@ export default defineComponent({
 
             switch (resizeHandle || resizeH.value) {
               case 'top':
-                states.value.top = mouseY - window.pageYOffset - ctx.shiftY
+                states.value.top = mouseY - window.scrollY - ctx.shiftY
                 if (computedHeight.value < states.value.minHeight) {
                   states.value.top = ctx.tmpBottom - states.value.minHeight
                 }
                 break
               case 'left':
-                states.value.left = mouseX - window.pageXOffset - ctx.shiftX
+                states.value.left = mouseX - window.scrollX - ctx.shiftX
                 if (computedWidth.value < states.value.minWidth) {
                   states.value.left = ctx.tmpRight - states.value.minWidth
                 }
                 break
               case 'right':
-                states.value.right = mouseX - window.pageXOffset
+                states.value.right = mouseX - window.scrollX
                 if (computedWidth.value < states.value.minWidth) {
                   states.value.right = ctx.tmpLeft - states.value.minWidth
                 }
                 break
               case 'bottom':
-                states.value.bottom = mouseY - window.pageYOffset
+                states.value.bottom = mouseY - window.scrollY
                 if (computedHeight.value < states.value.minHeight) {
                   states.value.bottom = ctx.tmpTop - states.value.minHeight
                 }
 
                 break
               case 'titlebar':
-                states.value.top = mouseY - window.pageYOffset - ctx.shiftY
-                states.value.left = mouseX - window.pageXOffset - ctx.shiftX
+                if(props.scrollWithWindow) {
+                  states.value.top = mouseY - ctx.shiftY
+                  states.value.left = mouseX - ctx.shiftX
+                } else {
+                  states.value.top = mouseY - window.scrollY - ctx.shiftY
+                  states.value.left = mouseX - window.scrollX - ctx.shiftX
+                }
+
                 states.value.bottom = states.value.top - ctx.tmpHeight
                 states.value.right = states.value.left - ctx.tmpWidth
                 break
@@ -619,7 +603,6 @@ export default defineComponent({
             }
 
 
-            console.info('ON MOUSE EVENT')
               stopAndPrevent(evt)
             return {
               ...ctx,
@@ -779,12 +762,12 @@ export default defineComponent({
 
 
     service.onTransition((state) => {
-      if (state.changed) {
-        context = state.context
-        console.log(state.value)
-        console.log(state.context)
-        console.log(states.value)
-      }
+      // if (state.changed) {
+      //   context = state.context
+      //   console.log(state.value)
+      //   console.log(state.context)
+      //   console.log(states.value)
+      // }
       // console.log(states.value)
     })
 
@@ -810,7 +793,7 @@ export default defineComponent({
       states.value.bottom = states.value.top + props.height
 
 
-      // document.addEventListener('scroll', this.__onScroll, { passive: true })
+      document.addEventListener('scroll', onScroll, { passive: true })
       // set up mousedown on body (so windows can deselect themselves on outside click)
       // document.body.addEventListener('mousedown', this.__onMouseDownBody, { passive: false })
 
@@ -821,6 +804,13 @@ export default defineComponent({
         type: evt.type,
         value: [ void 0, evt ]
       })
+    }
+
+    function onScroll (e) {
+      if (window !== void 0) {
+        scrollY.value = window.pageYOffset
+        scrollX.value = window.pageXOffset
+      }
     }
 
     function addEventListeners() {
@@ -845,8 +835,8 @@ export default defineComponent({
     // TODO ?
     watch([ () => $q.screen.height, () => $q.screen.width ], ([ height, width ]) => {
       if (state.value.context.actions.fullscreen.state === true) {
-        states.value.bottom = height
-        states.value.right = width
+        //states.value.bottom = height
+       // states.value.right = width
       }
     })
 
@@ -972,7 +962,7 @@ export default defineComponent({
           height: '100%'
         }
       } else {
-        const top = states.value.top
+        const top = states.value.top + (props.scrollWithWindow !== true ? scrollY.value : 0)
         const left = states.value.left + (props.scrollWithWindow !== true ? scrollX.value : 0)
         console.log(top)
         console.log(left)
@@ -1056,7 +1046,7 @@ export default defineComponent({
 
     function render() {
       return h(Teleport, {
-        to: 'body',
+        to: '#q-app',
         disabled: props.modelValue
       }, [renderWindow()])
     }
