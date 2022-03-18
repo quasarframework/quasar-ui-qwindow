@@ -52,7 +52,7 @@ import '@quasar/quasar-ui-qwindow/src/index.sass'
 
 import { ref } from 'vue'
 
-let showModal = ref(false)
+let showModal = ref(true)
 const visible = ref(true)
 
 const actions1 =['embedded', 'pin', 'maximize', 'fullscreen']

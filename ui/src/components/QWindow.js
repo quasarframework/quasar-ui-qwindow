@@ -381,6 +381,83 @@ export default defineComponent({
 
     const { removeClass, addClass } = useStyle()
 
+
+    onMounted(() => {
+
+      // calculate left starting position
+      if (props.startX > 0) {
+        states.value.left = props.startX
+      } else {
+        states.value.left = defaultX * QWindowCount
+      }
+      //
+      // calculate top starting position
+      if (props.startY > 0) {
+        states.value.top = props.startY
+      } else {
+        states.value.top = defaultY * QWindowCount
+      }
+
+      // calculate right and bottom starting positions
+      states.value.right = states.value.left + props.width
+      states.value.bottom = states.value.top + props.height
+
+      if (props.modelValue !== void 0) {
+        if (props.modelValue === true) {
+          setActionState(ACTION_VISIBLE, true)
+        }
+        else {
+          setActionState(ACTION_VISIBLE, false)
+        }
+      }
+      if (props.embedded !== void 0) {
+        if (props.embedded === true) {
+          setActionState(ACTION_EMBEDDED, true)
+        }
+        else {
+          setActionState(ACTION_EMBEDDED, false)
+        }
+      }
+      if (props.pinned !== void 0) {
+        if (props.pinned === true) {
+          if (checkActionState(ACTION_PINNED, true)) {
+            setActionState(ACTION_PINNED, true)
+          }
+        }
+        else {
+          if (checkActionState(ACTION_PINNED, false)) {
+            setActionState(ACTION_PINNED, false)
+          }
+        }
+      }
+      if (props.fullscreen !== void 0) {
+        if (props.fullscreen === true) {
+          fullscreenEnter()
+        }
+      }
+      if (props.maximized !== void 0) {
+        if (props.maximized === true && getActionState(ACTION_VISIBLE) !== true) {
+          setActionState(ACTION_MAXIMIZE, true)
+        }
+        else {
+          setActionState(ACTION_MAXIMIZE, false)
+        }
+      }
+      if (props.minimized !== void 0) {
+        if (props.minimized === true && getActionState(ACTION_FULLSCREEN) !== true) {
+          setActionState(ACTION_MINIMIZE, true)
+        }
+        else {
+          setActionState(ACTION_MINIMIZE, false)
+        }
+      }
+
+      document.addEventListener('scroll', onScroll, { passive: true })
+      document.body.addEventListener('mousedown', onMouseDownBody, { passive: false })
+    })
+
+
+
     function show() {
       if (checkActionState(ACTION_VISIBLE, true)) {
         setActionState(ACTION_VISIBLE, true)
@@ -465,14 +542,14 @@ export default defineComponent({
     }
 
     function restore() {
-      if (isActionActive(ACTION_VISIBLE) !== true) {
+      if (getActionState(ACTION_VISIBLE) !== true) {
         // not allowed
         return
 
       }
-      if (isActionActive(ACTION_MAXIMIZE) === true) {
+      if (getActionState(ACTION_MAXIMIZE) === true) {
         setActionState(ACTION_MAXIMIZE, false)
-      } else if (isActionActive(ACTION_MINIMIZE) === true) {
+      } else if (getActionState(ACTION_MINIMIZE) === true) {
         setActionState(ACTION_MINIMIZE, false)
       }
     }
@@ -482,7 +559,7 @@ export default defineComponent({
 
     // toggle fullscreen mode
     function toggleFullscreen() {
-      if (isActionActive(ACTION_VISIBLE) !== true) {
+      if (getActionState(ACTION_VISIBLE) !== true) {
         // not allowed
         return
       }
@@ -513,80 +590,80 @@ export default defineComponent({
       switch (mode) {
         case ACTION_VISIBLE:
           if (state) {
-            if (isActionActive(ACTION_VISIBLE) !== true) {
+            if (getActionState(ACTION_VISIBLE) !== true) {
               allowed = true
             }
           } else {
-            if (isActionActive(ACTION_VISIBLE) === true) {
+            if (getActionState(ACTION_VISIBLE) === true) {
               allowed = true
             }
           }
           break
         case ACTION_EMBEDDED:
           if (state) {
-            if (isActionActive(ACTION_EMBEDDED) !== true
-              && isActionActive(ACTION_FULLSCREEN) !== true) {
+            if (getActionState(ACTION_EMBEDDED) !== true
+              && getActionState(ACTION_FULLSCREEN) !== true) {
               allowed = true
             }
           } else {
-            if (isActionActive(ACTION_EMBEDDED) === true
-              && isActionActive(ACTION_FULLSCREEN) !== true) {
+            if (getActionState(ACTION_EMBEDDED) === true
+              && getActionState(ACTION_FULLSCREEN) !== true) {
               allowed = true
             }
           }
           break
         case ACTION_PINNED:
           if (state) {
-            if (isActionActive(ACTION_PINNED) !== true
-              && isActionActive(ACTION_EMBEDDED) !== true
-              && isActionActive(ACTION_MAXIMIZE) !== true
-              && isActionActive(ACTION_MINIMIZE) !== true
-              && isActionActive(ACTION_FULLSCREEN) !== true) {
+            if (getActionState(ACTION_PINNED) !== true
+              && getActionState(ACTION_EMBEDDED) !== true
+              && getActionState(ACTION_MAXIMIZE) !== true
+              && getActionState(ACTION_MINIMIZE) !== true
+              && getActionState(ACTION_FULLSCREEN) !== true) {
               allowed = true
             }
           } else {
-            if (isActionActive(ACTION_PINNED) === true
-              && isActionActive(ACTION_EMBEDDED) !== true
-              && isActionActive(ACTION_MAXIMIZE) !== true
-              && isActionActive(ACTION_MINIMIZE) !== true
-              && isActionActive(ACTION_FULLSCREEN) !== true) {
+            if (getActionState(ACTION_PINNED) === true
+              && getActionState(ACTION_EMBEDDED) !== true
+              && getActionState(ACTION_MAXIMIZE) !== true
+              && getActionState(ACTION_MINIMIZE) !== true
+              && getActionState(ACTION_FULLSCREEN) !== true) {
               allowed = true
             }
           }
           break
         case ACTION_MAXIMIZE:
           if (state) {
-            if (isActionActive(ACTION_MINIMIZE) !== true
-              && isActionActive(ACTION_EMBEDDED) !== true
-              && isActionActive(ACTION_MAXIMIZE) !== true
-              && isActionActive(ACTION_FULLSCREEN) !== true) {
+            if (getActionState(ACTION_MINIMIZE) !== true
+              && getActionState(ACTION_EMBEDDED) !== true
+              && getActionState(ACTION_MAXIMIZE) !== true
+              && getActionState(ACTION_FULLSCREEN) !== true) {
               allowed = true
             }
           } else {
-            if (isActionActive(ACTION_MAXIMIZE) === true
-              && isActionActive(ACTION_EMBEDDED) !== true
-              && isActionActive(ACTION_MINIMIZE) !== true
-              && isActionActive(ACTION_FULLSCREEN) !== true) {
+            if (getActionState(ACTION_MAXIMIZE) === true
+              && getActionState(ACTION_EMBEDDED) !== true
+              && getActionState(ACTION_MINIMIZE) !== true
+              && getActionState(ACTION_FULLSCREEN) !== true) {
               allowed = true
             }
           }
           break
         case ACTION_FULLSCREEN:
           if (state === true) {
-            if (isActionActive(ACTION_FULLSCREEN) !== true
-              && isActionActive(ACTION_EMBEDDED) !== true) {
+            if (getActionState(ACTION_FULLSCREEN) !== true
+              && getActionState(ACTION_EMBEDDED) !== true) {
               allowed = true
             }
           } else {
-            if (isActionActive(ACTION_FULLSCREEN) === true
-              && isActionActive(ACTION_EMBEDDED) !== true) {
+            if (getActionState(ACTION_FULLSCREEN) === true
+              && getActionState(ACTION_EMBEDDED) !== true) {
               allowed = true
             }
           }
           break
         case ACTION_CLOSE:
           if (state === true) {
-            if (isActionActive(ACTION_EMBEDDED) !== true) {
+            if (getActionState(ACTION_EMBEDDED) !== true) {
               allowed = true
             }
           } else {
@@ -600,7 +677,7 @@ export default defineComponent({
     }
 
     //
-    function isActionActive(name) {
+    function getActionState(name) {
       if (name in actionItems.value) {
         return actionItems.value[ name ].state
       }
@@ -616,32 +693,7 @@ export default defineComponent({
       return false
     }
 
-    //
-    //
-    // onMounted(() => {
-    //
-    //   // calculate left starting position
-    //   if (props.startX > 0) {
-    //     states.value.left = props.startX
-    //   } else {
-    //     state.left = defaultX * QWindowCount
-    //   }
-    //   //
-    //   // calculate top starting position
-    //   if (props.startY > 0) {
-    //     states.value.top = props.startY
-    //   } else {
-    //     states.value.top = defaultY * QWindowCount
-    //   }
-    //
-    //   // calculate right and bottom starting positions
-    //   states.value.right = states.value.left + props.width
-    //   states.value.bottom = states.value.top + props.height
-    //
-    //
-    //   document.addEventListener('scroll', onScroll, { passive: true })
-    //
-    // })
+
 
 
     function onScroll(e) {
@@ -893,10 +945,10 @@ export default defineComponent({
 
       restoreState.value.zIndex = computedZIndex.value
 
-      restoreState.value.pinned = isActionActive(ACTION_PINNED)
-      restoreState.value.embedded = isActionActive(ACTION_EMBEDDED)
-      restoreState.value.maximize = isActionActive(ACTION_MAXIMIZE)
-      restoreState.value.minimize = isActionActive(ACTION_MINIMIZE)
+      restoreState.value.pinned = getActionState(ACTION_PINNED)
+      restoreState.value.embedded = getActionState(ACTION_EMBEDDED)
+      restoreState.value.maximize = getActionState(ACTION_MAXIMIZE)
+      restoreState.value.minimize = getActionState(ACTION_MINIMIZE)
 
       console.log(`Save Position: ${ restoreState.value }`)
 
@@ -967,31 +1019,31 @@ export default defineComponent({
       }
     })
     const isVisible = computed(() => {
-      return isActionActive(ACTION_VISIBLE)
+      return getActionState(ACTION_VISIBLE)
     })
 
     const isEmbedded = computed(() => {
-      return isActionActive(ACTION_EMBEDDED)
+      return getActionState(ACTION_EMBEDDED)
     })
 
     const isFloating = computed(() => {
-      return isActionActive(ACTION_EMBEDDED) !== true
+      return getActionState(ACTION_EMBEDDED) !== true
     })
 
     const isPinned = computed(() => {
-      return isActionActive(ACTION_PINNED)
+      return getActionState(ACTION_PINNED)
     })
 
     const isFullscreen = computed(() => {
-      return isActionActive(ACTION_FULLSCREEN)
+      return getActionState(ACTION_FULLSCREEN)
     })
 
     const isMaximized = computed(() => {
-      return isActionActive(ACTION_MAXIMIZE)
+      return getActionState(ACTION_MAXIMIZE)
     })
 
     const isMinimized = computed(() => {
-      return isActionActive(ACTION_MINIMIZE)
+      return getActionState(ACTION_MINIMIZE)
     })
 
     const isDisabled = computed(() => {
