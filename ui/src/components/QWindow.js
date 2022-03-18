@@ -22,8 +22,6 @@ import useBody from "./composables/useBody";
 import { prevent, stopAndPrevent } from 'quasar/src/utils/event'
 
 
-
-
 // the starting zIndex for floating windows
 const startingZIndex = 4000
 
@@ -71,15 +69,15 @@ const getMouseShift = function (e, rect, type = 'x') {
   }
 }
 
-
-const MENU_ITEM_VISIBLE = 'visible';
-const MENU_ITEM_EMBEDDED = 'embedded';
-const MENU_ITEM_FULLSCREEN = 'fullscreen';
-const MENU_ITEM_PINNED = 'pinned';
-const MENU_ITEM_MAXIMIZE = 'maximize';
-const MENU_ITEM_MINIMIZE = 'minimize';
-const MENU_ITEM_CLOSE = 'close';
-export const MENU_ITEM_SEPARATOR = 'separator';
+const ACTION_HIDDEN = 'hidden'
+const ACTION_VISIBLE = 'visible'
+const ACTION_EMBEDDED = 'embedded'
+const ACTION_FULLSCREEN = 'fullscreen'
+const ACTION_PINNED = 'pinned'
+const ACTION_MAXIMIZE = 'maximize'
+const ACTION_MINIMIZE = 'minimize'
+const ACTION_CLOSE = 'close'
+export const MENU_ITEM_SEPARATOR = 'separator'
 
 export default defineComponent({
   name: 'QWindow',
@@ -158,14 +156,14 @@ export default defineComponent({
     },
     actions: {
       type: Array,
-      default: () => ([ 'pin', MENU_ITEM_EMBEDDED, MENU_ITEM_CLOSE ]),
+      default: () => ([ ACTION_PINNED, ACTION_EMBEDDED, ACTION_CLOSE ]),
       validator: (v) => v.some(action => [
-        'pin',
-        MENU_ITEM_EMBEDDED,
-        MENU_ITEM_MINIMIZE,
-        MENU_ITEM_MAXIMIZE,
-        MENU_ITEM_CLOSE,
-        MENU_ITEM_FULLSCREEN ].includes(action))
+        ACTION_PINNED,
+        ACTION_EMBEDDED,
+        ACTION_MINIMIZE,
+        ACTION_MAXIMIZE,
+        ACTION_CLOSE,
+        ACTION_FULLSCREEN ].includes(action))
     },
     menuFunc: Function,
     titlebarStyle: [ String, Object, Array ],
@@ -177,11 +175,11 @@ export default defineComponent({
   emits: [
     'selected',
     'input',
-    MENU_ITEM_FULLSCREEN,
-    MENU_ITEM_EMBEDDED,
-    MENU_ITEM_PINNED,
-    MENU_ITEM_MAXIMIZE,
-    MENU_ITEM_MINIMIZE,
+    'fullscreen',
+    'embedded',
+    'pinned',
+    'maximize',
+    'minimize',
     'position',
     'canceled',
     'beforeDrag',
@@ -251,7 +249,7 @@ export default defineComponent({
       },
     })
 
-    const menuActionItems = ref({
+    const actionItems = ref({
 
       visible: {
         state: true,
@@ -271,7 +269,7 @@ export default defineComponent({
         on: {
           label: props.iconSet !== void 0 && props.iconSet.embedded !== void 0 && props.iconSet.embedded.on !== void 0 && props.iconSet.embedded.on.label !== void 0 ? props.iconSet.embedded.on.label : iconSetTemplate.value.embedded.on.label,
           icon: props.iconSet !== void 0 && props.iconSet.embedded !== void 0 && props.iconSet.embedded.on !== void 0 && props.iconSet.embedded.on.icon !== void 0 ? props.iconSet.embedded.on.icon : iconSetTemplate.value.embedded.on.icon,
-         func: lock
+          func: lock
         },
         off: {
           label: props.iconSet !== void 0 && props.iconSet.embedded !== void 0 && props.iconSet.embedded.off !== void 0 && props.iconSet.embedded.off.label !== void 0 ? props.iconSet.embedded.off.label : iconSetTemplate.value.embedded.off.label,
@@ -284,7 +282,7 @@ export default defineComponent({
         on: {
           label: props.iconSet !== void 0 && props.iconSet.pinned !== void 0 && props.iconSet.pinned.on !== void 0 && props.iconSet.pinned.on.label !== void 0 ? props.iconSet.pinned.on.label : iconSetTemplate.value.pinned.on.label,
           icon: props.iconSet !== void 0 && props.iconSet.pinned !== void 0 && props.iconSet.pinned.on !== void 0 && props.iconSet.pinned.on.icon !== void 0 ? props.iconSet.pinned.on.icon : iconSetTemplate.value.pinned.on.icon,
-        func: pin
+          func: pin
         },
         off: {
           label: props.iconSet !== void 0 && props.iconSet.pinned !== void 0 && props.iconSet.pinned.off !== void 0 && props.iconSet.pinned.off.label !== void 0 ? props.iconSet.pinned.off.label : iconSetTemplate.value.pinned.off.label,
@@ -302,7 +300,7 @@ export default defineComponent({
         off: {
           label: props.iconSet !== void 0 && props.iconSet.fullscreen !== void 0 && props.iconSet.fullscreen.off !== void 0 && props.iconSet.fullscreen.off.label !== void 0 ? props.iconSet.fullscreen.off.label : iconSetTemplate.value.fullscreen.off.label,
           icon: props.iconSet !== void 0 && props.iconSet.fullscreen !== void 0 && props.iconSet.fullscreen.off !== void 0 && props.iconSet.fullscreen.off.icon !== void 0 ? props.iconSet.fullscreen.off.icon : iconSetTemplate.value.fullscreen.off.icon,
-         func: fullscreenLeave
+          func: fullscreenLeave
         }
       },
       maximize: {
@@ -310,7 +308,7 @@ export default defineComponent({
         on: {
           label: props.iconSet !== void 0 && props.iconSet.maximize !== void 0 && props.iconSet.maximize.on !== void 0 && props.iconSet.maximize.on.label !== void 0 ? props.iconSet.maximize.on.label : iconSetTemplate.value.maximize.on.label,
           icon: props.iconSet !== void 0 && props.iconSet.maximize !== void 0 && props.iconSet.maximize.on !== void 0 && props.iconSet.maximize.on.icon !== void 0 ? props.iconSet.maximize.on.icon : iconSetTemplate.value.maximize.on.icon,
-         func: maximize
+          func: maximize
         },
         off: {
           label: props.iconSet !== void 0 && props.iconSet.maximize !== void 0 && props.iconSet.maximize.off !== void 0 && props.iconSet.maximize.off.label !== void 0 ? props.iconSet.maximize.off.label : iconSetTemplate.value.maximize.off.label,
@@ -323,7 +321,7 @@ export default defineComponent({
         on: {
           label: props.iconSet !== void 0 && props.iconSet.minimize !== void 0 && props.iconSet.minimize.on !== void 0 && props.iconSet.minimize.on.label !== void 0 ? props.iconSet.minimize.on.label : iconSetTemplate.value.minimize.on.label,
           icon: props.iconSet !== void 0 && props.iconSet.minimize !== void 0 && props.iconSet.minimize.on !== void 0 && props.iconSet.minimize.on.icon !== void 0 ? props.iconSet.minimize.on.icon : iconSetTemplate.value.minimize.on.icon,
-         func: minimize
+          func: minimize
 
         },
         off: {
@@ -337,7 +335,7 @@ export default defineComponent({
     const shiftX = ref(0)
     const shiftY = ref(0)
     const mousePos = ref({
-      x:0, y:0
+      x: 0, y: 0
     })
     const statesTmp = ref({
       tmpTop: 0,
@@ -384,8 +382,8 @@ export default defineComponent({
     const { removeClass, addClass } = useStyle()
 
     function show() {
-      if (checkMenuItemState('visible', true)) {
-        setMenuItemState('visible', true)
+      if (checkActionState(ACTION_VISIBLE, true)) {
+        setActionState(ACTION_VISIBLE, true)
         return true
       }
       return false
@@ -394,8 +392,8 @@ export default defineComponent({
 
     // hide the component
     function hide() {
-      if (checkMenuItemState('visible', false)) {
-        setMenuItemState('visible', false)
+      if (checkActionState(ACTION_VISIBLE, false)) {
+        setActionState(ACTION_VISIBLE, false)
         return true
       }
       return false
@@ -403,26 +401,26 @@ export default defineComponent({
 
     // embedded
     function lock() {
-     if (checkMenuItemState('embedded', true)) {
-       setMenuItemState('embedded', true)
-       return true
-     }
+      if (checkActionState(ACTION_EMBEDDED, true)) {
+        setActionState(ACTION_EMBEDDED, true)
+        return true
+      }
       return false
     }
 
     // floating
     function unlock() {
-     if (checkMenuItemState('embedded', false)) {
-       setMenuItemState('embedded', false)
-       return true
-     }
+      if (checkActionState(ACTION_EMBEDDED, false)) {
+        setActionState(ACTION_EMBEDDED, false)
+        return true
+      }
       return false
     }
 
     // pinned (can't move or re-size)
     function pin() {
-      if (checkMenuItemState('pinned', true)) {
-        setMenuItemState('pinned', true)
+      if (checkActionState(ACTION_PINNED, true)) {
+        setActionState(ACTION_PINNED, true)
         return true
       }
       return false
@@ -431,23 +429,23 @@ export default defineComponent({
 
     // move and resize available, if not embedded
     function unpin() {
-      if (checkMenuItemState('pinned', false)) {
-        setMenuItemState('pinned', false)
+      if (checkActionState(ACTION_PINNED, false)) {
+        setActionState(ACTION_PINNED, false)
         return true
       }
       return false
     }
 
     function maximize() {
-      if (checkMenuItemState('maximize', true)) {
+      if (checkActionState(ACTION_MAXIMIZE, true)) {
         //thisbringToFront()
         savePositionAndState()
         setFullWindowPosition()
 
 
-        setMenuItemState('embedded', false)
+        setActionState(ACTION_EMBEDDED, false)
         nextTick(() => {
-          setMenuItemState('maximize', true)
+          setActionState(ACTION_MAXIMIZE, true)
         })
         return true
       }
@@ -455,38 +453,36 @@ export default defineComponent({
     }
 
     function minimize() {
-      if (checkMenuItemState('minimize', true)) {
+      if (checkActionState(ACTION_MINIMIZE, true)) {
         savePositionAndState()
         setMinimizePosition()
 
-        setMenuItemState('embedded', true)
-        setMenuItemState('minimize', true)
+        setActionState(ACTION_EMBEDDED, true)
+        setActionState(ACTION_MINIMIZE, true)
         return true
       }
       return false
     }
 
     function restore() {
-      if (isMenuItemActive('visible') !== true) {
+      if (isActionActive(ACTION_VISIBLE) !== true) {
         // not allowed
         return
 
       }
-      if (isMenuItemActive('maximize') === true) {
-        setMenuItemState('maximize', false)
-        this.$emit('maximize', false)
-      } else if (isMenuItemActive('minimize') === true) {
-        setMenuItemState('minimize', false)
+      if (isActionActive(ACTION_MAXIMIZE) === true) {
+        setActionState(ACTION_MAXIMIZE, false)
+      } else if (isActionActive(ACTION_MINIMIZE) === true) {
+        setActionState(ACTION_MINIMIZE, false)
       }
     }
 
     // go into fullscreen mode
 
 
-
     // toggle fullscreen mode
     function toggleFullscreen() {
-      if (isMenuItemActive('visible') !== true) {
+      if (isActionActive(ACTION_VISIBLE) !== true) {
         // not allowed
         return
       }
@@ -494,7 +490,7 @@ export default defineComponent({
     }
 
     function fullscreenEnter() {
-      if (checkMenuItemState('fullscreen', true)) {
+      if (checkActionState(ACTION_FULLSCREEN, true)) {
         fullscreenInitiated.value = true
         AppFullscreen.request(windowRef.value)
         return true
@@ -504,7 +500,7 @@ export default defineComponent({
 
     // leave fullscreen mode
     function fullscreenLeave() {
-      if (checkMenuItemState('fullscreen', false)) {
+      if (checkActionState(ACTION_FULLSCREEN, false)) {
         AppFullscreen.exit()
         return true
       }
@@ -512,114 +508,114 @@ export default defineComponent({
     }
 
 
-    function checkMenuItemState(mode, state) {
-      let active = false
+    function checkActionState(mode, state) {
+      let allowed = false
       switch (mode) {
-        case MENU_ITEM_VISIBLE:
+        case ACTION_VISIBLE:
           if (state) {
-            if (isMenuItemActive(MENU_ITEM_VISIBLE) !== true) {
-              active = true
+            if (isActionActive(ACTION_VISIBLE) !== true) {
+              allowed = true
             }
           } else {
-            if (isMenuItemActive(MENU_ITEM_VISIBLE) === true) {
-              active = true
+            if (isActionActive(ACTION_VISIBLE) === true) {
+              allowed = true
             }
           }
           break
-        case MENU_ITEM_EMBEDDED:
-          console.log('EMBEDDED')
+        case ACTION_EMBEDDED:
           if (state) {
-            if (isMenuItemActive(MENU_ITEM_EMBEDDED) !== true
-              && isMenuItemActive(MENU_ITEM_FULLSCREEN) !== true) {
-              console.log('EMBEDDED')
-              active = true
+            if (isActionActive(ACTION_EMBEDDED) !== true
+              && isActionActive(ACTION_FULLSCREEN) !== true) {
+              allowed = true
             }
           } else {
-            if (isMenuItemActive(MENU_ITEM_EMBEDDED) === true
-              && isMenuItemActive(MENU_ITEM_FULLSCREEN) !== true) {
-              active = true
+            if (isActionActive(ACTION_EMBEDDED) === true
+              && isActionActive(ACTION_FULLSCREEN) !== true) {
+              allowed = true
             }
           }
           break
-        case MENU_ITEM_PINNED:
+        case ACTION_PINNED:
           if (state) {
-            if (isMenuItemActive(MENU_ITEM_PINNED) !== true
-              && isMenuItemActive(MENU_ITEM_EMBEDDED) !== true
-              && isMenuItemActive(MENU_ITEM_MAXIMIZE) !== true
-              && isMenuItemActive(MENU_ITEM_MINIMIZE) !== true
-              && isMenuItemActive(MENU_ITEM_FULLSCREEN) !== true) {
-              active = true
+            if (isActionActive(ACTION_PINNED) !== true
+              && isActionActive(ACTION_EMBEDDED) !== true
+              && isActionActive(ACTION_MAXIMIZE) !== true
+              && isActionActive(ACTION_MINIMIZE) !== true
+              && isActionActive(ACTION_FULLSCREEN) !== true) {
+              allowed = true
             }
           } else {
-            if (isMenuItemActive(MENU_ITEM_PINNED) === true
-              && isMenuItemActive(MENU_ITEM_EMBEDDED) !== true
-              && isMenuItemActive(MENU_ITEM_MAXIMIZE) !== true
-              && isMenuItemActive(MENU_ITEM_MINIMIZE) !== true
-              && isMenuItemActive(MENU_ITEM_FULLSCREEN) !== true) {
-              active = true
+            if (isActionActive(ACTION_PINNED) === true
+              && isActionActive(ACTION_EMBEDDED) !== true
+              && isActionActive(ACTION_MAXIMIZE) !== true
+              && isActionActive(ACTION_MINIMIZE) !== true
+              && isActionActive(ACTION_FULLSCREEN) !== true) {
+              allowed = true
             }
           }
           break
-        case MENU_ITEM_MAXIMIZE:
+        case ACTION_MAXIMIZE:
           if (state) {
-            if (isMenuItemActive(MENU_ITEM_MINIMIZE) !== true
-              && isMenuItemActive(MENU_ITEM_EMBEDDED) !== true
-              && isMenuItemActive(MENU_ITEM_MAXIMIZE) !== true
-              && isMenuItemActive(MENU_ITEM_FULLSCREEN) !== true) {
-              active = true
+            if (isActionActive(ACTION_MINIMIZE) !== true
+              && isActionActive(ACTION_EMBEDDED) !== true
+              && isActionActive(ACTION_MAXIMIZE) !== true
+              && isActionActive(ACTION_FULLSCREEN) !== true) {
+              allowed = true
             }
           } else {
-            if (isMenuItemActive(MENU_ITEM_MAXIMIZE) === true
-              && isMenuItemActive(MENU_ITEM_EMBEDDED) !== true
-              && isMenuItemActive(MENU_ITEM_MINIMIZE) !== true
-              && isMenuItemActive(MENU_ITEM_FULLSCREEN) !== true) {
-              active = true
+            if (isActionActive(ACTION_MAXIMIZE) === true
+              && isActionActive(ACTION_EMBEDDED) !== true
+              && isActionActive(ACTION_MINIMIZE) !== true
+              && isActionActive(ACTION_FULLSCREEN) !== true) {
+              allowed = true
             }
           }
           break
-        case MENU_ITEM_FULLSCREEN:
+        case ACTION_FULLSCREEN:
           if (state === true) {
-            if (isMenuItemActive(MENU_ITEM_FULLSCREEN) !== true
-              && isMenuItemActive(MENU_ITEM_EMBEDDED) !== true) {
-              active = true
+            if (isActionActive(ACTION_FULLSCREEN) !== true
+              && isActionActive(ACTION_EMBEDDED) !== true) {
+              allowed = true
             }
           } else {
-            if (isMenuItemActive(MENU_ITEM_FULLSCREEN) === true
-              && isMenuItemActive(MENU_ITEM_EMBEDDED) !== true) {
-              active = true
+            if (isActionActive(ACTION_FULLSCREEN) === true
+              && isActionActive(ACTION_EMBEDDED) !== true) {
+              allowed = true
             }
           }
           break
-        case MENU_ITEM_CLOSE:
+        case ACTION_CLOSE:
           if (state === true) {
-            if (isMenuItemActive(MENU_ITEM_EMBEDDED) !== true) {
-              active = true
+            if (isActionActive(ACTION_EMBEDDED) !== true) {
+              allowed = true
             }
           } else {
-            active = true
+            allowed = true
           }
           break
         default:
           throw Error(`Unknown action type ${ mode }`)
       }
-      return active
+      return allowed
     }
 
     //
-    function isMenuItemActive(name) {
-      if (name in menuActionItems.value) {
-        return menuActionItems.value[ name ].state
+    function isActionActive(name) {
+      if (name in actionItems.value) {
+        return actionItems.value[ name ].state
       }
       return false
     }
+
     //
-    function setMenuItemState(id, val) {
-      if (id in menuActionItems.value) {
-        menuActionItems.value[ id ].state = val
+    function setActionState(id, val) {
+      if (id in actionItems.value) {
+        actionItems.value[ id ].state = val
         return true
       }
       return false
     }
+
     //
     //
     // onMounted(() => {
@@ -681,6 +677,7 @@ export default defineComponent({
       states.value.bottom = $q.screen.height
       states.value.right = $q.screen.width
     }
+
     //
     function setMinimizePosition() {
       const elements = document.getElementsByClassName('q-notifications__list--bottom')
@@ -688,9 +685,8 @@ export default defineComponent({
       //  elements[0].appendChild(this.$el)
       //}
     }
-    //
+
     // //// MOUSE ACTIONS
-    //
     function addEventListeners() {
       document.body.addEventListener('mousemove', onMouseMove, { capture: true })
       document.body.addEventListener('mouseup', onMouseUp, { capture: true })
@@ -702,7 +698,6 @@ export default defineComponent({
       document.body.removeEventListener('mouseup', onMouseUp, { capture: true })
       document.body.removeEventListener('keyup', onKeyUp, { capture: true })
     }
-
 
     function onMouseMove(evt, rh) {
 
@@ -829,7 +824,6 @@ export default defineComponent({
       prevent(evt)
     }
 
-
     // mousedown for document.body
     function onMouseDownBody(e) {
       if (isEmbedded.value) {
@@ -899,10 +893,10 @@ export default defineComponent({
 
       restoreState.value.zIndex = computedZIndex.value
 
-      restoreState.value.pinned = isMenuItemActive('pinned')
-      restoreState.value.embedded = isMenuItemActive('embedded')
-      restoreState.value.maximize = isMenuItemActive('maximize')
-      restoreState.value.minimize = isMenuItemActive('minimize')
+      restoreState.value.pinned = isActionActive(ACTION_PINNED)
+      restoreState.value.embedded = isActionActive(ACTION_EMBEDDED)
+      restoreState.value.maximize = isActionActive(ACTION_MAXIMIZE)
+      restoreState.value.minimize = isActionActive(ACTION_MINIMIZE)
 
       console.log(`Save Position: ${ restoreState.value }`)
 
@@ -915,17 +909,15 @@ export default defineComponent({
       states.value.right = restoreState.value.right
       zIndex.value = restoreState.value.zIndex
 
-      setMenuItemState('pinned', restoreState.value.pinned)
-      setMenuItemState('embedded', restoreState.value.embedded)
-      setMenuItemState('maximize', restoreState.value.maximize)
-      setMenuItemState('minimize', restoreState.value.minimize)
+      setActionState(ACTION_PINNED, restoreState.value.pinned)
+      setActionState(ACTION_EMBEDDED, restoreState.value.embedded)
+      setActionState(ACTION_MAXIMIZE, restoreState.value.maximize)
+      setActionState(ACTION_MINIMIZE, restoreState.value.minimize)
 
       console.log(`Save Position: ${ states.value }`)
     }
 
-
-
-    watch(() =>  menuActionItems.value.maximize.state , (val, oldVal) => {
+    watch(() => actionItems.value.maximize.state, (val, oldVal) => {
       if (oldVal === void 0) {
         // during initialization
         return
@@ -935,7 +927,7 @@ export default defineComponent({
       }
     })
 
-    watch(() =>  menuActionItems.value.minimize.state , (val, oldVal) => {
+    watch(() => actionItems.value.minimize.state, (val, oldVal) => {
       if (oldVal === void 0) {
         // during initialization
         return
@@ -945,64 +937,62 @@ export default defineComponent({
       }
     })
 
-    watch(() =>  menuActionItems.value.fullscreen.state , (val, oldVal) => {
+    watch(() => actionItems.value.fullscreen.state, (val, oldVal) => {
       if (oldVal === void 0) {
         return
       }
       if (val === true) {
         savePositionAndState()
         zIndex.value = maxZIndex
-      }
-      else {
+      } else {
         restorePositionAndState()
         fullscreenInitiated.value = val
       }
     })
 
-    watch(() =>  AppFullscreen.isActive, (val, oldVal) => {
+    watch(() => AppFullscreen.isActive, (val, oldVal) => {
       if (fullscreenInitiated.value === true) {
-        setMenuItemState('fullscreen', val)
+        setActionState(ACTION_FULLSCREEN, val)
       }
     })
 
-    watch(() =>  $q.screen.height, (val, oldVal) => {
+    watch(() => $q.screen.height, (val, oldVal) => {
       if (isFullscreen.value === true) {
         states.value.bottom = val
       }
     })
-    watch(() =>  $q.screen.width, (val, oldVal) => {
+    watch(() => $q.screen.width, (val, oldVal) => {
       if (isFullscreen.value === true) {
         states.value.right = val
       }
     })
     const isVisible = computed(() => {
-      return isMenuItemActive('visible')
+      return isActionActive(ACTION_VISIBLE)
     })
 
     const isEmbedded = computed(() => {
-      return isMenuItemActive('embedded')
+      return isActionActive(ACTION_EMBEDDED)
     })
 
     const isFloating = computed(() => {
-      return isMenuItemActive('embedded') !== true
+      return isActionActive(ACTION_EMBEDDED) !== true
     })
 
     const isPinned = computed(() => {
-      return isMenuItemActive('pinned')
+      return isActionActive(ACTION_PINNED)
     })
 
     const isFullscreen = computed(() => {
-      return isMenuItemActive('fullscreen')
+      return isActionActive(ACTION_FULLSCREEN)
     })
 
     const isMaximized = computed(() => {
-      return isMenuItemActive('maximize')
+      return isActionActive(ACTION_MAXIMIZE)
     })
 
     const isMinimized = computed(() => {
-      return isMenuItemActive('minimize')
+      return isActionActive(ACTION_MINIMIZE)
     })
-
 
     const isDisabled = computed(() => {
       return props.disabled === true
@@ -1030,18 +1020,18 @@ export default defineComponent({
     }
 
     const hasStateInfo = computed(() => {
-      return Object.keys(menuActionItems).length > 0
+      return Object.keys(actionItems.value).length > 0
     })
 
 
     const computedVisibility = computed(() => {
-      return isVisible.value === true ? 'visible' : 'hidden'
+      return isVisible.value === true ? ACTION_VISIBLE : ACTION_HIDDEN
     })
-    //
+
     const computedToolbarHeight = computed(() => {
       return props.headless === true ? 0 : props.dense === true ? 28 : 40
     })
-    //
+
     const computedLeft = computed(() => {
       return states.value.left
     })
@@ -1073,45 +1063,45 @@ export default defineComponent({
     const computedScrollY = computed(() => {
       return computedTop.value + (props.scrollWithWindow === false ? scrollY.value : 0)
     })
-    //
+
     const computedZIndex = computed(() => {
       let extra = 0
       if (isDragging.value) extra = 100
       return zIndex.value + extra
     })
 
-
-    const  computedActions = computed(() => {
+    const computedActions = computed(() => {
       // sort and pick ones that are visible based on user selection and state
       const actions = []
-      if (props.actions.includes('embedded') && (checkMenuItemState('embedded', true) || checkMenuItemState('embedded', false))) {
-        actions.push('embedded')
+      if (props.actions.includes(ACTION_EMBEDDED) && (checkActionState(ACTION_EMBEDDED, true) || checkActionState(ACTION_EMBEDDED, false))) {
+        actions.push(ACTION_EMBEDDED)
       }
-      if (props.actions.includes('pin') && (checkMenuItemState('pinned', true) || checkMenuItemState('pinned', false))) {
-        actions.push('pinned')
+      if (props.actions.includes(ACTION_PINNED) && (checkActionState(ACTION_PINNED, true) || checkActionState(ACTION_PINNED, false))) {
+        actions.push(ACTION_PINNED)
       }
-      if (props.actions.includes('fullscreen') && (checkMenuItemState('fullscreen', true) || checkMenuItemState('fullscreen', false))) {
-        actions.push('fullscreen')
+      if (props.actions.includes(ACTION_FULLSCREEN) && (checkActionState(ACTION_FULLSCREEN, true) || checkActionState(ACTION_FULLSCREEN, false))) {
+        actions.push(ACTION_FULLSCREEN)
       }
-      if (props.actions.includes('maximize') && (checkMenuItemState('maximize', true) || checkMenuItemState('maximize', false))) {
-        actions.push('maximize')
+      if (props.actions.includes(ACTION_MAXIMIZE) && (checkActionState(ACTION_MAXIMIZE, true) || checkActionState(ACTION_MAXIMIZE, false))) {
+        actions.push(ACTION_MAXIMIZE)
       }
-      // if (this.actions.includes('minimize') && (this.canDo('minimize', true) || this.canDo('minimize', false))) {
-      //   actions.push('maximize')
-      // }
-      if (props.actions.includes('close') && checkMenuItemState('close', true)) {
-        actions.push('visible')
+      if (props.actions.includes(ACTION_MINIMIZE) && (checkActionState(ACTION_MINIMIZE, true) || checkActionState(ACTION_MINIMIZE, false))) {
+        actions.push(ACTION_MINIMIZE)
+      }
+      if (props.actions.includes(ACTION_CLOSE) && checkActionState(ACTION_CLOSE, true)) {
+        actions.push(ACTION_VISIBLE)
       }
 
       return actions
     })
-    //
-    const computedMenuData = computed( () => {
+
+
+    const computedMenuData = computed(() => {
       // get stateInfo for each menu item
       const menuData = []
       computedActions.value.map(key => {
-        if (menuActionItems.value[ key ]) {
-          menuData.push({ ...menuActionItems.value[ key ], key: key })
+        if (actionItems.value[ key ]) {
+          menuData.push({ ...actionItems.value[ key ], key: key })
         }
       })
       return menuData
@@ -1201,11 +1191,17 @@ export default defineComponent({
 //
     const {
       renderGrippers,
-     renderResizeHandles,
+      renderResizeHandles,
       renderResizeHandle
-     } = useResize(props, slots, computedHeight, computedToolbarHeight, zIndex, canDrag, computedWidth,onMouseDown,onTouchStart,onTouchMove,onTouchEnd)
-    const { renderTitleBar } = useToolbar(props, slots, computedZIndex, canDrag, isDragging,   isEmbedded,isMinimized,computedMenuData, renderResizeHandle)
-    const { renderBody } = useBody(props, slots, computedHeight, computedToolbarHeight, zIndex, canDrag,isEmbedded,isFullscreen)
+    } = useResize(props, slots, computedHeight, computedToolbarHeight, zIndex, canDrag, computedWidth, onMouseDown, onTouchStart, onTouchMove, onTouchEnd)
+
+    const {
+      renderTitleBar
+    } = useToolbar(props, slots, computedZIndex, canDrag, isDragging, isEmbedded, isMinimized, computedMenuData, renderResizeHandle)
+
+    const {
+      renderBody
+    } = useBody(props, slots, computedHeight, computedToolbarHeight, zIndex, canDrag, isEmbedded, isFullscreen)
 
 
     function renderWindow() {
@@ -1218,18 +1214,18 @@ export default defineComponent({
       }, [
         (canDrag() === true) && [...renderResizeHandles()],
         (canDrag() === true) && [...renderGrippers()],
-         renderTitleBar(),
-         isMinimized.value !== true && renderBody()
+        renderTitleBar(),
+        isMinimized.value !== true && renderBody()
       ])
     }
 
     function render() {
       return h(Teleport, {
-        to: '#q-app',
-        disabled: isEmbedded.value
-      } ,
+          to: '#q-app',
+          disabled: isEmbedded.value
+        },
         [
-         renderWindow()
+          renderWindow()
         ]
       )
     }
