@@ -1,8 +1,7 @@
 import { h, ref } from "vue";
-import { prevent, stopAndPrevent } from 'quasar/src/utils/event'
 
 
-export default function useResize(props, slots, computedHeight, computedToolbarHeight, zIndex, state, canDrag, computedWidth, send) {
+export default function useResize(props, slots, computedHeight, computedToolbarHeight, zIndex, canDrag, computedWidth, onMouseDown, onTouchStart, onTouchMove, onTouchEnd) {
 
   const handles = ref([
     'top',
@@ -15,13 +14,6 @@ export default function useResize(props, slots, computedHeight, computedToolbarH
     'bottom-right'
   ])
 
-  function onSend(evt, resizeHandle) {
-    console.log(evt.type, resizeHandle)
-    send({
-      type: evt.type,
-      value: [ resizeHandle,evt ]
-    })
-  }
 
   function canResize(resizeHandle) {
     if (props.noResize === true) return false
@@ -38,10 +30,10 @@ export default function useResize(props, slots, computedHeight, computedToolbarH
       ref: resizeHandle,
       style: `border-color: ${ props.gripperBorderColor }`,
       class: `gripper gripper-${ resizeHandle }${ props.roundGrippers === true ? ' gripper-round' : '' }`,
-      onMousedown: (e) => onSend(e, resizeHandle),
-      onTouchstart: (e) => console.log(`Touchstart: ${ e }`),
-      onTouchmove: (e) => console.log(`Touchmove: ${ e }`),
-      onTouchend: (e) => console.log(`Touchend: ${ e }`)
+      onMousedown: (e) => onMouseDown(e, resizeHandle),
+      onTouchstart: (e) => onTouchStart(e, resizeHandle),
+      onTouchmove: (e) => onTouchMove(e, resizeHandle),
+      onTouchend: (e) => onTouchEnd(e, resizeHandle)
 
     })
   }
@@ -66,10 +58,10 @@ export default function useResize(props, slots, computedHeight, computedToolbarH
       ref: resizeHandle,
       class: [ 'q-window__resize-handle', `q-window__resize-handle--${ resizeHandle }` ],
       style: style,
-      onMousedown: (e) => onSend(e, resizeHandle),
-      onTouchstart: (e) => console.log(`Touchstart: ${ e }`),
-      onTouchmove: (e) => console.log(`Touchmove: ${ e }`),
-      onTouchend: (e) => console.log(`Touchend: ${ e }`)
+      onMousedown: (e) => onMouseDown(e, resizeHandle),
+      onTouchstart: (e) => onTouchStart(e, resizeHandle),
+      onTouchmove: (e) => onTouchMove(e, resizeHandle),
+      onTouchend: (e) => onTouchEnd(e, resizeHandle)
     })
   }
 

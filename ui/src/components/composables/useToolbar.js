@@ -3,20 +3,20 @@ import { computed, h, withDirectives, resolveDirective } from "vue";
 import { MENU_ITEM_SEPARATOR } from "../QWindow";
 
 const CLOSE_POPUP_DIRECTIVE_NAME = 'close-popup';
-export default function useToolbar(props, slots, state, send, __computedZIndex, renderResizeHandle, canDrag, isDragging) {
+export default function useToolbar(props, slots, computedZIndex, canDrag, isDragging,   isEmbedded,isMinimized,computedMenuData, renderResizeHandle) {
 
   const tbHeight = computed(() => {
     return props.headless === true ? 0 : props.dense === true ? 28 : 40
   })
-
   const tbStaticClass = computed(() => {
     return 'q-window__titlebar'
       + (props.hideToolbarDivider !== true ? ' q-window__titlebar--divider' : '')
       + (props.dense === true ? ' q-window__titlebar--dense' : '')
-      + (state.value.context.actions.embedded.state !== true && state.value.context.actions.minimize.state !== true ? ' absolute' : '')
+      + (isEmbedded.value !== true && isMinimized.value !== true ? ' absolute' : '')
       + (isDragging.value === true ? ' q-window__touch-action' : '')
       + ' row justify-between items-center'
   })
+
 
   const tbStyle = computed(() => {
     const titleHeight = `${ tbHeight.value }px`
@@ -40,12 +40,12 @@ export default function useToolbar(props, slots, state, send, __computedZIndex, 
     if (stateInfo === MENU_ITEM_SEPARATOR) {
       return h(QSeparator)
     }
-
+    console.log(stateInfo)
     return withDirectives(h(QItem, {
       key: stateInfo.key,
       clickable: true,
       dense: props.dense,
-      onClick: () => send(stateInfo.key)
+      onClick: () => (stateInfo.state === true ? stateInfo.off.func() : stateInfo.on.func())
     }, () => [
       h(QItemSection, {
         noWrap: true
@@ -72,7 +72,7 @@ export default function useToolbar(props, slots, state, send, __computedZIndex, 
           highlight: true,
           dense: true,
           style: [
-            { zIndex: (state.value.context.actions.embedded.state === true) ? void 0 : __computedZIndex.value + 1 },
+            { zIndex: (isEmbedded.value === true) ? void 0 : computedZIndex.value + 1 },
             `background-color:${ props.backgroundColor }`,
             `color: ${ props.color }`
           ]
@@ -109,17 +109,17 @@ export default function useToolbar(props, slots, state, send, __computedZIndex, 
     if (props.headless === true) {
       return ''
     }
-    const menuData = [...state.value.context.menuData]
+    const menuData = [...computedMenuData.value]
     const titlebarSlot = (slots.titlebar && slots.titlebar())
 
     return h('div', {
-      class: [ tbStaticClass.value, props.titlebarClass ],
+    class: [ tbStaticClass.value, props.titlebarClass ],
       style: tbStyle.value
     }, [
       titlebarSlot === void 0 ? renderTitle() : '',
       titlebarSlot === void 0 ? renderMenuButton(menuData) : '',
       titlebarSlot !== void 0 ? titlebarSlot(menuData) : '',
-      (canDrag() === true) && renderResizeHandle('titlebar', props.noMenu ? 0 : 35) // width of more button
+     (canDrag() === true) && renderResizeHandle('titlebar', props.noMenu ? 0 : 35) // width of more button
     ])
   }
 

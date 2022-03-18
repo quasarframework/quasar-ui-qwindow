@@ -1,18 +1,12 @@
 import {
   h,
   defineComponent,
-  onBeforeMount,
-  onBeforeUnmount,
   computed,
-  watch,
   onMounted,
   ref,
   nextTick,
-  createApp,
-  getCurrentInstance,
-  reactive,
   Teleport,
-  watchEffect
+  watch
 } from 'vue'
 
 import {
@@ -21,15 +15,13 @@ import {
   useQuasar,
   AppFullscreen
 } from 'quasar'
-
-import { useMachine } from '@xstate/vue';
+import useStyle from "./composables/useStyle";
+import useResize from "./composables/useResize";
 import useToolbar from "./composables/useToolbar";
 import useBody from "./composables/useBody";
-import { qWindowMachine } from "./composables/machine";
-import { assign } from "@xstate/fsm";
-import useResize from "./composables/useResize";
-import useStyle from "./composables/useStyle";
 import { prevent, stopAndPrevent } from 'quasar/src/utils/event'
+
+
 
 
 // the starting zIndex for floating windows
@@ -86,8 +78,9 @@ const MENU_ITEM_FULLSCREEN = 'fullscreen';
 const MENU_ITEM_PINNED = 'pinned';
 const MENU_ITEM_MAXIMIZE = 'maximize';
 const MENU_ITEM_MINIMIZE = 'minimize';
-export const MENU_ITEM_SEPARATOR = 'separator';
 const MENU_ITEM_CLOSE = 'close';
+export const MENU_ITEM_SEPARATOR = 'separator';
+
 export default defineComponent({
   name: 'QWindow',
   directives: {
@@ -258,6 +251,104 @@ export default defineComponent({
       },
     })
 
+    const menuActionItems = ref({
+
+      visible: {
+        state: true,
+        on: {
+          label: props.iconSet !== void 0 && props.iconSet.visible !== void 0 && props.iconSet.visible.on !== void 0 && props.iconSet.visible.on.label !== void 0 ? this.iconSet.visible.on.label : iconSetTemplate.value.visible.on.label,
+          icon: props.iconSet !== void 0 && props.iconSet.visible !== void 0 && props.iconSet.visible.on !== void 0 && props.iconSet.visible.on.icon !== void 0 ? this.iconSet.visible.on.icon : iconSetTemplate.value.visible.on.icon,
+          func: show
+        },
+        off: {
+          label: props.iconSet !== void 0 && props.iconSet.visible !== void 0 && props.iconSet.visible.off !== void 0 && props.iconSet.visible.off.label !== void 0 ? this.iconSet.visible.off.label : iconSetTemplate.value.visible.off.label,
+          icon: props.iconSet !== void 0 && props.iconSet.visible !== void 0 && props.iconSet.visible.off !== void 0 && props.iconSet.visible.off.icon !== void 0 ? this.iconSet.visible.off.icon : iconSetTemplate.value.visible.off.icon,
+          func: hide
+        }
+      },
+      embedded: {
+        state: true,
+        on: {
+          label: props.iconSet !== void 0 && props.iconSet.embedded !== void 0 && props.iconSet.embedded.on !== void 0 && props.iconSet.embedded.on.label !== void 0 ? props.iconSet.embedded.on.label : iconSetTemplate.value.embedded.on.label,
+          icon: props.iconSet !== void 0 && props.iconSet.embedded !== void 0 && props.iconSet.embedded.on !== void 0 && props.iconSet.embedded.on.icon !== void 0 ? props.iconSet.embedded.on.icon : iconSetTemplate.value.embedded.on.icon,
+         func: lock
+        },
+        off: {
+          label: props.iconSet !== void 0 && props.iconSet.embedded !== void 0 && props.iconSet.embedded.off !== void 0 && props.iconSet.embedded.off.label !== void 0 ? props.iconSet.embedded.off.label : iconSetTemplate.value.embedded.off.label,
+          icon: props.iconSet !== void 0 && props.iconSet.embedded !== void 0 && props.iconSet.embedded.off !== void 0 && props.iconSet.embedded.off.icon !== void 0 ? props.iconSet.embedded.off.icon : iconSetTemplate.value.embedded.off.icon,
+          func: unlock
+        }
+      },
+      pinned: {
+        state: false,
+        on: {
+          label: props.iconSet !== void 0 && props.iconSet.pinned !== void 0 && props.iconSet.pinned.on !== void 0 && props.iconSet.pinned.on.label !== void 0 ? props.iconSet.pinned.on.label : iconSetTemplate.value.pinned.on.label,
+          icon: props.iconSet !== void 0 && props.iconSet.pinned !== void 0 && props.iconSet.pinned.on !== void 0 && props.iconSet.pinned.on.icon !== void 0 ? props.iconSet.pinned.on.icon : iconSetTemplate.value.pinned.on.icon,
+        func: pin
+        },
+        off: {
+          label: props.iconSet !== void 0 && props.iconSet.pinned !== void 0 && props.iconSet.pinned.off !== void 0 && props.iconSet.pinned.off.label !== void 0 ? props.iconSet.pinned.off.label : iconSetTemplate.value.pinned.off.label,
+          icon: props.iconSet !== void 0 && props.iconSet.pinned !== void 0 && props.iconSet.pinned.off !== void 0 && props.iconSet.pinned.off.icon !== void 0 ? props.iconSet.pinned.off.icon : iconSetTemplate.value.pinned.off.icon,
+          func: unpin
+        }
+      },
+      fullscreen: {
+        state: false,
+        on: {
+          label: props.iconSet !== void 0 && props.iconSet.fullscreen !== void 0 && props.iconSet.fullscreen.on !== void 0 && props.iconSet.fullscreen.on.label !== void 0 ? props.iconSet.fullscreen.on.label : iconSetTemplate.value.fullscreen.on.label,
+          icon: props.iconSet !== void 0 && props.iconSet.fullscreen !== void 0 && props.iconSet.fullscreen.on !== void 0 && props.iconSet.fullscreen.on.icon !== void 0 ? props.iconSet.fullscreen.on.icon : iconSetTemplate.value.fullscreen.on.icon,
+          func: fullscreenEnter
+        },
+        off: {
+          label: props.iconSet !== void 0 && props.iconSet.fullscreen !== void 0 && props.iconSet.fullscreen.off !== void 0 && props.iconSet.fullscreen.off.label !== void 0 ? props.iconSet.fullscreen.off.label : iconSetTemplate.value.fullscreen.off.label,
+          icon: props.iconSet !== void 0 && props.iconSet.fullscreen !== void 0 && props.iconSet.fullscreen.off !== void 0 && props.iconSet.fullscreen.off.icon !== void 0 ? props.iconSet.fullscreen.off.icon : iconSetTemplate.value.fullscreen.off.icon,
+         func: fullscreenLeave
+        }
+      },
+      maximize: {
+        state: false,
+        on: {
+          label: props.iconSet !== void 0 && props.iconSet.maximize !== void 0 && props.iconSet.maximize.on !== void 0 && props.iconSet.maximize.on.label !== void 0 ? props.iconSet.maximize.on.label : iconSetTemplate.value.maximize.on.label,
+          icon: props.iconSet !== void 0 && props.iconSet.maximize !== void 0 && props.iconSet.maximize.on !== void 0 && props.iconSet.maximize.on.icon !== void 0 ? props.iconSet.maximize.on.icon : iconSetTemplate.value.maximize.on.icon,
+         func: maximize
+        },
+        off: {
+          label: props.iconSet !== void 0 && props.iconSet.maximize !== void 0 && props.iconSet.maximize.off !== void 0 && props.iconSet.maximize.off.label !== void 0 ? props.iconSet.maximize.off.label : iconSetTemplate.value.maximize.off.label,
+          icon: props.iconSet !== void 0 && props.iconSet.maximize !== void 0 && props.iconSet.maximize.off !== void 0 && props.iconSet.maximize.off.icon !== void 0 ? props.iconSet.maximize.off.icon : iconSetTemplate.value.maximize.off.icon,
+          func: restore
+        }
+      },
+      minimize: {
+        state: false,
+        on: {
+          label: props.iconSet !== void 0 && props.iconSet.minimize !== void 0 && props.iconSet.minimize.on !== void 0 && props.iconSet.minimize.on.label !== void 0 ? props.iconSet.minimize.on.label : iconSetTemplate.value.minimize.on.label,
+          icon: props.iconSet !== void 0 && props.iconSet.minimize !== void 0 && props.iconSet.minimize.on !== void 0 && props.iconSet.minimize.on.icon !== void 0 ? props.iconSet.minimize.on.icon : iconSetTemplate.value.minimize.on.icon,
+         func: minimize
+
+        },
+        off: {
+          label: props.iconSet !== void 0 && props.iconSet.minimize !== void 0 && props.iconSet.minimize.off !== void 0 && props.iconSet.minimize.off.label !== void 0 ? props.iconSet.minimize.off.label : iconSetTemplate.value.minimize.off.label,
+          icon: props.iconSet !== void 0 && props.iconSet.minimize !== void 0 && props.iconSet.minimize.off !== void 0 && props.iconSet.minimize.off.icon !== void 0 ? props.iconSet.minimize.off.icon : iconSetTemplate.value.minimize.off.icon,
+          func: maximize
+        }
+      }
+    })
+
+    const shiftX = ref(0)
+    const shiftY = ref(0)
+    const mousePos = ref({
+      x:0, y:0
+    })
+    const statesTmp = ref({
+      tmpTop: 0,
+      tmpLeft: 0,
+      tmpRight: 0,
+      tmpBottom: 0,
+      tmpHeight: 0,
+      tmpWidth: 0
+    })
+
+
     const states = ref({
       top: 150,
       left: 10,
@@ -287,459 +378,221 @@ export default defineComponent({
     const scrollX = ref(0)
     const scrollY = ref(0)
     const selected = ref(false)
-    const resizeH = ref()
+    const resizeHandle = ref()
     const fullscreenInitiated = ref(false)
 
     const { removeClass, addClass } = useStyle()
 
-    let context;
-    const { state, send, service } = useMachine(qWindowMachine, {
-        context: {
-          tmpTop: 0,
-          tmpLeft: 0,
-          tmpRight: 0,
-          tmpBottom: 0,
-          tmpHeight: 0,
-          tmpWidth: 0,
-          shiftX: 0,
-          shiftY: 0,
-
-          mOffsetX: 0,
-          mOffsetY: 0,
-          menuData: [],
-          actions: {
-            visible: {
-              state: true,
-              on: {
-                label: props.iconSet !== void 0 && props.iconSet.visible !== void 0 && props.iconSet.visible.on !== void 0 && props.iconSet.visible.on.label !== void 0 ? this.iconSet.visible.on.label : iconSetTemplate.value.visible.on.label,
-                icon: props.iconSet !== void 0 && props.iconSet.visible !== void 0 && props.iconSet.visible.on !== void 0 && props.iconSet.visible.on.icon !== void 0 ? this.iconSet.visible.on.icon : iconSetTemplate.value.visible.on.icon,
-              },
-              off: {
-                label: props.iconSet !== void 0 && props.iconSet.visible !== void 0 && props.iconSet.visible.off !== void 0 && props.iconSet.visible.off.label !== void 0 ? this.iconSet.visible.off.label : iconSetTemplate.value.visible.off.label,
-                icon: props.iconSet !== void 0 && props.iconSet.visible !== void 0 && props.iconSet.visible.off !== void 0 && props.iconSet.visible.off.icon !== void 0 ? this.iconSet.visible.off.icon : iconSetTemplate.value.visible.off.icon,
-              }
-            },
-            embedded: {
-              state: true,
-              on: {
-                label: props.iconSet !== void 0 && props.iconSet.embedded !== void 0 && props.iconSet.embedded.on !== void 0 && props.iconSet.embedded.on.label !== void 0 ? props.iconSet.embedded.on.label : iconSetTemplate.value.embedded.on.label,
-                icon: props.iconSet !== void 0 && props.iconSet.embedded !== void 0 && props.iconSet.embedded.on !== void 0 && props.iconSet.embedded.on.icon !== void 0 ? props.iconSet.embedded.on.icon : iconSetTemplate.value.embedded.on.icon,
-              },
-              off: {
-                label: props.iconSet !== void 0 && props.iconSet.embedded !== void 0 && props.iconSet.embedded.off !== void 0 && props.iconSet.embedded.off.label !== void 0 ? props.iconSet.embedded.off.label : iconSetTemplate.value.embedded.off.label,
-                icon: props.iconSet !== void 0 && props.iconSet.embedded !== void 0 && props.iconSet.embedded.off !== void 0 && props.iconSet.embedded.off.icon !== void 0 ? props.iconSet.embedded.off.icon : iconSetTemplate.value.embedded.off.icon,
-              }
-            },
-            pinned: {
-              state: false,
-              on: {
-                label: props.iconSet !== void 0 && props.iconSet.pinned !== void 0 && props.iconSet.pinned.on !== void 0 && props.iconSet.pinned.on.label !== void 0 ? props.iconSet.pinned.on.label : iconSetTemplate.value.pinned.on.label,
-                icon: props.iconSet !== void 0 && props.iconSet.pinned !== void 0 && props.iconSet.pinned.on !== void 0 && props.iconSet.pinned.on.icon !== void 0 ? props.iconSet.pinned.on.icon : iconSetTemplate.value.pinned.on.icon,
-              },
-              off: {
-                label: props.iconSet !== void 0 && props.iconSet.pinned !== void 0 && props.iconSet.pinned.off !== void 0 && props.iconSet.pinned.off.label !== void 0 ? props.iconSet.pinned.off.label : iconSetTemplate.value.pinned.off.label,
-                icon: props.iconSet !== void 0 && props.iconSet.pinned !== void 0 && props.iconSet.pinned.off !== void 0 && props.iconSet.pinned.off.icon !== void 0 ? props.iconSet.pinned.off.icon : iconSetTemplate.value.pinned.off.icon,
-              }
-            },
-            fullscreen: {
-              state: false,
-              on: {
-                label: props.iconSet !== void 0 && props.iconSet.fullscreen !== void 0 && props.iconSet.fullscreen.on !== void 0 && props.iconSet.fullscreen.on.label !== void 0 ? props.iconSet.fullscreen.on.label : iconSetTemplate.value.fullscreen.on.label,
-                icon: props.iconSet !== void 0 && props.iconSet.fullscreen !== void 0 && props.iconSet.fullscreen.on !== void 0 && props.iconSet.fullscreen.on.icon !== void 0 ? props.iconSet.fullscreen.on.icon : iconSetTemplate.value.fullscreen.on.icon,
-              },
-              off: {
-                label: props.iconSet !== void 0 && props.iconSet.fullscreen !== void 0 && props.iconSet.fullscreen.off !== void 0 && props.iconSet.fullscreen.off.label !== void 0 ? props.iconSet.fullscreen.off.label : iconSetTemplate.value.fullscreen.off.label,
-                icon: props.iconSet !== void 0 && props.iconSet.fullscreen !== void 0 && props.iconSet.fullscreen.off !== void 0 && props.iconSet.fullscreen.off.icon !== void 0 ? props.iconSet.fullscreen.off.icon : iconSetTemplate.value.fullscreen.off.icon,
-              }
-            },
-            maximize: {
-              state: false,
-              on: {
-                label: props.iconSet !== void 0 && props.iconSet.maximize !== void 0 && props.iconSet.maximize.on !== void 0 && props.iconSet.maximize.on.label !== void 0 ? props.iconSet.maximize.on.label : iconSetTemplate.value.maximize.on.label,
-                icon: props.iconSet !== void 0 && props.iconSet.maximize !== void 0 && props.iconSet.maximize.on !== void 0 && props.iconSet.maximize.on.icon !== void 0 ? props.iconSet.maximize.on.icon : iconSetTemplate.value.maximize.on.icon,
-              },
-              off: {
-                label: props.iconSet !== void 0 && props.iconSet.maximize !== void 0 && props.iconSet.maximize.off !== void 0 && props.iconSet.maximize.off.label !== void 0 ? props.iconSet.maximize.off.label : iconSetTemplate.value.maximize.off.label,
-                icon: props.iconSet !== void 0 && props.iconSet.maximize !== void 0 && props.iconSet.maximize.off !== void 0 && props.iconSet.maximize.off.icon !== void 0 ? props.iconSet.maximize.off.icon : iconSetTemplate.value.maximize.off.icon,
-              }
-            },
-            minimize: {
-              state: false,
-              on: {
-                label: props.iconSet !== void 0 && props.iconSet.minimize !== void 0 && props.iconSet.minimize.on !== void 0 && props.iconSet.minimize.on.label !== void 0 ? props.iconSet.minimize.on.label : iconSetTemplate.value.minimize.on.label,
-                icon: props.iconSet !== void 0 && props.iconSet.minimize !== void 0 && props.iconSet.minimize.on !== void 0 && props.iconSet.minimize.on.icon !== void 0 ? props.iconSet.minimize.on.icon : iconSetTemplate.value.minimize.on.icon,
-
-              },
-              off: {
-                label: props.iconSet !== void 0 && props.iconSet.minimize !== void 0 && props.iconSet.minimize.off !== void 0 && props.iconSet.minimize.off.label !== void 0 ? props.iconSet.minimize.off.label : iconSetTemplate.value.minimize.off.label,
-                icon: props.iconSet !== void 0 && props.iconSet.minimize !== void 0 && props.iconSet.minimize.off !== void 0 && props.iconSet.minimize.off.icon !== void 0 ? props.iconSet.minimize.off.icon : iconSetTemplate.value.minimize.off.icon,
-              }
-            }
-          }
-        },
-        actions: {
-          menu: assign((ctx, evt) => {
-            console.log(props.actions)
-            const menu = props.actions
-            const filteredActions = []
-            if (menu.includes(MENU_ITEM_EMBEDDED) && (checkActions(MENU_ITEM_EMBEDDED, true, ctx) || checkActions(MENU_ITEM_EMBEDDED, false, ctx))) {
-              filteredActions.push(MENU_ITEM_EMBEDDED)
-            }
-            if (menu.includes('pin') && (checkActions(MENU_ITEM_PINNED, true, ctx) || checkActions(MENU_ITEM_PINNED, false, ctx))) {
-              filteredActions.push(MENU_ITEM_PINNED)
-            }
-            if (menu.includes(MENU_ITEM_FULLSCREEN) && (checkActions(MENU_ITEM_FULLSCREEN, true, ctx) || checkActions(MENU_ITEM_FULLSCREEN, false, ctx))) {
-              filteredActions.push(MENU_ITEM_FULLSCREEN)
-            }
-            if (menu.includes(MENU_ITEM_MAXIMIZE) && (checkActions(MENU_ITEM_MAXIMIZE, true, ctx) || checkActions(MENU_ITEM_MAXIMIZE, false, ctx))) {
-              filteredActions.push(MENU_ITEM_MAXIMIZE)
-            }
-            if (props.actions.includes(MENU_ITEM_MINIMIZE) && (checkActions(MENU_ITEM_MINIMIZE, true) || checkActions(MENU_ITEM_MINIMIZE, false))) {
-              filteredActions.push(MENU_ITEM_MINIMIZE)
-            }
-            if (menu.includes(MENU_ITEM_CLOSE) && checkActions(MENU_ITEM_CLOSE, true, ctx)) {
-              filteredActions.push(MENU_ITEM_VISIBLE)
-            }
-
-            const menuData = []
-            filteredActions.map(key => {
-              if (ctx.actions[ key ]) {
-                menuData.push({ ...ctx.actions[ key ], key: key })
-              }
-            })
-
-
-            console.info(menuData)
-            return {
-              menuData: menuData,
-              actions: {
-                ...ctx.actions,
-                menu: evt.value,
-              }
-            }
-          }),
-          embed: assign((ctx) => {
-            if (ctx.actions.embedded.state === true) {
-              return emitAndAssign(MENU_ITEM_EMBEDDED, false, ctx)
-            } else {
-              return emitAndAssign(MENU_ITEM_EMBEDDED, true, ctx)
-            }
-          }),
-          visible: assign((ctx) => {
-            if (ctx.actions.visible.state === true) {
-              return emitAndAssign(MENU_ITEM_VISIBLE, true, ctx)
-            } else {
-              return emitAndAssign(MENU_ITEM_VISIBLE, false, ctx)
-            }
-          }),
-          maximize: assign((ctx) => {
-            savePositionAndState()
-            setFullWindowPosition()
-            return {
-              actions: {
-                ...ctx.actions,
-                ...ctx.actions[ 'embedded' ].state = false,
-                ...ctx.actions[ 'maximize' ].state = true
-              }
-            }
-          }),
-          minimize: assign((ctx) => {
-            savePositionAndState()
-
-            // TODO LOGIC
-            const elements = document.getElementsByClassName('q-notifications__list--bottom')
-            if (elements.length > 0) {
-              //elements[0].appendChild(this.$el)
-            }
-
-            return {
-              actions: {
-                ...ctx.actions,
-                ...ctx.actions[ 'embedded' ].state = true,
-                ...ctx.actions[ 'minimize' ].state = true
-              }
-            }
-          }),
-          fullscreenLeave: assign((ctx) => {
-            restorePositionAndState()
-            return emitAndAssign(MENU_ITEM_FULLSCREEN, false, ctx)
-          }),
-          fullScreenEnter: assign(async (ctx) => {
-            fullscreenInitiated.value = true
-            savePositionAndState()
-            zIndex.value = maxZIndex
-            return emitAndAssign(MENU_ITEM_FULLSCREEN, true, ctx)
-          }),
-          restore: assign((ctx) => {
-            if (ctx.actions[ MENU_ITEM_VISIBLE ].state !== true) {
-              return ctx
-            }
-
-            if (ctx.actions.maximize.state === true) {
-              restorePositionAndState()
-              return emitAndAssign(MENU_ITEM_MAXIMIZE, false, ctx)
-            } else if (ctx.actions[ MENU_ITEM_MINIMIZE ].state) {
-              return emitAndAssign(MENU_ITEM_MAXIMIZE, false, ctx)
-            }
-          }),
-          onMouseDown: assign((ctx, event) => {
-            const [ resizeHandle, evt ] = event.value
-            console.log(evt)
-            removeEventListeners()
-
-
-            console.log('WAHHHHHHHHHHHHHHHHHHHHHH')
-            console.log(evt)
-            // this.selected = false
-            if (evt.touches === void 0 && evt.buttons !== 1) {
-              return
-            }
-
-            if (ctx.actions.embedded.state === true) {
-              states.value.shouldDrag = states.value.dragging = false
-              return
-            }
-
-            const x = getMousePosition(evt, 'x')
-            const y = getMousePosition(evt, 'y')
-
-            const rect = windowRef.value.getBoundingClientRect()
-            const shiftX = getMouseShift(evt, rect, 'x')
-            const shiftY = getMouseShift(evt, rect, 'y')
-
-            console.log(`x: ${ x } y: ${ y } shiftX: ${ shiftX } shiftY: ${ shiftY } rectLeft: ${ rect.left } rectTop: ${ rect.top }`)
-
-            states.value.shouldDrag = true
-
-            addEventListeners()
-            if (evt.touches !== void 0) {
-              addClass(document.body, 'q-window__touch-action')
-            }
-            resizeH.value = resizeHandle
-
-            prevent(evt)
-
-console.log(states.value.right)
-            return {
-              ...ctx,
-              mX: x,
-              mY: y,
-              tmpTop: states.value.top,
-              tmpLeft: states.value.left,
-              tmpRight: states.value.right,
-              tmpBottom: states.value.bottom,
-              tmpHeight: states.value.bottom - states.value.top,
-              tmpWidth: states.value.right - states.value.left,
-              shiftY: shiftY,
-              shiftX: shiftX
-            }
-          }),
-
-
-          onMouseMove: assign((ctx, event) => {
-            const [ resizeHandle, evt ] = event.value
-
-
-            if (states.value.shouldDrag !== true || (evt.touches === void 0 && evt.buttons !== 1)) {
-              removeEventListeners()
-              return
-            }
-
-
-            const mouseX = getMousePosition(evt, 'x')
-            const mouseY = getMousePosition(evt, 'y')
-
-
-            // wait 3 pixel move to initiate drag
-            if (states.value.dragging !== true) {
-              if (Math.abs(ctx.mX - mouseX) >= 3 || Math.abs(ctx.mY - mouseY) >= 3) {
-                states.value.dragging = true
-              } else {
-                return
-              }
-            }
-
-
-            switch (resizeHandle || resizeH.value) {
-              case 'top':
-                states.value.top = mouseY - window.scrollY - ctx.shiftY
-                if (computedHeight.value < states.value.minHeight) {
-                  states.value.top = ctx.tmpBottom - states.value.minHeight
-                }
-                break
-              case 'left':
-                states.value.left = mouseX - window.scrollX - ctx.shiftX
-                if (computedWidth.value < states.value.minWidth) {
-                  states.value.left = ctx.tmpRight - states.value.minWidth
-                }
-                break
-              case 'right':
-                states.value.right = mouseX - window.scrollX
-                if (computedWidth.value < states.value.minWidth) {
-                  states.value.right = ctx.tmpLeft - states.value.minWidth
-                }
-                break
-              case 'bottom':
-                states.value.bottom = mouseY - window.scrollY
-                if (computedHeight.value < states.value.minHeight) {
-                  states.value.bottom = ctx.tmpTop - states.value.minHeight
-                }
-
-                break
-              case 'titlebar':
-                if(props.scrollWithWindow) {
-                  states.value.top = mouseY - ctx.shiftY
-                  states.value.left = mouseX - ctx.shiftX
-                } else {
-                  states.value.top = mouseY - window.scrollY - ctx.shiftY
-                  states.value.left = mouseX - window.scrollX - ctx.shiftX
-                }
-
-                states.value.bottom = states.value.top - ctx.tmpHeight
-                states.value.right = states.value.left - ctx.tmpWidth
-                break
-
-
-            }
-
-
-              stopAndPrevent(evt)
-            return {
-              ...ctx,
-              mX: mouseX,
-              mY: mouseY
-            }
-          }),
-          onMouseUp: assign((ctx, event) => {
-            const [ _, evt ] = event.value
-            if (states.value.dragging === true) {
-              prevent(evt)
-              removeEventListeners()
-              if (evt.touches !== void 0) {
-                removeClass(document.body, 'q-window__touch-action')
-              }
-              states.value.shouldDrag = states.value.dragging = false
-            }
-
-
-          })
-        },
-        services: {
-          openFullscreen: () => {
-            return AppFullscreen.request(windowRef.value)
-          },
-          closeFullscreen: () => {
-            return AppFullscreen.exit()
-          }
-        },
-        guards: {
-          isRestoreState: (ctx) => {
-            return (ctx.actions.maximize.state === true)
-          },
-          isFullscreen: (ctx) => {
-            return (ctx.actions.fullscreen.state === true)
-          }
-        }
+    function show() {
+      if (checkMenuItemState('visible', true)) {
+        setMenuItemState('visible', true)
+        return true
       }
-    );
-
-    function emitAndAssign(name, state, ctx) {
-      emit(name, state)
-      return {
-        actions: {
-          ...ctx.actions,
-          ...ctx.actions[ name ].state = state
-        }
-      }
+      return false
     }
 
 
-    function setFullWindowPosition() {
-      states.value.top = 0
-      states.value.left = 0
-      states.value.bottom = $q.screen.height
-      states.value.right = $q.screen.width
+    // hide the component
+    function hide() {
+      if (checkMenuItemState('visible', false)) {
+        setMenuItemState('visible', false)
+        return true
+      }
+      return false
     }
 
-    function checkActions(mode, state, ctx) {
+    // embedded
+    function lock() {
+     if (checkMenuItemState('embedded', true)) {
+       setMenuItemState('embedded', true)
+       return true
+     }
+      return false
+    }
+
+    // floating
+    function unlock() {
+     if (checkMenuItemState('embedded', false)) {
+       setMenuItemState('embedded', false)
+       return true
+     }
+      return false
+    }
+
+    // pinned (can't move or re-size)
+    function pin() {
+      if (checkMenuItemState('pinned', true)) {
+        setMenuItemState('pinned', true)
+        return true
+      }
+      return false
+    }
+
+
+    // move and resize available, if not embedded
+    function unpin() {
+      if (checkMenuItemState('pinned', false)) {
+        setMenuItemState('pinned', false)
+        return true
+      }
+      return false
+    }
+
+    function maximize() {
+      if (checkMenuItemState('maximize', true)) {
+        //thisbringToFront()
+        savePositionAndState()
+        setFullWindowPosition()
+
+
+        setMenuItemState('embedded', false)
+        nextTick(() => {
+          setMenuItemState('maximize', true)
+        })
+        return true
+      }
+      return false
+    }
+
+    function minimize() {
+      if (checkMenuItemState('minimize', true)) {
+        savePositionAndState()
+        setMinimizePosition()
+
+        setMenuItemState('embedded', true)
+        setMenuItemState('minimize', true)
+        return true
+      }
+      return false
+    }
+
+    function restore() {
+      if (isMenuItemActive('visible') !== true) {
+        // not allowed
+        return
+
+      }
+      if (isMenuItemActive('maximize') === true) {
+        setMenuItemState('maximize', false)
+        this.$emit('maximize', false)
+      } else if (isMenuItemActive('minimize') === true) {
+        setMenuItemState('minimize', false)
+      }
+    }
+
+    // go into fullscreen mode
+
+
+
+    // toggle fullscreen mode
+    function toggleFullscreen() {
+      if (isMenuItemActive('visible') !== true) {
+        // not allowed
+        return
+      }
+      AppFullscreen.isActive ? fullscreenLeave() : fullscreenEnter()
+    }
+
+    function fullscreenEnter() {
+      if (checkMenuItemState('fullscreen', true)) {
+        fullscreenInitiated.value = true
+        AppFullscreen.request(windowRef.value)
+        return true
+      }
+      return false
+    }
+
+    // leave fullscreen mode
+    function fullscreenLeave() {
+      if (checkMenuItemState('fullscreen', false)) {
+        AppFullscreen.exit()
+        return true
+      }
+      return false
+    }
+
+
+    function checkMenuItemState(mode, state) {
       let active = false
       switch (mode) {
         case MENU_ITEM_VISIBLE:
           if (state) {
-            if (isActive(MENU_ITEM_VISIBLE) !== true) {
+            if (isMenuItemActive(MENU_ITEM_VISIBLE) !== true) {
               active = true
             }
           } else {
-            if (isActive(MENU_ITEM_VISIBLE) === true) {
+            if (isMenuItemActive(MENU_ITEM_VISIBLE) === true) {
               active = true
             }
           }
           break
         case MENU_ITEM_EMBEDDED:
+          console.log('EMBEDDED')
           if (state) {
-            if (isActive(MENU_ITEM_EMBEDDED) !== true
-              && isActive(MENU_ITEM_FULLSCREEN) !== true) {
+            if (isMenuItemActive(MENU_ITEM_EMBEDDED) !== true
+              && isMenuItemActive(MENU_ITEM_FULLSCREEN) !== true) {
+              console.log('EMBEDDED')
               active = true
             }
           } else {
-            if (isActive(MENU_ITEM_EMBEDDED) === true
-              && isActive(MENU_ITEM_FULLSCREEN) !== true) {
+            if (isMenuItemActive(MENU_ITEM_EMBEDDED) === true
+              && isMenuItemActive(MENU_ITEM_FULLSCREEN) !== true) {
               active = true
             }
           }
           break
         case MENU_ITEM_PINNED:
           if (state) {
-            if (isActive(MENU_ITEM_PINNED) !== true
-              && isActive(MENU_ITEM_EMBEDDED) !== true
-              && isActive(MENU_ITEM_MAXIMIZE) !== true
-              && isActive(MENU_ITEM_MINIMIZE) !== true
-              && isActive(MENU_ITEM_FULLSCREEN) !== true) {
+            if (isMenuItemActive(MENU_ITEM_PINNED) !== true
+              && isMenuItemActive(MENU_ITEM_EMBEDDED) !== true
+              && isMenuItemActive(MENU_ITEM_MAXIMIZE) !== true
+              && isMenuItemActive(MENU_ITEM_MINIMIZE) !== true
+              && isMenuItemActive(MENU_ITEM_FULLSCREEN) !== true) {
               active = true
             }
           } else {
-            if (isActive(MENU_ITEM_PINNED) === true
-              && isActive(MENU_ITEM_EMBEDDED) !== true
-              && isActive(MENU_ITEM_MAXIMIZE) !== true
-              && isActive(MENU_ITEM_MINIMIZE) !== true
-              && isActive(MENU_ITEM_FULLSCREEN) !== true) {
+            if (isMenuItemActive(MENU_ITEM_PINNED) === true
+              && isMenuItemActive(MENU_ITEM_EMBEDDED) !== true
+              && isMenuItemActive(MENU_ITEM_MAXIMIZE) !== true
+              && isMenuItemActive(MENU_ITEM_MINIMIZE) !== true
+              && isMenuItemActive(MENU_ITEM_FULLSCREEN) !== true) {
               active = true
             }
           }
           break
         case MENU_ITEM_MAXIMIZE:
           if (state) {
-            if (isActive(MENU_ITEM_MINIMIZE) !== true
-              && isActive(MENU_ITEM_EMBEDDED) !== true
-              && isActive(MENU_ITEM_MAXIMIZE) !== true
-              && isActive(MENU_ITEM_FULLSCREEN) !== true) {
+            if (isMenuItemActive(MENU_ITEM_MINIMIZE) !== true
+              && isMenuItemActive(MENU_ITEM_EMBEDDED) !== true
+              && isMenuItemActive(MENU_ITEM_MAXIMIZE) !== true
+              && isMenuItemActive(MENU_ITEM_FULLSCREEN) !== true) {
               active = true
             }
           } else {
-            if (isActive(MENU_ITEM_MAXIMIZE) === true
-              && isActive(MENU_ITEM_EMBEDDED) !== true
-              && isActive(MENU_ITEM_MINIMIZE) !== true
-              && isActive(MENU_ITEM_FULLSCREEN) !== true) {
+            if (isMenuItemActive(MENU_ITEM_MAXIMIZE) === true
+              && isMenuItemActive(MENU_ITEM_EMBEDDED) !== true
+              && isMenuItemActive(MENU_ITEM_MINIMIZE) !== true
+              && isMenuItemActive(MENU_ITEM_FULLSCREEN) !== true) {
               active = true
             }
           }
           break
         case MENU_ITEM_FULLSCREEN:
           if (state === true) {
-            if (isActive(MENU_ITEM_FULLSCREEN) !== true
-              && isActive(MENU_ITEM_EMBEDDED) !== true) {
+            if (isMenuItemActive(MENU_ITEM_FULLSCREEN) !== true
+              && isMenuItemActive(MENU_ITEM_EMBEDDED) !== true) {
               active = true
             }
           } else {
-            if (isActive(MENU_ITEM_FULLSCREEN) === true
-              && isActive(MENU_ITEM_EMBEDDED) !== true) {
+            if (isMenuItemActive(MENU_ITEM_FULLSCREEN) === true
+              && isMenuItemActive(MENU_ITEM_EMBEDDED) !== true) {
               active = true
             }
           }
           break
         case MENU_ITEM_CLOSE:
           if (state === true) {
-            if (isActive(MENU_ITEM_EMBEDDED) !== true) {
+            if (isMenuItemActive(MENU_ITEM_EMBEDDED) !== true) {
               active = true
             }
           } else {
@@ -752,106 +605,307 @@ console.log(states.value.right)
       return active
     }
 
-    function isActive(name) {
-      const states = state.value.context.actions
-      if (name in states) {
-        return states[ name ].state
+    //
+    function isMenuItemActive(name) {
+      if (name in menuActionItems.value) {
+        return menuActionItems.value[ name ].state
       }
       return false
     }
-
-
-    service.onTransition((state) => {
-      // if (state.changed) {
-      //   context = state.context
-      //   console.log(state.value)
-      //   console.log(state.context)
-      //   console.log(states.value)
-      // }
-      // console.log(states.value)
-    })
-
-
-    onMounted(() => {
-      send('update_menu_actions', { value: props.actions })
-      // calculate left starting position
-      if (props.startX > 0) {
-        states.value.left = props.startX
-      } else {
-        state.left = defaultX * QWindowCount
+    //
+    function setMenuItemState(id, val) {
+      if (id in menuActionItems.value) {
+        menuActionItems.value[ id ].state = val
+        return true
       }
-      //
-      // calculate top starting position
-      if (props.startY > 0) {
-        states.value.top = props.startY
-      } else {
-        states.value.top = defaultY * QWindowCount
-      }
-
-      // calculate right and bottom starting positions
-      states.value.right = states.value.left + props.width
-      states.value.bottom = states.value.top + props.height
-
-
-      document.addEventListener('scroll', onScroll, { passive: true })
-      // set up mousedown on body (so windows can deselect themselves on outside click)
-      // document.body.addEventListener('mousedown', this.__onMouseDownBody, { passive: false })
-
-    })
-
-    function sendEvent(evt) {
-      send({
-        type: evt.type,
-        value: [ void 0, evt ]
-      })
+      return false
     }
+    //
+    //
+    // onMounted(() => {
+    //
+    //   // calculate left starting position
+    //   if (props.startX > 0) {
+    //     states.value.left = props.startX
+    //   } else {
+    //     state.left = defaultX * QWindowCount
+    //   }
+    //   //
+    //   // calculate top starting position
+    //   if (props.startY > 0) {
+    //     states.value.top = props.startY
+    //   } else {
+    //     states.value.top = defaultY * QWindowCount
+    //   }
+    //
+    //   // calculate right and bottom starting positions
+    //   states.value.right = states.value.left + props.width
+    //   states.value.bottom = states.value.top + props.height
+    //
+    //
+    //   document.addEventListener('scroll', onScroll, { passive: true })
+    //
+    // })
 
-    function onScroll (e) {
+
+    function onScroll(e) {
       if (window !== void 0) {
-        scrollY.value = window.pageYOffset
-        scrollX.value = window.pageXOffset
+        scrollY.value = window.scrollY
+        scrollX.value = window.scrollX
       }
     }
 
+
+    function canBeSelected(x, y) {
+      // const sortedLayers = this.__computedSortedLayers
+      // const sortedLayers = sortedLayers()
+      // for (let index = sortedLayers.length - 1; index >= 0; --index) {
+      //   if (sortedLayers[index].__portal !== void 0) {
+      //     if (isPointInRect(x, y, sortedLayers[index].__portal.$el)) {
+      //       if (sortedLayers[index].id === this.id) {
+      //         return true
+      //       }
+      //       else {
+      //         return false
+      //       }
+      //     }
+      //   }
+      // }
+      // return false
+    }
+
+    //
+    function setFullWindowPosition() {
+      states.value.top = 0
+      states.value.left = 0
+      states.value.bottom = $q.screen.height
+      states.value.right = $q.screen.width
+    }
+    //
+    function setMinimizePosition() {
+      const elements = document.getElementsByClassName('q-notifications__list--bottom')
+      //if (elements.length > 0) {
+      //  elements[0].appendChild(this.$el)
+      //}
+    }
+    //
+    // //// MOUSE ACTIONS
+    //
     function addEventListeners() {
-      document.body.addEventListener('mousemove', sendEvent, { capture: true })
-      document.body.addEventListener('mouseup', sendEvent, { capture: true })
-      document.body.addEventListener('keyup', sendEvent, { capture: true })
+      document.body.addEventListener('mousemove', onMouseMove, { capture: true })
+      document.body.addEventListener('mouseup', onMouseUp, { capture: true })
+      document.body.addEventListener('keyup', onKeyUp, { capture: true })
     }
 
     function removeEventListeners() {
-      document.body.removeEventListener('mousemove', sendEvent, { capture: true })
-      document.body.removeEventListener('mouseup', sendEvent, { capture: true })
-      document.body.removeEventListener('keyup', sendEvent, { capture: true })
+      document.body.removeEventListener('mousemove', onMouseMove, { capture: true })
+      document.body.removeEventListener('mouseup', onMouseUp, { capture: true })
+      document.body.removeEventListener('keyup', onKeyUp, { capture: true })
     }
 
 
-    watch(() => $q.fullscreen.isActive, (isActive) => {
-      if (isActive === false && state.value.context.actions.fullscreen.state === true) {
-        send('fullscreen')
-      }
-    })
+    function onMouseMove(evt, rh) {
 
-    // TODO ?
-    watch([ () => $q.screen.height, () => $q.screen.width ], ([ height, width ]) => {
-      if (state.value.context.actions.fullscreen.state === true) {
-        //states.value.bottom = height
-       // states.value.right = width
+      if (states.value.shouldDrag !== true || (evt.touches === void 0 && evt.buttons !== 1)) {
+        removeEventListeners()
+        return
       }
-    })
 
+      const mouseX = getMousePosition(evt, 'x')
+      const mouseY = getMousePosition(evt, 'y')
+
+      // wait 3 pixel move to initiate drag
+      if (states.value.dragging !== true) {
+        if (Math.abs(mousePos.value.x - mouseX) >= 3 || Math.abs(mousePos.value.y - mouseY) >= 3) {
+          states.value.dragging = true
+        } else {
+          return
+        }
+      }
+
+      switch (rh || resizeHandle.value) {
+        case 'top':
+          states.value.top = mouseY - window.scrollY - shiftY.value
+          if (computedHeight.value < states.value.minHeight) {
+            states.value.top = statesTmp.value.tmpBottom - states.value.minHeight
+          }
+          break
+        case 'left':
+          states.value.left = mouseX - window.scrollX - shiftX.value
+          if (computedWidth.value < states.value.minWidth) {
+            states.value.left = statesTmp.value.tmpRight - states.value.minWidth
+          }
+          break
+        case 'right':
+          states.value.right = mouseX - window.scrollX
+          if (computedWidth.value < states.value.minWidth) {
+            states.value.right = statesTmp.value.tmpLeft - states.value.minWidth
+          }
+          break
+        case 'bottom':
+          states.value.bottom = mouseY - window.scrollY
+          if (computedHeight.value < states.value.minHeight) {
+            states.value.bottom = statesTmp.value.tmpTop - states.value.minHeight
+          }
+          break
+        case 'top-left':
+          onMouseMove(evt, 'top')
+          onMouseMove(evt, 'left')
+          break
+        case 'top-right':
+          onMouseMove(evt, 'top')
+          onMouseMove(evt, 'right')
+          break
+        case 'bottom-left':
+          onMouseMove(evt, 'bottom')
+          onMouseMove(evt, 'left')
+          break
+        case 'bottom-right':
+          onMouseMove(evt, 'bottom')
+          onMouseMove(evt, 'right')
+          break
+        case 'titlebar':
+          if (props.scrollWithWindow) {
+            states.value.top = mouseY - shiftY.value
+            states.value.left = mouseX - shiftX.value
+          } else {
+            states.value.top = mouseY - window.scrollY - shiftY.value
+            states.value.left = mouseX - window.scrollX - shiftX.value
+          }
+
+          states.value.bottom = states.value.top - statesTmp.value.tmpHeight
+          states.value.right = states.value.left - statesTmp.value.tmpWidth
+          break
+      }
+      stopAndPrevent(evt)
+    }
+
+    function onMouseDown(evt, rh) {
+      removeEventListeners()
+
+      selected.value = false
+      if (evt.touches === void 0 && evt.buttons !== 1) {
+        return
+      }
+
+      if (isEmbedded.value === true) {
+        states.value.shouldDrag = states.value.dragging = false
+        return
+
+      }
+
+      const x = getMousePosition(evt, 'x')
+      const y = getMousePosition(evt, 'y')
+
+      //selected.value = canBeSelected(x - scrollX.value, y - scrollY.value)
+      //if (!selected.valu) {
+      //  return
+      //}
+
+      //bringToFront()
+
+      resizeHandle.value = rh
+
+      mousePos.value.x = x
+      mousePos.value.y = y
+
+      const rect = windowRef.value.getBoundingClientRect()
+      shiftX.value = getMouseShift(evt, rect, 'x')
+      shiftY.value = getMouseShift(evt, rect, 'y')
+
+      statesTmp.value.tmpTop = states.value.top
+      statesTmp.value.tmpLeft = states.value.left
+      statesTmp.value.tmpRight = states.value.right
+      statesTmp.value.tmpBottom = states.value.bottom
+      statesTmp.value.tmpHeight = states.value.bottom - states.value.top
+      statesTmp.value.tmpWidth = states.value.right - states.value.left
+
+      states.value.shouldDrag = true
+
+      addEventListeners()
+      if (e.touches !== void 0) {
+        addClass(document.body, 'q-window__touch-action')
+      }
+      prevent(evt)
+    }
+
+
+    // mousedown for document.body
+    function onMouseDownBody(e) {
+      if (isEmbedded.value) {
+        states.value.shouldDrag = states.value.dragging = false
+        return
+      }
+
+      // if dragging, already selected
+      if (states.value.dragging !== true) {
+        const x = getMousePosition(e, 'x')
+        const y = getMousePosition(e, 'y')
+
+        selected.value = canBeSelected(x - scrollX.value, y - scrollY.value)
+        if (selected.value) {
+          //bringToFront()
+        }
+      }
+    }
+
+    function onMouseUp(e) {
+      if (states.value.dragging === true) {
+        prevent(e)
+        removeEventListeners()
+        if (e.touches !== void 0) {
+          removeClass(document.body, 'q-window__touch-action')
+        }
+        states.value.shouldDrag = states.value.dragging = false
+
+      }
+    }
+
+    function onKeyUp(e) {
+      // if ESC key
+      if (e.keyCode === 27 && isDragging.value === true) {
+        prevent(e)
+        removeEventListeners()
+        states.value.shouldDrag = states.value.dragging = false
+        states.value.top = statesTmp.value.tmpTop
+        states.value.left = statesTmp.value.tmpLeft
+        states.value.right = statesTmp.value.tmpRight
+        states.value.bottom = statesTmp.value.tmpBottom
+      }
+    }
+
+    function onTouchMove(e, resizeHandle) {
+      stopAndPrevent(e)
+      resizeHandle.value = resizeHandle
+      onMouseMove(e)
+    }
+
+    function onTouchStart(e, resizeHandle) {
+      stopAndPrevent(e)
+      onMouseDown(e, resizeHandle)
+    }
+
+    function onTouchEnd(e, resizeHandle) {
+      stopAndPrevent(e)
+      resizeHandle.value = resizeHandle
+      onMouseUp(e)
+    }
 
     const savePositionAndState = () => {
       restoreState.value.top = states.value.top
       restoreState.value.left = states.value.left
       restoreState.value.bottom = states.value.bottom
       restoreState.value.right = states.value.right
-      restoreState.value.zIndex = __computedZIndex.value
 
-      restoreState.value.pinned = state.value.context.actions.pinned.state
-      restoreState.value.embedded = state.value.context.actions.embedded.state
-      restoreState.value.maximize = state.value.context.actions.maximize.state
-      restoreState.value.minimize = state.value.context.actions.minimize.state
+      restoreState.value.zIndex = computedZIndex.value
+
+      restoreState.value.pinned = isMenuItemActive('pinned')
+      restoreState.value.embedded = isMenuItemActive('embedded')
+      restoreState.value.maximize = isMenuItemActive('maximize')
+      restoreState.value.minimize = isMenuItemActive('minimize')
+
+      console.log(`Save Position: ${ restoreState.value }`)
+
     }
 
     const restorePositionAndState = () => {
@@ -860,20 +914,94 @@ console.log(states.value.right)
       states.value.bottom = restoreState.value.bottom
       states.value.right = restoreState.value.right
       zIndex.value = restoreState.value.zIndex
-      state.value.context.actions.pinned.state = restoreState.value.pinned
-      state.value.context.actions.embedded.state = restoreState.value.embedded
-      state.value.context.actions.maximize.state = restoreState.value.maximize
-      state.value.context.actions.minimize.state = restoreState.value.minimize
+
+      setMenuItemState('pinned', restoreState.value.pinned)
+      setMenuItemState('embedded', restoreState.value.embedded)
+      setMenuItemState('maximize', restoreState.value.maximize)
+      setMenuItemState('minimize', restoreState.value.minimize)
+
+      console.log(`Save Position: ${ states.value }`)
     }
 
-    const canDrag = () => {
-      return state.value.context.actions.visible.state === true
-        && state.value.context.actions.embedded.state !== true
-        && state.value.context.actions.pinned.state !== true
-        && state.value.context.actions.fullscreen.state !== true
-        && state.value.context.actions.maximize.state !== true
-        && state.value.context.actions.minimize.state !== true;
-    }
+
+
+    watch(() =>  menuActionItems.value.maximize.state , (val, oldVal) => {
+      if (oldVal === void 0) {
+        // during initialization
+        return
+      }
+      if (val === false) {
+        restorePositionAndState()
+      }
+    })
+
+    watch(() =>  menuActionItems.value.minimize.state , (val, oldVal) => {
+      if (oldVal === void 0) {
+        // during initialization
+        return
+      }
+      if (val === false) {
+        restorePositionAndState()
+      }
+    })
+
+    watch(() =>  menuActionItems.value.fullscreen.state , (val, oldVal) => {
+      if (oldVal === void 0) {
+        return
+      }
+      if (val === true) {
+        savePositionAndState()
+        zIndex.value = maxZIndex
+      }
+      else {
+        restorePositionAndState()
+        fullscreenInitiated.value = val
+      }
+    })
+
+    watch(() =>  AppFullscreen.isActive, (val, oldVal) => {
+      if (fullscreenInitiated.value === true) {
+        setMenuItemState('fullscreen', val)
+      }
+    })
+
+    watch(() =>  $q.screen.height, (val, oldVal) => {
+      if (isFullscreen.value === true) {
+        states.value.bottom = val
+      }
+    })
+    watch(() =>  $q.screen.width, (val, oldVal) => {
+      if (isFullscreen.value === true) {
+        states.value.right = val
+      }
+    })
+    const isVisible = computed(() => {
+      return isMenuItemActive('visible')
+    })
+
+    const isEmbedded = computed(() => {
+      return isMenuItemActive('embedded')
+    })
+
+    const isFloating = computed(() => {
+      return isMenuItemActive('embedded') !== true
+    })
+
+    const isPinned = computed(() => {
+      return isMenuItemActive('pinned')
+    })
+
+    const isFullscreen = computed(() => {
+      return isMenuItemActive('fullscreen')
+    })
+
+    const isMaximized = computed(() => {
+      return isMenuItemActive('maximize')
+    })
+
+    const isMinimized = computed(() => {
+      return isMenuItemActive('minimize')
+    })
 
 
     const isDisabled = computed(() => {
@@ -892,15 +1020,28 @@ console.log(states.value.right)
       return selected.value === true
     })
 
+    const canDrag = () => {
+      return isVisible.value === true
+        && isEmbedded.value !== true
+        && isPinned.value !== true
+        && isFullscreen.value !== true
+        && isMaximized.value !== true
+        && isMinimized.value !== true
+    }
 
-    const __computedVisibility = computed(() => {
-      return state.value.context.actions.visible.state === true ? 'visible' : 'hidden'
+    const hasStateInfo = computed(() => {
+      return Object.keys(menuActionItems).length > 0
     })
 
+
+    const computedVisibility = computed(() => {
+      return isVisible.value === true ? 'visible' : 'hidden'
+    })
+    //
     const computedToolbarHeight = computed(() => {
       return props.headless === true ? 0 : props.dense === true ? 28 : 40
     })
-
+    //
     const computedLeft = computed(() => {
       return states.value.left
     })
@@ -932,19 +1073,57 @@ console.log(states.value.right)
     const computedScrollY = computed(() => {
       return computedTop.value + (props.scrollWithWindow === false ? scrollY.value : 0)
     })
-
-    const __computedZIndex = computed(() => {
+    //
+    const computedZIndex = computed(() => {
       let extra = 0
       if (isDragging.value) extra = 100
       return zIndex.value + extra
     })
 
+
+    const  computedActions = computed(() => {
+      // sort and pick ones that are visible based on user selection and state
+      const actions = []
+      if (props.actions.includes('embedded') && (checkMenuItemState('embedded', true) || checkMenuItemState('embedded', false))) {
+        actions.push('embedded')
+      }
+      if (props.actions.includes('pin') && (checkMenuItemState('pinned', true) || checkMenuItemState('pinned', false))) {
+        actions.push('pinned')
+      }
+      if (props.actions.includes('fullscreen') && (checkMenuItemState('fullscreen', true) || checkMenuItemState('fullscreen', false))) {
+        actions.push('fullscreen')
+      }
+      if (props.actions.includes('maximize') && (checkMenuItemState('maximize', true) || checkMenuItemState('maximize', false))) {
+        actions.push('maximize')
+      }
+      // if (this.actions.includes('minimize') && (this.canDo('minimize', true) || this.canDo('minimize', false))) {
+      //   actions.push('maximize')
+      // }
+      if (props.actions.includes('close') && checkMenuItemState('close', true)) {
+        actions.push('visible')
+      }
+
+      return actions
+    })
+    //
+    const computedMenuData = computed( () => {
+      // get stateInfo for each menu item
+      const menuData = []
+      computedActions.value.map(key => {
+        if (menuActionItems.value[ key ]) {
+          menuData.push({ ...menuActionItems.value[ key ], key: key })
+        }
+      })
+      return menuData
+    })
+
+
     const __style = computed(() => {
       let style
-      if (state.value.context.actions.minimize.state === true) {
+      if (isMinimized.value === true) {
         style = {
           position: 'relative',
-          visibility: __computedVisibility.value,
+          visibility: computedVisibility.value,
           height: computedToolbarHeight.value + 'px',
           borderWidth: '1px',
           borderStyle: 'solid',
@@ -952,10 +1131,10 @@ console.log(states.value.right)
           backgroundColor: props.backgroundColor,
           minWidth: '100px'
         }
-      } else if (state.value.context.actions.embedded.state === true) {
+      } else if (isEmbedded.value === true) {
         style = {
           position: 'relative',
-          visibility: __computedVisibility.value,
+          visibility: computedVisibility.value,
           borderWidth: props.borderWidth,
           borderStyle: props.borderStyle,
           width: '100%',
@@ -972,16 +1151,16 @@ console.log(states.value.right)
           borderWidth: props.borderWidth,
           borderStyle: props.borderStyle,
           padding: 0,
-          visibility: __computedVisibility.value,
+          visibility: computedVisibility.value,
           minWidth: '90px',
           minHeight: '50px',
           top: top + 'px',
           left: left + 'px',
-          zIndex: __computedZIndex.value
+          zIndex: computedZIndex.value
         }
 
 
-        if (state.value.context.actions.maximize.state) {
+        if (isMaximized.value === true) {
           style.width = '100%'
           style.height = '100%'
         } else {
@@ -1014,19 +1193,19 @@ console.log(states.value.right)
     const __classes = computed(() => {
       return ''
         + (isEnabled.value === true ? ' q-focusable q-hoverable' : ' disabled')
-        + (state.value.context.actions.embedded.state !== true && state.value.context.actions.fullscreen.state !== true ? ' q-window__floating' : '')
-        + (state.value.context.actions.fullscreen.state === true ? ' q-window__fullscreen' : '')
-        + (isSelected.value === true && state.value.context.actions.embedded.state !== true && state.value.context.actions.fullscreen.state !== true ? ' q-window__selected' : '')
+        + (isEmbedded.value !== true && isFullscreen.value !== true ? ' q-window__floating' : '')
+        + (isFullscreen.value === true ? ' q-window__fullscreen' : '')
+        + (isSelected.value === true && isEmbedded.value !== true && isFullscreen.value !== true ? ' q-window__selected' : '')
         + (isDragging.value === true ? ' q-window__dragging q-window__touch-action' : '');
     })
-
+//
     const {
       renderGrippers,
-      renderResizeHandles,
+     renderResizeHandles,
       renderResizeHandle
-    } = useResize(props, slots, computedHeight, computedToolbarHeight, zIndex, state, canDrag, computedWidth, send)
-    const { renderTitleBar } = useToolbar(props, slots, state, send, __computedZIndex, renderResizeHandle, canDrag, isDragging)
-    const { renderBody } = useBody(props, slots, computedHeight, computedToolbarHeight, zIndex, state, renderResizeHandle, canDrag)
+     } = useResize(props, slots, computedHeight, computedToolbarHeight, zIndex, canDrag, computedWidth,onMouseDown,onTouchStart,onTouchMove,onTouchEnd)
+    const { renderTitleBar } = useToolbar(props, slots, computedZIndex, canDrag, isDragging,   isEmbedded,isMinimized,computedMenuData, renderResizeHandle)
+    const { renderBody } = useBody(props, slots, computedHeight, computedToolbarHeight, zIndex, canDrag,isEmbedded,isFullscreen)
 
 
     function renderWindow() {
@@ -1039,16 +1218,20 @@ console.log(states.value.right)
       }, [
         (canDrag() === true) && [...renderResizeHandles()],
         (canDrag() === true) && [...renderGrippers()],
-        renderTitleBar(),
-        state.value.context.actions.minimize.state !== true && renderBody()
+         renderTitleBar(),
+         isMinimized.value !== true && renderBody()
       ])
     }
 
     function render() {
       return h(Teleport, {
         to: '#q-app',
-        disabled: props.modelValue
-      }, [renderWindow()])
+        disabled: isEmbedded.value
+      } ,
+        [
+         renderWindow()
+        ]
+      )
     }
 
     return () => render()
