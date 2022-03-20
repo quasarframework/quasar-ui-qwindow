@@ -6,7 +6,8 @@ import {
   ref,
   nextTick,
   Teleport,
-  watch
+  watch,
+  getCurrentInstance
 } from 'vue'
 
 import {
@@ -19,7 +20,7 @@ import useStyle from "./composables/useStyle";
 import useResize from "./composables/useResize";
 import useToolbar from "./composables/useToolbar";
 import useBody from "./composables/useBody";
-import { prevent, stopAndPrevent } from 'quasar/src/utils/event'
+import {prevent, stopAndPrevent} from 'quasar/src/utils/event'
 
 
 // the starting zIndex for floating windows
@@ -45,9 +46,9 @@ const defaultY = 20
 const getMousePosition = function (e, type = 'x') {
   if (e.touches !== void 0) {
     if (type === 'x') {
-      return e.touches[ 0 ].pageX
+      return e.touches[0].pageX
     }
-    return e.touches[ 0 ].pageY
+    return e.touches[0].pageY
   } else {
     if (type === 'x') {
       return e.pageX
@@ -58,9 +59,9 @@ const getMousePosition = function (e, type = 'x') {
 const getMouseShift = function (e, rect, type = 'x') {
   if (e.touches !== void 0) {
     if (type === 'x') {
-      return e.touches[ 0 ].clientX - rect.left
+      return e.touches[0].clientX - rect.left
     }
-    return e.touches[ 0 ].clientY - rect.top
+    return e.touches[0].clientY - rect.top
   } else {
     if (type === 'x') {
       return e.clientX - rect.left
@@ -144,32 +145,32 @@ export default defineComponent({
       default: 'solid'
     },
 
-    startX: [ Number, String ],
-    startY: [ Number, String ],
+    startX: [Number, String],
+    startY: [Number, String],
     width: {
-      type: [ Number, String ],
+      type: [Number, String],
       default: 400
     },
     height: {
-      type: [ Number, String ],
+      type: [Number, String],
       default: 400
     },
     actions: {
       type: Array,
-      default: () => ([ ACTION_PINNED, ACTION_EMBEDDED, ACTION_CLOSE ]),
+      default: () => ([ACTION_PINNED, ACTION_EMBEDDED, ACTION_CLOSE]),
       validator: (v) => v.some(action => [
         ACTION_PINNED,
         ACTION_EMBEDDED,
         ACTION_MINIMIZE,
         ACTION_MAXIMIZE,
         ACTION_CLOSE,
-        ACTION_FULLSCREEN ].includes(action))
+        ACTION_FULLSCREEN].includes(action))
     },
     menuFunc: Function,
-    titlebarStyle: [ String, Object, Array ],
-    titlebarClass: [ String, Object, Array ],
-    contentClass: [ String, Object, Array ],
-    contentStyle: [ String, Object, Array ]
+    titlebarStyle: [String, Object, Array],
+    titlebarClass: [String, Object, Array],
+    contentClass: [String, Object, Array],
+    contentStyle: [String, Object, Array]
   },
 
   emits: [
@@ -185,7 +186,8 @@ export default defineComponent({
     'beforeDrag',
     'afterDrag'
   ],
-  setup(props, { slots, emit }) {
+  setup(props, {slots, emit}) {
+
     const iconSetTemplate = ref({
       visible: {
         on: {
@@ -379,8 +381,8 @@ export default defineComponent({
     const resizeHandle = ref()
     const fullscreenInitiated = ref(false)
 
-    const { removeClass, addClass } = useStyle()
-
+    const {removeClass, addClass} = useStyle()
+    const {ctx: _this} = getCurrentInstance()
 
     onMounted(() => {
 
@@ -405,16 +407,14 @@ export default defineComponent({
       if (props.modelValue !== void 0) {
         if (props.modelValue === true) {
           setActionState(ACTION_VISIBLE, true)
-        }
-        else {
+        } else {
           setActionState(ACTION_VISIBLE, false)
         }
       }
       if (props.embedded !== void 0) {
         if (props.embedded === true) {
           setActionState(ACTION_EMBEDDED, true)
-        }
-        else {
+        } else {
           setActionState(ACTION_EMBEDDED, false)
         }
       }
@@ -423,8 +423,7 @@ export default defineComponent({
           if (checkActionState(ACTION_PINNED, true)) {
             setActionState(ACTION_PINNED, true)
           }
-        }
-        else {
+        } else {
           if (checkActionState(ACTION_PINNED, false)) {
             setActionState(ACTION_PINNED, false)
           }
@@ -438,24 +437,21 @@ export default defineComponent({
       if (props.maximized !== void 0) {
         if (props.maximized === true && getActionState(ACTION_VISIBLE) !== true) {
           setActionState(ACTION_MAXIMIZE, true)
-        }
-        else {
+        } else {
           setActionState(ACTION_MAXIMIZE, false)
         }
       }
       if (props.minimized !== void 0) {
         if (props.minimized === true && getActionState(ACTION_FULLSCREEN) !== true) {
           setActionState(ACTION_MINIMIZE, true)
-        }
-        else {
+        } else {
           setActionState(ACTION_MINIMIZE, false)
         }
       }
 
-      document.addEventListener('scroll', onScroll, { passive: true })
-      document.body.addEventListener('mousedown', onMouseDownBody, { passive: false })
+      document.addEventListener('scroll', onScroll, {passive: true})
+      document.body.addEventListener('mousedown', onMouseDownBody, {passive: false})
     })
-
 
 
     function show() {
@@ -519,11 +515,8 @@ export default defineComponent({
         savePositionAndState()
         setFullWindowPosition()
 
-
         setActionState(ACTION_EMBEDDED, false)
-        nextTick(() => {
-          setActionState(ACTION_MAXIMIZE, true)
-        })
+        setActionState(ACTION_MAXIMIZE, true)
         return true
       }
       return false
@@ -671,7 +664,7 @@ export default defineComponent({
           }
           break
         default:
-          throw Error(`Unknown action type ${ mode }`)
+          throw Error(`Unknown action type ${mode}`)
       }
       return allowed
     }
@@ -679,7 +672,7 @@ export default defineComponent({
     //
     function getActionState(name) {
       if (name in actionItems.value) {
-        return actionItems.value[ name ].state
+        return actionItems.value[name].state
       }
       return false
     }
@@ -687,13 +680,11 @@ export default defineComponent({
     //
     function setActionState(id, val) {
       if (id in actionItems.value) {
-        actionItems.value[ id ].state = val
+        actionItems.value[id].state = val
         return true
       }
       return false
     }
-
-
 
 
     function onScroll(e) {
@@ -740,19 +731,18 @@ export default defineComponent({
 
     // //// MOUSE ACTIONS
     function addEventListeners() {
-      document.body.addEventListener('mousemove', onMouseMove, { capture: true })
-      document.body.addEventListener('mouseup', onMouseUp, { capture: true })
-      document.body.addEventListener('keyup', onKeyUp, { capture: true })
+      document.body.addEventListener('mousemove', onMouseMove, {capture: true})
+      document.body.addEventListener('mouseup', onMouseUp, {capture: true})
+      document.body.addEventListener('keyup', onKeyUp, {capture: true})
     }
 
     function removeEventListeners() {
-      document.body.removeEventListener('mousemove', onMouseMove, { capture: true })
-      document.body.removeEventListener('mouseup', onMouseUp, { capture: true })
-      document.body.removeEventListener('keyup', onKeyUp, { capture: true })
+      document.body.removeEventListener('mousemove', onMouseMove, {capture: true})
+      document.body.removeEventListener('mouseup', onMouseUp, {capture: true})
+      document.body.removeEventListener('keyup', onKeyUp, {capture: true})
     }
 
     function onMouseMove(evt, rh) {
-
       if (states.value.shouldDrag !== true || (evt.touches === void 0 && evt.buttons !== 1)) {
         removeEventListeners()
         return
@@ -773,27 +763,35 @@ export default defineComponent({
       switch (rh || resizeHandle.value) {
         case 'top':
           states.value.top = mouseY - window.scrollY - shiftY.value
-          if (computedHeight.value < states.value.minHeight) {
-            states.value.top = statesTmp.value.tmpBottom - states.value.minHeight
-          }
+          nextTick(() => {
+            if (computedHeight.value < states.value.minHeight) {
+              states.value.top = statesTmp.value.tmpBottom - states.value.minHeight
+            }
+          })
           break
         case 'left':
-          states.value.left = mouseX - window.scrollX - shiftX.value
-          if (computedWidth.value < states.value.minWidth) {
-            states.value.left = statesTmp.value.tmpRight - states.value.minWidth
-          }
+          states.value.left = mouseX - window.pageXOffset - shiftX.value
+          nextTick(() => {
+            if (computedWidth.value < states.value.minWidth) {
+              states.value.left = statesTmp.value.tmpRight - states.value.minWidth
+            }
+          })
           break
         case 'right':
-          states.value.right = mouseX - window.scrollX
-          if (computedWidth.value < states.value.minWidth) {
-            states.value.right = statesTmp.value.tmpLeft - states.value.minWidth
-          }
+          states.value.right = mouseX - window.pageXOffset
+          nextTick(() => {
+            if (computedWidth.value < states.value.minWidth) {
+              states.value.right = statesTmp.value.tmpLeft - states.value.minWidth
+            }
+          })
           break
         case 'bottom':
           states.value.bottom = mouseY - window.scrollY
-          if (computedHeight.value < states.value.minHeight) {
-            states.value.bottom = statesTmp.value.tmpTop - states.value.minHeight
-          }
+          nextTick(() => {
+            if (computedHeight.value < states.value.minHeight) {
+              states.value.bottom = statesTmp.value.tmpTop - states.value.minHeight
+            }
+          })
           break
         case 'top-left':
           onMouseMove(evt, 'top')
@@ -812,16 +810,18 @@ export default defineComponent({
           onMouseMove(evt, 'right')
           break
         case 'titlebar':
-          if (props.scrollWithWindow) {
+          if (props.scrollWithWindow === true) {
             states.value.top = mouseY - shiftY.value
             states.value.left = mouseX - shiftX.value
           } else {
-            states.value.top = mouseY - window.scrollY - shiftY.value
-            states.value.left = mouseX - window.scrollX - shiftX.value
+            states.value.top = mouseY - window.pageYOffset - shiftY.value
+            states.value.left = mouseX - window.pageXOffset - shiftX.value
           }
 
           states.value.bottom = states.value.top - statesTmp.value.tmpHeight
           states.value.right = states.value.left - statesTmp.value.tmpWidth
+
+          console.log(states.value)
           break
       }
       stopAndPrevent(evt)
@@ -829,7 +829,8 @@ export default defineComponent({
 
     function onMouseDown(evt, rh) {
       removeEventListeners()
-
+      console.log('---- DOWN STATES ----')
+      console.log(states.value)
       selected.value = false
       if (evt.touches === void 0 && evt.buttons !== 1) {
         return
@@ -838,7 +839,6 @@ export default defineComponent({
       if (isEmbedded.value === true) {
         states.value.shouldDrag = states.value.dragging = false
         return
-
       }
 
       const x = getMousePosition(evt, 'x')
@@ -864,13 +864,13 @@ export default defineComponent({
       statesTmp.value.tmpLeft = states.value.left
       statesTmp.value.tmpRight = states.value.right
       statesTmp.value.tmpBottom = states.value.bottom
-      statesTmp.value.tmpHeight = states.value.bottom - states.value.top
-      statesTmp.value.tmpWidth = states.value.right - states.value.left
+      statesTmp.value.tmpHeight = statesTmp.value.tmpBottom - statesTmp.value.tmpTop
+      statesTmp.value.tmpWidth = statesTmp.value.tmpRight - statesTmp.value.tmpLeft
 
       states.value.shouldDrag = true
 
       addEventListeners()
-      if (e.touches !== void 0) {
+      if (evt.touches !== void 0) {
         addClass(document.body, 'q-window__touch-action')
       }
       prevent(evt)
@@ -896,6 +896,8 @@ export default defineComponent({
     }
 
     function onMouseUp(e) {
+      console.log('---- UP STATES ----')
+      console.log(states.value)
       if (states.value.dragging === true) {
         prevent(e)
         removeEventListeners()
@@ -949,8 +951,8 @@ export default defineComponent({
       restoreState.value.embedded = getActionState(ACTION_EMBEDDED)
       restoreState.value.maximize = getActionState(ACTION_MAXIMIZE)
       restoreState.value.minimize = getActionState(ACTION_MINIMIZE)
-
-      console.log(`Save Position: ${ restoreState.value }`)
+      console.log('==== SAVE STATE ====')
+      console.log(`Save Position: ${restoreState.value}`)
 
     }
 
@@ -965,8 +967,8 @@ export default defineComponent({
       setActionState(ACTION_EMBEDDED, restoreState.value.embedded)
       setActionState(ACTION_MAXIMIZE, restoreState.value.maximize)
       setActionState(ACTION_MINIMIZE, restoreState.value.minimize)
-
-      console.log(`Save Position: ${ states.value }`)
+      console.log('==== RESTORE STATE ====')
+      console.log(`Save Position: ${states.value}`)
     }
 
     watch(() => actionItems.value.maximize.state, (val, oldVal) => {
@@ -1101,11 +1103,25 @@ export default defineComponent({
     })
 
     const computedHeight = computed(() => {
-      return computedBottom.value - computedTop.value
+      const height =  computedBottom.value - computedTop.value
+      console.log(`Computed Height: ${height}`)
+      console.log(`Computed Bottom: ${computedBottom.value} - ${computedTop.value}` )
+      return height
     })
 
     const computedWidth = computed(() => {
-      return computedRight.value - computedLeft.value
+      const width =  computedRight.value - computedLeft.value
+      console.log(`Computed Width: ${width}`)
+      console.log(`Computed Bottom: ${computedRight.value} - ${computedLeft.value}` )
+      return width
+    })
+
+    const computedHeight2 = computed(() => {
+      return Math.abs(computedBottom.value - computedTop.value)
+    })
+
+    const computedWidth2 = computed(() => {
+      return Math.abs(computedRight.value - computedLeft.value)
     })
 
     const computedScrollX = computed(() => {
@@ -1152,8 +1168,8 @@ export default defineComponent({
       // get stateInfo for each menu item
       const menuData = []
       computedActions.value.map(key => {
-        if (actionItems.value[ key ]) {
-          menuData.push({ ...actionItems.value[ key ], key: key })
+        if (actionItems.value[key]) {
+          menuData.push({...actionItems.value[key], key: key})
         }
       })
       return menuData
@@ -1163,6 +1179,7 @@ export default defineComponent({
     const __style = computed(() => {
       let style
       if (isMinimized.value === true) {
+        console.log('==== MINIMIZE ====')
         style = {
           position: 'relative',
           visibility: computedVisibility.value,
@@ -1174,6 +1191,7 @@ export default defineComponent({
           minWidth: '100px'
         }
       } else if (isEmbedded.value === true) {
+        console.log('==== EMBEDDED ====')
         style = {
           position: 'relative',
           visibility: computedVisibility.value,
@@ -1183,10 +1201,17 @@ export default defineComponent({
           height: '100%'
         }
       } else {
+        console.log('==== ELSE ====')
+        console.log(states.value)
         const top = states.value.top + (props.scrollWithWindow !== true ? scrollY.value : 0)
         const left = states.value.left + (props.scrollWithWindow !== true ? scrollX.value : 0)
+
         console.log(top)
         console.log(left)
+        console.log(scrollY.value)
+        console.log(scrollX.value)
+
+
         style = {
           position: 'absolute',
           display: 'inline-block',
@@ -1200,9 +1225,7 @@ export default defineComponent({
           left: left + 'px',
           zIndex: computedZIndex.value
         }
-
-
-        if (isMaximized.value === true) {
+        if (isMaximized.value) {
           style.width = '100%'
           style.height = '100%'
         } else {
@@ -1214,20 +1237,20 @@ export default defineComponent({
       if (props.contentStyle) {
         const type = Object.prototype.toString.call(props.contentStyle)
         if (type === '[object Object]') {
-          style = { ...style, ...props.contentStyle }
+          style = {...style, ...props.contentStyle}
         } else if ((type === '[object Array]')) {
           props.contentStyle.forEach(item => {
-            style = { ...style, ...item }
+            style = {...style, ...item}
           })
         } else if (typeof props.contentStyle === 'string') {
           const items = props.contentStyle.split(';')
           items.forEach(item => {
             const props = item.split(':')
-            style[ props[ 0 ].trim() ] = props[ 1 ].trim()
+            style[props[0].trim()] = props[1].trim()
           })
         }
       }
-
+      console.log(style)
       return style
     })
 
@@ -1253,15 +1276,13 @@ export default defineComponent({
 
     const {
       renderBody
-    } = useBody(props, slots, computedHeight, computedToolbarHeight, zIndex, canDrag, isEmbedded, isFullscreen)
+    } = useBody(props, slots, computedHeight, computedToolbarHeight, zIndex, canDrag, isEmbedded, isFullscreen, renderResizeHandle)
 
 
     function renderWindow() {
-      return h('div', {
-        class: [ 'q-window', __classes.value, props.contentClass ],
+      const r = h('div', {
+        class: ['q-window', __classes.value, props.contentClass],
         style: __style.value,
-        to: '#q-app',
-        disabled: props.modelValue,
         ref: windowRef,
       }, [
         (canDrag() === true) && [...renderResizeHandles()],
@@ -1269,6 +1290,8 @@ export default defineComponent({
         renderTitleBar(),
         isMinimized.value !== true && renderBody()
       ])
+      console.log(r)
+      return r
     }
 
     function render() {

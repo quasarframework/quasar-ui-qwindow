@@ -40,6 +40,7 @@ export default function useToolbar(props, slots, computedZIndex, canDrag, isDrag
     if (stateInfo === MENU_ITEM_SEPARATOR) {
       return h(QSeparator)
     }
+    console.log('CLICK ITEM')
     console.log(stateInfo)
     return withDirectives(h(QItem, {
       key: stateInfo.key,

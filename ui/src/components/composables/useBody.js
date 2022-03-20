@@ -1,6 +1,6 @@
 import { computed, h } from "vue";
 
-export default function useBody(props, slots, computedHeight, computedToolbarHeight, zIndex,canDrag,  isEmbedded,isFullscreen) {
+export default function useBody(props, slots, computedHeight, computedToolbarHeight, zIndex,canDrag,  isEmbedded,isFullscreen, renderResizeHandle) {
 
   const bodyStyle = computed(() => {
 
@@ -14,8 +14,6 @@ export default function useBody(props, slots, computedHeight, computedToolbarHei
     }
 
     if (isFullscreen.value === true) {
-
-
       return {
         position: 'fixed',
         height: `calc(100% - ${ computedToolbarHeight.value }px`,
@@ -32,7 +30,7 @@ export default function useBody(props, slots, computedHeight, computedToolbarHei
   function renderBody() {
     const slot = slots && slots.default
     return h('div', {
-      class: 'q-window__body row',
+      class: ['q-window__body row'],
       style: bodyStyle.value
     }, [
       slot ? slot({ zIndex: zIndex.value }) : '',
