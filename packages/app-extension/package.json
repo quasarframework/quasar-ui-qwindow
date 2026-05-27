@@ -1,0 +1,53 @@
+{
+  "name": "@quasar/quasar-app-extension-qwindow",
+  "version": "3.0.0-beta.0",
+  "description": "A Quasar App Extension for @quasar/quasar-ui-qwindow",
+  "keywords": [
+    "app",
+    "app extension",
+    "extension",
+    "floating",
+    "quasar",
+    "quasarframework",
+    "resizable",
+    "window"
+  ],
+  "homepage": "https://github.com/quasarframework/quasar-ui-qwindow",
+  "bugs": "https://github.com/quasarframework/quasar-ui-qwindow/issues",
+  "license": "MIT",
+  "author": "Jeff Galbraith <jeff@quasar.dev>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/quasarframework/quasar-ui-qwindow.git"
+  },
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/hawkeye64"
+  },
+  "files": [
+    "src"
+  ],
+  "type": "module",
+  "main": "src/index.ts",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "lint": "oxlint src"
+  },
+  "dependencies": {
+    "@quasar/quasar-ui-qwindow": "workspace:^"
+  },
+  "devDependencies": {
+    "@quasar/app-vite": "3.0.0-beta.29",
+    "quasar": "^2.19.3",
+    "typescript": "~5.9.3"
+  },
+  "peerDependencies": {
+    "@quasar/app-vite": ">=3.0.0-beta.29"
+  },
+  "engines": {
+    "node": ">=22.13",
+    "pnpm": ">=11.3.0"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "name": "quasar-ui-qwindow-workspace",
+  "version": "3.0.0-beta.0",
+  "private": true,
+  "description": "QWindow workspace",
+  "type": "module",
+  "scripts": {
+    "clean": "rm -rf node_modules pnpm-lock.yaml packages/ui/node_modules packages/docs/node_modules packages/app-extension/node_modules packages/docs/.quasar packages/docs/dist",
+    "build": "pnpm run build:ui && pnpm run build:docs",
+    "build:ui": "cd packages/ui && pnpm build",
+    "build:docs": "cd packages/docs && pnpm build",
+    "ci:publish": "pnpm --filter @quasar/quasar-ui-qwindow publish --access public --publish-branch main && pnpm --filter @quasar/quasar-app-extension-qwindow publish --access public --publish-branch main",
+    "ci:publish:beta": "pnpm --filter @quasar/quasar-ui-qwindow publish --access public --publish-branch v3-beta --tag beta --no-git-checks && pnpm --filter @quasar/quasar-app-extension-qwindow publish --access public --publish-branch v3-beta --tag beta --no-git-checks",
+    "test": "vitest run",
+    "coverage": "vitest run --coverage",
+    "typecheck": "pnpm --filter @quasar/quasar-ui-qwindow typecheck && pnpm --filter docs typecheck",
+    "deep": "ncu --configFilePath . --packageFile '{package.json,packages/*/package.json}'",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.1",
+    "@vitest/coverage-v8": "^4.1.7",
+    "npm-check-updates": "^22.2.1",
+    "oxfmt": "^0.52.0",
+    "oxlint": "^1.67.0",
+    "typescript": "~5.9.3",
+    "vitest": "^4.1.7",
+    "vue": "^3.5.35"
+  },
+  "engines": {
+    "node": ">=22.13",
+    "pnpm": ">=11.3.0"
+  },
+  "packageManager": "pnpm@11.4.0"
+}

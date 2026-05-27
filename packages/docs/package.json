@@ -1,0 +1,48 @@
+{
+  "name": "docs",
+  "version": "3.0.0-beta.0",
+  "private": true,
+  "description": "QWindow Docs",
+  "author": "Jeff Galbraith <jeff@quasar.dev>",
+  "type": "module",
+  "scripts": {
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
+    "typecheck": "vue-tsc -p tsconfig.json --noEmit --pretty false",
+    "test": "echo \"No test specified\" && exit 0",
+    "dev": "quasar dev",
+    "build": "quasar build",
+    "postinstall": "quasar prepare --silent"
+  },
+  "dependencies": {
+    "@quasar/extras": "2.0.0-beta.1",
+    "markdown-it": "^14.2.0",
+    "markdown-it-container": "^4.0.0",
+    "pinia": "^3.0.4",
+    "prismjs": "^1.30.0",
+    "quasar": "^2.19.3",
+    "vue": "^3.5.35",
+    "vue-router": "^5.0.7"
+  },
+  "devDependencies": {
+    "@md-plugins/quasar-app-extension-q-press": "0.1.0-beta.10",
+    "@md-plugins/shared": "0.1.0-beta.10",
+    "@md-plugins/vite-examples-plugin": "0.1.0-beta.10",
+    "@md-plugins/vite-md-plugin": "0.1.0-beta.10",
+    "@quasar/app-vite": "3.0.0-beta.29",
+    "@quasar/quasar-ui-qwindow": "workspace:*",
+    "@types/node": "^25.9.1",
+    "autoprefixer": "^10.5.0",
+    "sass-embedded": "^1.100.0",
+    "typescript": "~5.9.3",
+    "vite-plugin-checker": "^0.14.1",
+    "vue-tsc": "^3.3.2"
+  },
+  "engines": {
+    "node": ">=22.13",
+    "pnpm": ">=11.3.0"
+  },
+  "productName": "QWindow Docs"
+}

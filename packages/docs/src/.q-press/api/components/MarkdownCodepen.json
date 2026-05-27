@@ -1,0 +1,15 @@
+{
+  "type": "component",
+  "meta": {
+    "docsUrl": "https://path-to-your-docs/markdown-codepen"
+  },
+  "props": {
+    "title": {
+      "type": "String",
+      "desc": "Title used for the generated CodePen",
+      "required": true,
+      "examples": ["'Basic Example'", "'Advanced Playground'"],
+      "category": "content"
+    }
+  }
+}

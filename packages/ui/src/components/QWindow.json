@@ -1,0 +1,319 @@
+{
+  "meta": {
+    "docsUrl": "https://qwindow.netlify.app/developing/using-qwindow"
+  },
+  "props": {
+    "model-value": {
+      "type": "Boolean",
+      "category": "model",
+      "desc": "`v-model`; Controls visibility of the window"
+    },
+    "title": {
+      "type": "String",
+      "category": "content",
+      "desc": "Text shown in the title bar"
+    },
+    "dense": {
+      "type": "Boolean",
+      "category": "style",
+      "desc": "Uses a shorter title bar"
+    },
+    "embedded": {
+      "type": "Boolean",
+      "category": "behavior",
+      "desc": "Renders the window in place instead of floating it through Teleport"
+    },
+    "pinned": {
+      "type": "Boolean",
+      "category": "behavior",
+      "desc": "Prevents the floating window from moving or resizing"
+    },
+    "fullscreen": {
+      "type": "Boolean",
+      "category": "behavior",
+      "desc": "Starts the window in fullscreen mode"
+    },
+    "maximized": {
+      "type": "Boolean",
+      "category": "behavior",
+      "desc": "Starts the window maximized"
+    },
+    "minimized": {
+      "type": "Boolean",
+      "category": "behavior",
+      "desc": "Starts the window minimized"
+    },
+    "no-menu": {
+      "type": "Boolean",
+      "category": "content",
+      "desc": "Hides the title bar actions menu"
+    },
+    "no-move": {
+      "type": "Boolean",
+      "category": "behavior",
+      "desc": "Disables dragging by the title bar"
+    },
+    "no-resize": {
+      "type": "Boolean",
+      "category": "behavior",
+      "desc": "Disables resize handles"
+    },
+    "resizable": {
+      "type": "Array",
+      "category": "behavior",
+      "desc": "List of resize handles to enable",
+      "examples": [["top", "right", "bottom", "left"]]
+    },
+    "scroll-with-window": {
+      "type": "Boolean",
+      "category": "behavior",
+      "desc": "Keeps the floating position tied to document scroll"
+    },
+    "auto-pin": {
+      "type": "Boolean",
+      "category": "behavior",
+      "desc": "Automatically pins the window when its state requires it"
+    },
+    "disabled": {
+      "type": "Boolean",
+      "category": "state",
+      "desc": "Puts the window into a disabled visual state"
+    },
+    "hide-toolbar-divider": {
+      "type": "Boolean",
+      "category": "style",
+      "desc": "Hides the divider under the title bar"
+    },
+    "hide-grippers": {
+      "type": "Boolean",
+      "category": "style",
+      "desc": "Hides visible resize grippers and uses invisible resize handles"
+    },
+    "round-grippers": {
+      "type": "Boolean",
+      "category": "style",
+      "desc": "Rounds visible resize grippers"
+    },
+    "headless": {
+      "type": "Boolean",
+      "category": "content",
+      "desc": "Hides the title bar"
+    },
+    "icon-set": {
+      "type": "Object",
+      "category": "content",
+      "desc": "Overrides the menu action labels and icons"
+    },
+    "color": {
+      "type": "String",
+      "category": "style",
+      "default": "#000000",
+      "desc": "CSS text color for the window"
+    },
+    "background-color": {
+      "type": "String",
+      "category": "style",
+      "desc": "CSS background color for the window"
+    },
+    "gripper-border-color": {
+      "type": "String",
+      "category": "style",
+      "desc": "CSS border color for resize grippers"
+    },
+    "gripper-background-color": {
+      "type": "String",
+      "category": "style",
+      "desc": "CSS background color for resize grippers"
+    },
+    "border-width": {
+      "type": "String",
+      "category": "style",
+      "default": "1px",
+      "desc": "CSS border width for the window"
+    },
+    "border-style": {
+      "type": "String",
+      "category": "style",
+      "default": "solid",
+      "desc": "CSS border style for the window"
+    },
+    "start-x": {
+      "type": ["Number", "String"],
+      "category": "position",
+      "desc": "Initial left position for floating windows"
+    },
+    "start-y": {
+      "type": ["Number", "String"],
+      "category": "position",
+      "desc": "Initial top position for floating windows"
+    },
+    "width": {
+      "type": ["Number", "String"],
+      "category": "position",
+      "default": 400,
+      "desc": "Initial window width"
+    },
+    "height": {
+      "type": ["Number", "String"],
+      "category": "position",
+      "default": 400,
+      "desc": "Initial window height"
+    },
+    "actions": {
+      "type": "Array",
+      "category": "content",
+      "default": ["pinned", "embedded", "close"],
+      "desc": "Menu actions shown in the title bar",
+      "examples": [["pinned", "fullscreen", "close"]]
+    },
+    "menu-func": {
+      "type": "Function",
+      "category": "content",
+      "desc": "Receives and may mutate the generated menu item list before rendering"
+    },
+    "titlebar-style": {
+      "type": ["String", "Object", "Array"],
+      "category": "style",
+      "desc": "Style applied to the title bar"
+    },
+    "titlebar-class": {
+      "type": ["String", "Object", "Array"],
+      "category": "style",
+      "desc": "Class applied to the title bar"
+    },
+    "content-style": {
+      "type": ["String", "Object", "Array"],
+      "category": "style",
+      "desc": "Style applied to the outer window"
+    },
+    "content-class": {
+      "type": ["String", "Object", "Array"],
+      "category": "style",
+      "desc": "Class applied to the outer window"
+    }
+  },
+  "events": {
+    "update:model-value": {
+      "desc": "Emitted when the visible state changes",
+      "params": {
+        "value": {
+          "type": "Boolean",
+          "desc": "New visible state"
+        }
+      }
+    },
+    "input": {
+      "desc": "Legacy visible-state event kept for compatibility",
+      "params": {
+        "value": {
+          "type": "Boolean",
+          "desc": "New visible state"
+        }
+      }
+    },
+    "show": {
+      "desc": "Emitted when the window becomes visible"
+    },
+    "hide": {
+      "desc": "Emitted when the window becomes hidden"
+    },
+    "embedded": {
+      "desc": "Emitted when embedded mode changes",
+      "params": {
+        "value": {
+          "type": "Boolean",
+          "desc": "New embedded state"
+        }
+      }
+    },
+    "pinned": {
+      "desc": "Emitted when pinned mode changes",
+      "params": {
+        "value": {
+          "type": "Boolean",
+          "desc": "New pinned state"
+        }
+      }
+    },
+    "fullscreen": {
+      "desc": "Emitted when fullscreen state changes",
+      "params": {
+        "value": {
+          "type": "Boolean",
+          "desc": "New fullscreen state"
+        }
+      }
+    },
+    "maximize": {
+      "desc": "Emitted when maximized state changes",
+      "params": {
+        "value": {
+          "type": "Boolean",
+          "desc": "New maximized state"
+        }
+      }
+    },
+    "minimize": {
+      "desc": "Emitted when minimized state changes",
+      "params": {
+        "value": {
+          "type": "Boolean",
+          "desc": "New minimized state"
+        }
+      }
+    },
+    "selected": {
+      "desc": "Emitted when selected state changes",
+      "params": {
+        "value": {
+          "type": "Boolean",
+          "desc": "New selected state"
+        }
+      }
+    },
+    "before-drag": {
+      "desc": "Emitted before a drag or resize interaction starts",
+      "params": {
+        "evt": {
+          "type": ["MouseEvent", "TouchEvent"],
+          "desc": "Pointer event that started the drag"
+        }
+      }
+    },
+    "after-drag": {
+      "desc": "Emitted after a drag or resize interaction finishes",
+      "params": {
+        "evt": {
+          "type": ["MouseEvent", "TouchEvent"],
+          "desc": "Pointer event that finished the drag"
+        }
+      }
+    },
+    "position": {
+      "desc": "Emitted after the window moves, resizes, or restores position",
+      "params": {
+        "position": {
+          "type": "Object",
+          "desc": "Window position payload with left, top, width, height, scrollX, and scrollY"
+        }
+      }
+    },
+    "canceled": {
+      "desc": "Emitted when an active drag or resize interaction is canceled",
+      "params": {
+        "position": {
+          "type": "Object",
+          "desc": "Restored window position payload"
+        }
+      }
+    }
+  },
+  "slots": {
+    "default": {
+      "desc": "Window body content; receives `zIndex`"
+    },
+    "titlebar": {
+      "desc": "Custom title bar content; receives `menuData`"
+    }
+  }
+}

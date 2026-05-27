@@ -1,42 +1,68 @@
-> It's likely this App Extension will be deprecated (no support for Quasar v2/Vue 3) unless it gets a strong representation from developers using it.
+# QWindow
 
-QWindow (Vue Plugin, UMD and Quasar App Extension)
-===
+![@quasar/quasar-ui-qwindow](https://img.shields.io/npm/v/@quasar/quasar-ui-qwindow?label=@quasar/quasar-ui-qwindow)
+![@quasar/quasar-app-extension-qwindow](https://img.shields.io/npm/v/@quasar/quasar-app-extension-qwindow?label=@quasar/quasar-app-extension-qwindow)
+[![npm](https://img.shields.io/npm/dt/@quasar/quasar-ui-qwindow.svg)](https://www.npmjs.com/package/@quasar/quasar-ui-qwindow)
+[![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/quasarframework/quasar-ui-qwindow.svg)](https://github.com/quasarframework/quasar-ui-qwindow)
+[![GitHub repo size in bytes](https://img.shields.io/github/repo-size/quasarframework/quasar-ui-qwindow.svg)](https://github.com/quasarframework/quasar-ui-qwindow)
 
-![@quasar/quasar-ui-qwindow](https://img.shields.io/npm/v/@quasar/quasar-ui-qwindow.svg?label=@quasar/quasar-ui-qwindow)
-![@quasar/quasar-app-extension-qwindow](https://img.shields.io/npm/v/@quasar/quasar-app-extension-qwindow.svg?label=@quasar/quasar-app-extension-qwindow)
-[![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/quasarframework/quasar-ui-qwindow.svg)]()
-[![GitHub repo size in bytes](https://img.shields.io/github/repo-size/quasarframework/quasar-ui-qwindow.svg)]()
+QWindow is a Quasar component and app extension for building floating, movable, and resizable window
+panels. It is useful for desktop-style workspaces, inspectors, tool palettes, and dashboards where
+users need to keep multiple panels open at once.
 
-# Structure
+## Documentation
 
-* [/ui](ui) - standalone npm package (go here for more information)
-* [/app-extension](app-extension) - Quasar app extension
-* [/demo](demo) - sources for docs, demo and examples project
-* [live demo](https://quasarframework.github.io/quasar-ui-qwindow/docs) - live docs, demo and examples
+[Live docs and examples](https://qwindow.netlify.app/)
 
-# Demo Workflow
-If you fork or download this project, make sure you have the Quasar CLI globally installed:
+## Install
 
-```
-$ npm i -g @quasar/cli
-```
+For Quasar CLI projects:
 
-The workflow to build the demo, on a fresh project, is as follows:
-```
-$ cd ui
-$ yarn
-$ yarn build
-$ cd ../demo
-$ yarn
-$ quasar dev
+```bash
+quasar ext add @quasar/qwindow
 ```
 
-# Codepen
-[UMD example on Codepen](https://codepen.io/Hawkeye64/pen/RwwwKQL)
+While v3 is in beta:
 
-# Donate
-If you appreciate the work that went into this, please consider donating to [Quasar](https://donate.quasar.dev) or [Jeff](https://github.com/sponsors/hawkeye64).
+```bash
+quasar ext add @quasar/qwindow@beta
+```
 
-# License
+For direct package usage:
+
+```bash
+pnpm add @quasar/quasar-ui-qwindow@beta
+# or
+bun add @quasar/quasar-ui-qwindow@beta
+# or
+yarn add @quasar/quasar-ui-qwindow@beta
+# or
+npm install @quasar/quasar-ui-qwindow@beta
+```
+
+```ts
+import { createApp } from "vue";
+import QWindow from "@quasar/quasar-ui-qwindow";
+import "@quasar/quasar-ui-qwindow/dist/index.css";
+
+const app = createApp(App);
+
+app.use(QWindow);
+app.mount("#app");
+```
+
+## Component
+
+- `QWindow` provides the floating or embedded panel, title bar, menu actions, move behavior, and
+  resize handles.
+
+Use `quasar describe QWindow` after installing the app extension.
+
+## Donate
+
+If you appreciate the work that went into this, please consider donating to
+[Quasar](https://donate.quasar.dev) or [Jeff](https://github.com/sponsors/hawkeye64).
+
+## License
+
 MIT (c) Jeff Galbraith <jeff@quasar.dev>

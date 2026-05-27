@@ -1,0 +1,12 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "..",
+    "paths": {
+      "@quasar/quasar-ui-qwindow": ["src/index.ts"]
+    },
+    "types": ["node"],
+    "noEmit": true
+  },
+  "include": ["root-consumer.ts"]
+}

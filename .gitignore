@@ -2,7 +2,14 @@
 .thumbs.db
 node_modules
 dist
+coverage
+.quasar
+packages/*/node_modules
+packages/*/dist
+packages/docs/.quasar
+packages/docs/dist
 yarn.lock
+package-lock.json
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
