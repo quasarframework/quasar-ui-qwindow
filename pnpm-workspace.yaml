@@ -94,3 +94,4 @@ minimumReleaseAgeExclude:
   - "@md-plugins/shared"
   - "@md-plugins/vite-examples-plugin"
   - "@md-plugins/vite-md-plugin"
+  - vue-router@5.1.0
