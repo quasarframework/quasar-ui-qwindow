@@ -13,5 +13,6 @@
     "jsx": "preserve",
     "types": ["node"]
   },
-  "include": ["src/**/*.ts", "types/**/*.d.ts"]
+  "include": ["build/**/*.ts", "src/**/*.ts", "types/**/*.d.ts"],
+  "exclude": ["build/version/version-template.ts"]
 }
