@@ -60,6 +60,13 @@ Use `dist/index.rtl.min.css` instead when your app needs the RTL stylesheet.
 
 [Live docs and examples](https://qwindow.netlify.app/)
 
+## Support
+
+If QWindow is useful in your workflow and you want to support ongoing maintenance:
+
+GitHub Sponsors: https://github.com/sponsors/hawkeye64
+PayPal: https://paypal.me/hawkeye64
+
 ## License
 
 MIT (c) Jeff Galbraith <jeff@quasar.dev>
