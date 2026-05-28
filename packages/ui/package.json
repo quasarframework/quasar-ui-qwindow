@@ -33,7 +33,8 @@
     "dist",
     "src"
   ],
-  "main": "dist/index.cjs.js",
+  "type": "module",
+  "main": "dist/index.esm.js",
   "module": "dist/index.esm.js",
   "types": "dist/types/index.d.ts",
   "typings": "dist/types/index.d.ts",
@@ -43,7 +44,7 @@
     ".": {
       "types": "./dist/types/index.d.ts",
       "import": "./dist/index.esm.js",
-      "require": "./dist/index.cjs.js"
+      "default": "./dist/index.esm.js"
     },
     "./index.min.css": {
       "default": "./dist/index.min.css"
@@ -109,7 +110,7 @@
   ],
   "engines": {
     "node": ">=22.13",
-    "pnpm": ">=11.3.0"
+    "pnpm": ">=11.4.0"
   },
   "vetur": {
     "tags": "dist/vetur/tags.json",

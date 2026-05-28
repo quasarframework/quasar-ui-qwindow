@@ -41,7 +41,7 @@
   },
   "engines": {
     "node": ">=22.13",
-    "pnpm": ">=11.3.0"
+    "pnpm": ">=11.4.0"
   },
   "productName": "QWindow Docs"
 }
