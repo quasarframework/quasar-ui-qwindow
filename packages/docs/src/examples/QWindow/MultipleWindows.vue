@@ -139,7 +139,7 @@ const taskTitlebarStyle = {
 
 .workspace-window {
   display: grid;
-  align-content: start;
+  align-content: flex-start;
   gap: 10px;
   width: 100%;
   height: 100%;

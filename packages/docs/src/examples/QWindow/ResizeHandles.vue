@@ -90,7 +90,7 @@ const titlebarStyle = {
 
 .resize-window {
   display: grid;
-  align-content: start;
+  align-content: flex-start;
   gap: 16px;
   width: 100%;
   height: 100%;

@@ -136,7 +136,7 @@ const titlebarStyle = {
 }
 
 .scroll-marker--bottom {
-  align-self: end;
+  align-self: flex-end;
 }
 
 .scroll-spacer {
@@ -145,7 +145,7 @@ const titlebarStyle = {
 
 .scroll-window {
   display: grid;
-  align-content: start;
+  align-content: flex-start;
   gap: 16px;
   width: 100%;
   height: 100%;
