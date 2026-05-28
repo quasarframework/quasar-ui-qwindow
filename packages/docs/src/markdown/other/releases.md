@@ -4,4 +4,8 @@ desc: Release notes
 keys: other
 ---
 
-<Releases />
+<script import>
+import GitHubReleases from '@/components/page-parts/releases/GitHubReleases.vue'
+</script>
+
+<GitHubReleases />
