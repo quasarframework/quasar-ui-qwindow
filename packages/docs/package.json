@@ -27,10 +27,10 @@
     "vue-router": "^5.1.0"
   },
   "devDependencies": {
-    "@md-plugins/quasar-app-extension-q-press": "0.1.0-beta.16",
-    "@md-plugins/vite-examples-plugin": "0.1.0-beta.16",
-    "@md-plugins/vite-md-plugin": "0.1.0-beta.16",
-    "@quasar/app-vite": "3.0.0-beta.32",
+    "@md-plugins/quasar-app-extension-q-press": "0.1.0-beta.17",
+    "@md-plugins/vite-examples-plugin": "0.1.0-beta.17",
+    "@md-plugins/vite-md-plugin": "0.1.0-beta.17",
+    "@quasar/app-vite": "3.0.0-beta.33",
     "@quasar/quasar-ui-qwindow": "workspace:*",
     "@types/node": "^25.9.1",
     "autoprefixer": "^10.5.0",
@@ -41,7 +41,7 @@
   },
   "engines": {
     "node": ">=22.13",
-    "pnpm": ">=11.4.0"
+    "pnpm": ">=11.5.0"
   },
   "productName": "QWindow Docs"
 }
