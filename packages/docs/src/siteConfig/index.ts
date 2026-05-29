@@ -154,6 +154,7 @@ const docsMenus: SiteMenuItem[] = [
     name: "Other",
     mq: 760,
     children: [
+      { name: "Upgrade Guide", path: "/other/upgrade-guide" },
       { name: "Releases", path: "/other/releases" },
       { name: "Contact", path: "/other/contact" },
       {

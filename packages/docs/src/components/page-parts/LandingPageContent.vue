@@ -23,6 +23,18 @@
           </div>
         </router-link>
 
+        <router-link
+          to="/other/upgrade-guide"
+          class="hero-button q-btn q-btn-item non-selectable no-outline q-btn--standard q-btn--rectangle q-btn--actionable q-focusable q-hoverable q-btn--no-uppercase q-btn--rounded q-btn--dense"
+        >
+          <div
+            class="hero-button__content row justify-around items-center q-btn__content text-center col items-center q-anchor--skip"
+          >
+            <span class="hero-button__label">Upgrade Guide</span>
+            <q-icon name="upgrade" />
+          </div>
+        </router-link>
+
         <a
           href="https://github.com/quasarframework/quasar-ui-qwindow/tree/v3-beta"
           target="_blank"
@@ -149,7 +161,7 @@ import siteConfig from "../../siteConfig";
 
 .hero-button__content {
   flex-wrap: nowrap;
-  width: 120px;
+  width: 140px;
 }
 
 .hero-button__label {
