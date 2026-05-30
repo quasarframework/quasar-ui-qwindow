@@ -41,8 +41,16 @@ npm install @quasar/quasar-ui-qwindow@beta
 
 Use the package entrypoint instead of old source-file imports:
 
-```ts
+```ts [twoslash]
 import { QWindow } from "@quasar/quasar-ui-qwindow";
+
+QWindow
+// ^?
+```
+
+Import the component stylesheet alongside the component:
+
+```ts
 import "@quasar/quasar-ui-qwindow/dist/index.css";
 ```
 
