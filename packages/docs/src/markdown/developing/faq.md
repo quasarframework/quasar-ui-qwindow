@@ -26,6 +26,18 @@ css: [
 
 :::
 
+:::details Q. Can I inspect the component API from the CLI?
+
+Yes. After the App Extension is installed, run:
+
+```bash
+quasar describe QWindow
+```
+
+The same generated API is shown on the [Using QWindow](/developing/using-qwindow) page.
+
+:::
+
 :::details Q. When should I use QWindow instead of QDialog?
 
 Use QWindow when the user should be able to keep a panel open, move it around, resize it, or work
