@@ -4,6 +4,28 @@ desc: Frequently asked QWindow questions
 keys: developing
 ---
 
+:::details Q. Do I need to import QWindow CSS myself?
+
+The App Extension adds the stylesheet for you.
+
+If you install the UI package directly, import the stylesheet in your boot file or app entry:
+
+```ts
+import "@quasar/quasar-ui-qwindow/dist/index.css";
+```
+
+Quasar CLI projects can also centralize the stylesheet in `quasar.config.ts`:
+
+```ts
+// Note: using ~ tells Quasar the file resides in node_modules
+css: [
+  "app.scss",
+  "~@quasar/quasar-ui-qwindow/dist/index.css",
+],
+```
+
+:::
+
 :::details Q. When should I use QWindow instead of QDialog?
 
 Use QWindow when the user should be able to keep a panel open, move it around, resize it, or work
