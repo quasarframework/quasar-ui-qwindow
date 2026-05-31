@@ -33,13 +33,14 @@ does not support webpack-based Quasar applications.
 
 If you do not install through the App Extension, install the UI package directly:
 
-```bash
+```tabs
+<<| bash pnpm |>>
 pnpm add @quasar/quasar-ui-qwindow@beta
-# or
+<<| bash bun |>>
 bun add @quasar/quasar-ui-qwindow@beta
-# or
+<<| bash yarn |>>
 yarn add @quasar/quasar-ui-qwindow@beta
-# or
+<<| bash npm |>>
 npm install @quasar/quasar-ui-qwindow@beta
 ```
 
