@@ -97,5 +97,5 @@ minimumReleaseAgeExclude:
   - "@md-plugins/vite-examples-plugin"
   - "@md-plugins/vite-md-plugin"
   - vue-router@5.1.0
-  - '@md-plugins/md-plugin-mermaid@0.1.0-beta.21'
+  - "@md-plugins/md-plugin-mermaid@0.1.0-beta.21"
   - tinyglobby@0.2.17

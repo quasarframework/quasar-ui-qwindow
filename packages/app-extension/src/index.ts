@@ -14,7 +14,7 @@ export default defineIndexScript((api) => {
   api.registerDescribeApi("QWindow", "~@quasar/quasar-ui-qwindow/dist/api/QWindow.json");
 
   api.extendQuasarConf(() => ({
-    boot: ["~@quasar/quasar-app-extension-qwindow/src/boot/vite-register.ts"],
+    boot: ["~@quasar/quasar-app-extension-qwindow/dist/boot/vite-register.js"],
     css: ["~@quasar/quasar-ui-qwindow/src/index.scss"],
   }));
 });
