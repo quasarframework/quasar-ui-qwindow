@@ -19,6 +19,11 @@ While v3 is in beta:
 quasar ext add @quasar/qwindow@beta
 ```
 
+## Requirements
+
+- Quasar v2.
+- `@quasar/app-vite` >=3.0.0-beta.36.
+
 ## Uninstall
 
 ```bash

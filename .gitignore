@@ -4,6 +4,8 @@ node_modules
 dist
 coverage
 .quasar
+.playwright
+.playwright-cli
 packages/*/node_modules
 packages/*/dist
 packages/docs/.quasar

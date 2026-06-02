@@ -30,14 +30,14 @@
     "@md-plugins/quasar-app-extension-q-press": "0.1.0-beta.21",
     "@md-plugins/vite-examples-plugin": "0.1.0-beta.21",
     "@md-plugins/vite-md-plugin": "0.1.0-beta.21",
-    "@quasar/app-vite": "3.0.0-beta.35",
+    "@quasar/app-vite": "3.0.0-beta.36",
     "@quasar/quasar-ui-qwindow": "workspace:*",
     "@types/node": "^25.9.1",
     "autoprefixer": "^10.5.0",
     "sass-embedded": "^1.100.0",
     "typescript": "~6.0.3",
     "vite-plugin-checker": "^0.14.1",
-    "vue-tsc": "^3.3.2"
+    "vue-tsc": "^3.3.3"
   },
   "engines": {
     "node": ">=22.13",
