@@ -68,3 +68,5 @@ PayPal: https://paypal.me/hawkeye64
 ## License
 
 MIT (c) Jeff Galbraith <jeff@quasar.dev>
+
+<!-- Trigger a Netlify branch redeploy without changing the rendered README. -->
