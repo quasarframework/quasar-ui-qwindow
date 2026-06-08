@@ -1,4 +1,3 @@
-/* eslint-disable array-bracket-spacing */
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import autoprefixer from "autoprefixer";
