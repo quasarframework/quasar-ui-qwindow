@@ -26,7 +26,7 @@ While QWindow v3 is in beta, install with:
 quasar ext add @quasar/qwindow@beta
 ```
 
-The QWindow v3 App Extension targets Quasar CLI Vite 3 and requires `@quasar/app-vite` >=3.0.0-beta.40. It
+The QWindow v3 App Extension targets Quasar CLI Vite 3 and requires `@quasar/app-vite` >=3.0.0-beta.41. It
 does not support webpack-based Quasar applications.
 
 ### Manual Boot File
@@ -47,7 +47,7 @@ npm install @quasar/quasar-ui-qwindow@beta
 Then create and register a boot file:
 
 ```js
-import { defineBoot } from "@quasar/app-vite";
+import { defineBoot } from "#q-app";
 import Plugin from "@quasar/quasar-ui-qwindow";
 import "@quasar/quasar-ui-qwindow/dist/index.css";
 
