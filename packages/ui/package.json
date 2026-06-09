@@ -76,7 +76,8 @@
     "build:app-ext": "tsx build/script.app-ext.ts",
     "typecheck": "pnpm build:api && tsc -p tsconfig.json --noEmit --pretty false && tsc -p test-d/tsconfig.json --noEmit --pretty false",
     "test:types": "pnpm build && pnpm typecheck",
-    "release": "pnpm publish --tag beta"
+    "release": "pnpm publish --tag beta",
+    "prepack": "pnpm build"
   },
   "devDependencies": {
     "@types/node": "^25.9.2",
