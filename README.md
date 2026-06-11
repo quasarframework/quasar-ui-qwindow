@@ -10,9 +10,14 @@ QWindow is a Quasar component and app extension for building floating, movable, 
 panels. It is useful for desktop-style workspaces, inspectors, tool palettes, and dashboards where
 users need to keep multiple panels open at once.
 
-## Documentation
+# Structure
 
-[Live docs and examples](https://qwindow.netlify.app/)
+This is a pnpm workspace mono-repo. You cannot use npm for building.
+
+- [/ui](packages/ui) - standalone npm package (go here for more information)
+- [/app-extension](packages/app-extension) - Quasar app extension
+- [/docs](packages/docs) - Q-Press documentation site with docs, demos, and examples
+- [live demo](https://qwindow.netlify.app/) - **live Q-Press docs, demos, and examples**
 
 ## Install
 
