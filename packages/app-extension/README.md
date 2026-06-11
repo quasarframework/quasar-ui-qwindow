@@ -22,7 +22,7 @@ quasar ext add @quasar/qwindow@beta
 ## Requirements
 
 - Quasar v2.
-- `@quasar/app-vite` >=3.0.0-beta.44.
+- `@quasar/app-vite` >=3.0.0-rc.1.
 
 ## Uninstall
 
