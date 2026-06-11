@@ -1,6 +1,6 @@
 {
   "name": "@quasar/quasar-app-extension-qwindow",
-  "version": "3.0.0-beta.2",
+  "version": "3.0.0-rc.0",
   "description": "A Quasar App Extension for @quasar/quasar-ui-qwindow",
   "keywords": [
     "app",
@@ -39,6 +39,7 @@
   "scripts": {
     "build": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\" && tsc -p tsconfig.build.json",
     "lint": "oxlint src",
+    "release": "pnpm publish --tag latest",
     "prepack": "pnpm build"
   },
   "dependencies": {

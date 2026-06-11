@@ -22,20 +22,20 @@ tooling.
 For Quasar App Extension installs:
 
 ```bash
-quasar ext add @quasar/qwindow@beta
+quasar ext add @quasar/qwindow
 ```
 
 For direct UI package installs:
 
 ```tabs
 <<| bash pnpm |>>
-pnpm add @quasar/quasar-ui-qwindow@beta
+pnpm add @quasar/quasar-ui-qwindow
 <<| bash bun |>>
-bun add @quasar/quasar-ui-qwindow@beta
+bun add @quasar/quasar-ui-qwindow
 <<| bash yarn |>>
-yarn add @quasar/quasar-ui-qwindow@beta
+yarn add @quasar/quasar-ui-qwindow
 <<| bash npm |>>
-npm install @quasar/quasar-ui-qwindow@beta
+npm install @quasar/quasar-ui-qwindow
 ```
 
 ## Import Changes

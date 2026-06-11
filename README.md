@@ -27,22 +27,16 @@ For Quasar CLI projects:
 quasar ext add @quasar/qwindow
 ```
 
-While v3 is in beta:
-
-```bash
-quasar ext add @quasar/qwindow@beta
-```
-
 For direct package usage:
 
 ```bash
-pnpm add @quasar/quasar-ui-qwindow@beta
+pnpm add @quasar/quasar-ui-qwindow
 # or
-bun add @quasar/quasar-ui-qwindow@beta
+bun add @quasar/quasar-ui-qwindow
 # or
-yarn add @quasar/quasar-ui-qwindow@beta
+yarn add @quasar/quasar-ui-qwindow
 # or
-npm install @quasar/quasar-ui-qwindow@beta
+npm install @quasar/quasar-ui-qwindow
 ```
 
 ```ts

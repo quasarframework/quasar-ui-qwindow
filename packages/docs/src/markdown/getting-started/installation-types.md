@@ -20,12 +20,6 @@ To add QWindow to your Quasar application, run the following in your Quasar app 
 quasar ext add @quasar/qwindow
 ```
 
-While QWindow v3 is in beta, install with:
-
-```bash
-quasar ext add @quasar/qwindow@beta
-```
-
 The QWindow v3 App Extension targets Quasar CLI Vite 3 and requires `@quasar/app-vite` >=3.0.0-rc.1. It
 does not support webpack-based Quasar applications.
 
@@ -35,13 +29,13 @@ If you do not install through the App Extension, install the UI package directly
 
 ```tabs
 <<| bash pnpm |>>
-pnpm add @quasar/quasar-ui-qwindow@beta
+pnpm add @quasar/quasar-ui-qwindow
 <<| bash bun |>>
-bun add @quasar/quasar-ui-qwindow@beta
+bun add @quasar/quasar-ui-qwindow
 <<| bash yarn |>>
-yarn add @quasar/quasar-ui-qwindow@beta
+yarn add @quasar/quasar-ui-qwindow
 <<| bash npm |>>
-npm install @quasar/quasar-ui-qwindow@beta
+npm install @quasar/quasar-ui-qwindow
 ```
 
 Then create and register a boot file:

@@ -13,12 +13,6 @@ component for Quasar CLI Vite applications.
 quasar ext add @quasar/qwindow
 ```
 
-While v3 is in beta:
-
-```bash
-quasar ext add @quasar/qwindow@beta
-```
-
 ## Requirements
 
 - Quasar v2.
