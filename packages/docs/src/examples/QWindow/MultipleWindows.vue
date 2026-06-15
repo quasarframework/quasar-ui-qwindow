@@ -12,11 +12,8 @@
 
     <q-window
       v-model="showInbox"
+      v-bind="inboxWindowProps"
       title="Inbox"
-      :width="inboxWidth"
-      :height="inboxHeight"
-      :start-x="inboxStartX"
-      :start-y="inboxStartY"
       :actions="windowActions"
       :content-style="inboxStyle"
       :titlebar-style="inboxTitlebarStyle"
@@ -33,11 +30,8 @@
 
     <q-window
       v-model="showTasks"
+      v-bind="tasksWindowProps"
       title="Task List"
-      :width="tasksWidth"
-      :height="tasksHeight"
-      :start-x="tasksStartX"
-      :start-y="tasksStartY"
       :actions="windowActions"
       :content-style="taskStyle"
       :titlebar-style="taskTitlebarStyle"
@@ -58,19 +52,13 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { QWindow } from "@quasar/quasar-ui-qwindow";
+import { QWindow, useQWindowResponsiveProps } from "@quasar/quasar-ui-qwindow";
 import "@quasar/quasar-ui-qwindow/src/index.scss";
-import { useResponsiveWindow } from "./useResponsiveWindow";
 
 const showInbox = ref(false);
 const showTasks = ref(false);
 const windowActions = ["pinned", "close"];
-const {
-  width: inboxWidth,
-  height: inboxHeight,
-  startX: inboxStartX,
-  startY: inboxStartY,
-} = useResponsiveWindow({
+const inboxWindowProps = useQWindowResponsiveProps({
   width: 340,
   height: 230,
   startX: 92,
@@ -78,12 +66,7 @@ const {
   mobileWidth: 310,
   mobileStartY: 120,
 });
-const {
-  width: tasksWidth,
-  height: tasksHeight,
-  startX: tasksStartX,
-  startY: tasksStartY,
-} = useResponsiveWindow({
+const tasksWindowProps = useQWindowResponsiveProps({
   width: 330,
   height: 210,
   startX: 250,

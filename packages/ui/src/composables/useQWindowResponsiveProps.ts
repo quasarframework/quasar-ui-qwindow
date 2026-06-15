@@ -1,8 +1,5 @@
-import type { ComputedRef } from "vue";
-import type { Screen } from "quasar";
-
-export type NumberArray = number[];
-export type StringArray = string[];
+import { computed, type ComputedRef } from "vue";
+import { type Screen, useQuasar } from "quasar";
 
 /**
  * Quasar screen breakpoints that can be used as the mobile cutoff.
@@ -69,6 +66,12 @@ export interface QWindowResponsivePropsOptions extends QWindowResponsiveProps {
   viewportPadding?: number;
 }
 
+const DEFAULT_MOBILE_BREAKPOINT: QWindowResponsiveBreakpoint = "sm";
+const DEFAULT_MOBILE_START_X = 16;
+const DEFAULT_MOBILE_START_Y = 96;
+const DEFAULT_MIN_VIEWPORT_WIDTH = 280;
+const DEFAULT_VIEWPORT_PADDING = 32;
+
 /**
  * Creates a reactive QWindow prop object that swaps to mobile-friendly size and position values.
  *
@@ -77,4 +80,32 @@ export interface QWindowResponsivePropsOptions extends QWindowResponsiveProps {
  */
 export function useQWindowResponsiveProps(
   options: QWindowResponsivePropsOptions,
-): ComputedRef<QWindowResponsiveProps>;
+): ComputedRef<QWindowResponsiveProps> {
+  const $q = useQuasar();
+
+  return computed(() => {
+    const isMobile =
+      options.mobilePredicate?.($q.screen) ??
+      $q.screen.lt[options.mobileBreakpoint ?? DEFAULT_MOBILE_BREAKPOINT];
+
+    if (isMobile !== true) {
+      return {
+        height: options.height,
+        startX: options.startX,
+        startY: options.startY,
+        width: options.width,
+      };
+    }
+
+    const viewportPadding = options.viewportPadding ?? DEFAULT_VIEWPORT_PADDING;
+    const minViewportWidth = options.minViewportWidth ?? DEFAULT_MIN_VIEWPORT_WIDTH;
+    const safeViewportWidth = Math.max(minViewportWidth, $q.screen.width - viewportPadding);
+
+    return {
+      height: options.mobileHeight ?? options.height,
+      startX: options.mobileStartX ?? DEFAULT_MOBILE_START_X,
+      startY: options.mobileStartY ?? DEFAULT_MOBILE_START_Y,
+      width: Math.min(options.mobileWidth ?? options.width, safeViewportWidth),
+    };
+  });
+}

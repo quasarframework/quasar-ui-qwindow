@@ -65,9 +65,8 @@
           <q-page padding class="window-demo-page">
             <q-window
               v-model="showing"
+              v-bind="windowProps"
               title="UMD QWindow"
-              :width="380"
-              :height="240"
               content-class="window-demo"
               background-color="#1976d2"
             >
@@ -95,28 +94,47 @@
     <script src="dist/index.umd.js?ae=qwindow"></script>
 
     <script>
-      const { ref } = Vue
-      const windowPlugin = globalThis.QWindow
+      const { computed, ref } = Vue;
+      const windowPlugin = globalThis.QWindow;
       const bundleReady =
         windowPlugin !== void 0 &&
-        typeof windowPlugin.install === 'function' &&
-        windowPlugin.QWindow !== void 0
+        typeof windowPlugin.install === "function" &&
+        typeof windowPlugin.useQWindowResponsiveProps === "function" &&
+        windowPlugin.QWindow !== void 0;
 
       const app = Vue.createApp({
         setup() {
-          const showing = ref(true)
+          const showing = ref(true);
+          const windowProps =
+            bundleReady === true
+              ? windowPlugin.useQWindowResponsiveProps({
+                  width: 380,
+                  height: 240,
+                  startX: 40,
+                  startY: 90,
+                  mobileWidth: 320,
+                  mobileHeight: 260,
+                  mobileStartY: 84,
+                })
+              : computed(() => ({
+                  width: 380,
+                  height: 240,
+                  startX: 40,
+                  startY: 90,
+                }));
 
           return {
-            version: bundleReady === true ? windowPlugin.version : 'bundle missing',
+            version: bundleReady === true ? windowPlugin.version : "bundle missing",
+            windowProps,
             showing,
-          }
+          };
         },
-      })
-      app.use(Quasar)
+      });
+      app.use(Quasar);
       if (bundleReady === true) {
-        app.use(windowPlugin)
+        app.use(windowPlugin);
       }
-      app.mount("#q-app")
+      app.mount("#q-app");
     </script>
   </body>
 </html>

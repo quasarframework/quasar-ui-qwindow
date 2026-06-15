@@ -11,11 +11,8 @@
 
     <q-window
       v-model="showing"
+      v-bind="windowProps"
       title="Brush Palette"
-      :width="width"
-      :height="height"
-      :start-x="startX"
-      :start-y="startY"
       :actions="paletteActions"
       :content-style="windowStyle"
       :titlebar-style="titlebarStyle"
@@ -71,9 +68,8 @@
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { QWindow } from "@quasar/quasar-ui-qwindow";
+import { QWindow, useQWindowResponsiveProps } from "@quasar/quasar-ui-qwindow";
 import "@quasar/quasar-ui-qwindow/src/index.scss";
-import { useResponsiveWindow } from "./useResponsiveWindow";
 
 const showing = ref(false);
 const opacity = ref(86);
@@ -90,7 +86,7 @@ const previewShadow = computed(
       Math.min(previewAlpha.value, 0.72),
     )}`,
 );
-const { width, height, startX, startY } = useResponsiveWindow({
+const windowProps = useQWindowResponsiveProps({
   width: 300,
   height: 560,
   startX: 128,

@@ -2,12 +2,9 @@
   <div class="q-pa-md q-window-demo-stage">
     <q-window
       v-model="showing"
+      v-bind="windowProps"
       embedded
       title="Project Notes"
-      :width="width"
-      :height="height"
-      :start-x="startX"
-      :start-y="startY"
       :content-style="windowStyle"
       :titlebar-style="titlebarStyle"
       gripper-background-color="#f8fafc"
@@ -31,12 +28,11 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { QWindow } from "@quasar/quasar-ui-qwindow";
+import { QWindow, useQWindowResponsiveProps } from "@quasar/quasar-ui-qwindow";
 import "@quasar/quasar-ui-qwindow/src/index.scss";
-import { useResponsiveWindow } from "./useResponsiveWindow";
 
 const showing = ref(true);
-const { width, height, startX, startY } = useResponsiveWindow({
+const windowProps = useQWindowResponsiveProps({
   width: 420,
   height: 260,
   startX: 72,

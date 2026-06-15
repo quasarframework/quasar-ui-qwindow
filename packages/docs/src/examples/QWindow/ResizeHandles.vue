@@ -11,11 +11,8 @@
 
     <q-window
       v-model="showing"
+      v-bind="windowProps"
       title="Bottom + Right Resize"
-      :width="width"
-      :height="height"
-      :start-x="startX"
-      :start-y="startY"
       :actions="windowActions"
       :resizable="resizeHandles"
       :content-style="windowStyle"
@@ -45,14 +42,13 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { QWindow } from "@quasar/quasar-ui-qwindow";
+import { QWindow, useQWindowResponsiveProps } from "@quasar/quasar-ui-qwindow";
 import "@quasar/quasar-ui-qwindow/src/index.scss";
-import { useResponsiveWindow } from "./useResponsiveWindow";
 
 const showing = ref(false);
 const windowActions = ["pinned", "close"];
 const resizeHandles = ["right", "bottom", "bottom-right"];
-const { width, height, startX, startY } = useResponsiveWindow({
+const windowProps = useQWindowResponsiveProps({
   width: 380,
   height: 310,
   startX: 112,

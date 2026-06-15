@@ -136,7 +136,7 @@ function writeApiFiles(components: ComponentApiFile[]): Promise<string[]> {
   );
 }
 
-function getSourceTypeNames(): string {
+function getSourceTypeNames(): string[] {
   const content = fs.readFileSync(sourceTypesFile, "utf-8");
   const names: string[] = [];
   const exportRE = /^export\s+(?:type|interface)\s+([A-Za-z0-9_]+)/gm;
@@ -146,18 +146,37 @@ function getSourceTypeNames(): string {
     names.push(match[1]);
   }
 
-  return names.join(", ");
+  return names;
+}
+
+function getSourceFunctionNames(): string[] {
+  const content = fs.readFileSync(sourceTypesFile, "utf-8");
+  const names: string[] = [];
+  const exportRE = /^export\s+(?:declare\s+)?function\s+([A-Za-z0-9_]+)/gm;
+  let match: RegExpExecArray | null;
+
+  while ((match = exportRE.exec(content)) !== null) {
+    names.push(match[1]);
+  }
+
+  return names;
 }
 
 function getTypesFile(components: ComponentApiFile[]): string {
-  const typeImports = fs.existsSync(sourceTypesFile)
-    ? `import { ${getSourceTypeNames()} } from './types'\n\n`
-    : "";
+  const typeNames = fs.existsSync(sourceTypesFile) ? getSourceTypeNames() : [];
+  const functionNames = fs.existsSync(sourceTypesFile) ? getSourceFunctionNames() : [];
+  const sourceImports = [
+    typeNames.length > 0 ? `import type { ${typeNames.join(", ")} } from './types'` : "",
+    functionNames.length > 0 ? `import { ${functionNames.join(", ")} } from './types'` : "",
+  ]
+    .filter(Boolean)
+    .join("\n");
+  const imports = sourceImports.length > 0 ? `${sourceImports}\n\n` : "";
 
   return `import type { ComponentPublicInstance, ComponentOptions } from 'vue'
 
 ${components.map(({ name, api }) => getComponentTypes(name, api)).join("\n")}
-${typeImports}declare module 'vue' {
+${imports}declare module 'vue' {
     interface ComponentCustomProperties {
     }
 }
@@ -170,6 +189,7 @@ export const version: string
 export interface QWindowPlugin {
     version: string
 ${components.map(({ name }) => `    ${name}: ComponentOptions`).join("\n")}
+${functionNames.map((name) => `    ${name}: typeof ${name}`).join("\n")}
     install(app: import('vue').App): void
 }
 

@@ -11,11 +11,8 @@
 
     <q-window
       v-model="showing"
+      v-bind="windowProps"
       title="Event Logger"
-      :width="width"
-      :height="height"
-      :start-x="startX"
-      :start-y="startY"
       :actions="windowActions"
       :content-style="windowStyle"
       :titlebar-style="titlebarStyle"
@@ -62,9 +59,8 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { QWindow } from "@quasar/quasar-ui-qwindow";
+import { QWindow, useQWindowResponsiveProps } from "@quasar/quasar-ui-qwindow";
 import "@quasar/quasar-ui-qwindow/src/index.scss";
-import { useResponsiveWindow } from "./useResponsiveWindow";
 
 type PositionPayload = {
   left?: number;
@@ -76,7 +72,7 @@ type PositionPayload = {
 const showing = ref(false);
 const messages = ref<string[]>([]);
 const windowActions = ["pinned", "maximize", "fullscreen", "close"];
-const { width, height, startX, startY } = useResponsiveWindow({
+const windowProps = useQWindowResponsiveProps({
   width: 390,
   height: 220,
   startX: 118,

@@ -11,14 +11,11 @@
 
     <q-window
       v-model="showing"
+      v-bind="windowProps"
       title="Selection Toolbar"
       dense
       no-resize
       hide-grippers
-      :width="width"
-      :height="height"
-      :start-x="startX"
-      :start-y="startY"
       :actions="toolbarActions"
       :content-style="windowStyle"
       :titlebar-style="titlebarStyle"
@@ -55,14 +52,13 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { QWindow } from "@quasar/quasar-ui-qwindow";
+import { QWindow, useQWindowResponsiveProps } from "@quasar/quasar-ui-qwindow";
 import "@quasar/quasar-ui-qwindow/src/index.scss";
-import { useResponsiveWindow } from "./useResponsiveWindow";
 
 const showing = ref(false);
 const alignment = ref("left");
 const toolbarActions = ["pinned", "close"];
-const { width, height, startX, startY } = useResponsiveWindow({
+const windowProps = useQWindowResponsiveProps({
   width: 520,
   height: 126,
   startX: 96,

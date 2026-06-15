@@ -28,8 +28,8 @@
       v-model="showing"
       title="Scroll-linked Helper"
       scroll-with-window
-      :width="width"
-      :height="height"
+      :width="windowProps.width"
+      :height="windowProps.height"
       :start-x="startX"
       :start-y="startY"
       :actions="windowActions"
@@ -51,9 +51,8 @@
 
 <script setup lang="ts">
 import { nextTick, ref } from "vue";
-import { QWindow } from "@quasar/quasar-ui-qwindow";
+import { QWindow, useQWindowResponsiveProps } from "@quasar/quasar-ui-qwindow";
 import "@quasar/quasar-ui-qwindow/src/index.scss";
-import { useResponsiveWindow } from "./useResponsiveWindow";
 
 const showing = ref(false);
 const stage = ref<HTMLElement | null>(null);
@@ -61,7 +60,7 @@ const scrollArea = ref<HTMLElement | null>(null);
 const windowActions = ["pinned", "close"];
 const startX = ref(130);
 const startY = ref(170);
-const { width, height } = useResponsiveWindow({
+const windowProps = useQWindowResponsiveProps({
   width: 380,
   height: 240,
   startX: 130,
@@ -81,7 +80,7 @@ async function openWindow() {
   if (rect !== void 0) {
     const safePadding = 16;
     const targetLeft = win.scrollX + rect.left + 24;
-    const maxVisibleLeft = win.scrollX + win.innerWidth - width.value - safePadding;
+    const maxVisibleLeft = win.scrollX + win.innerWidth - windowProps.value.width - safePadding;
 
     startX.value = Math.max(win.scrollX + safePadding, Math.min(targetLeft, maxVisibleLeft));
     startY.value = win.scrollY + rect.top + 136;

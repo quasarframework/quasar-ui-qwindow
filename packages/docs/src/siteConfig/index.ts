@@ -3,6 +3,7 @@ import type { MenuItem } from "@md-plugins/vite-md-plugin";
 import { version } from "../../../ui/package.json";
 import { slugify } from "../.q-press/components/markdown-utils";
 
+const codepenPackageVersion = version.includes("-beta.") ? "beta" : version;
 const repoBranch = "v3-beta";
 const productName = "QWindow";
 
@@ -265,6 +266,25 @@ const config: SiteConfig = {
   description: "Floating, movable, resizable windows for Vue and Quasar applications",
   theme: "doc",
   version,
+  codepen: {
+    jsPreProcessor: "typescript",
+    titleSuffix: `QWindow v${version}`,
+    cssExternal: [
+      `https://cdn.jsdelivr.net/npm/@quasar/quasar-ui-qwindow@${codepenPackageVersion}/dist/index.min.css`,
+    ],
+    jsExternal: [
+      `https://cdn.jsdelivr.net/npm/@quasar/quasar-ui-qwindow@${codepenPackageVersion}/dist/index.umd.min.js`,
+    ],
+    globalPackages: [
+      {
+        packageName: "@quasar/quasar-ui-qwindow",
+        globalName: "(globalThis as any).QWindow",
+      },
+    ],
+    jsSetup: ["const QWindowPlugin = (globalThis as any).QWindow", "app.use(QWindowPlugin)"].join(
+      "\n",
+    ),
+  },
   copyright: {
     line1: `Copyright © 2019-${new Date().getFullYear()} Jeff Galbraith`,
     line2: "",
