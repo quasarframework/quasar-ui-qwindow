@@ -93,6 +93,8 @@ body {
   &__body {
     width: 100%;
     overflow: hidden;
+    border-bottom-left-radius: inherit;
+    border-bottom-right-radius: inherit;
   }
 
   &__selected {
