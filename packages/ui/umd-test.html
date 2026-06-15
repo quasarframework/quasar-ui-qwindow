@@ -54,17 +54,21 @@
     <script src="dist/index.umd.js"></script>
 
     <script>
+      const { ref } = Vue
+
       const app = Vue.createApp({
-        data: function () {
+        setup() {
+          const showing = ref(true)
+
           return {
             version: QWindow.version,
-            showing: true,
-          };
+            showing,
+          }
         },
-      });
-      app.use(Quasar);
-      app.use(QWindow);
-      app.mount("#q-app");
+      })
+      app.use(Quasar)
+      app.use(QWindow)
+      app.mount("#q-app")
     </script>
   </body>
 </html>
