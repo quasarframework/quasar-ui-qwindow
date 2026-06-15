@@ -55,19 +55,26 @@
 
     <script>
       const { ref } = Vue
+      const windowPlugin = globalThis.QWindow
+      const bundleReady =
+        windowPlugin !== void 0 &&
+        typeof windowPlugin.install === 'function' &&
+        windowPlugin.QWindow !== void 0
 
       const app = Vue.createApp({
         setup() {
           const showing = ref(true)
 
           return {
-            version: QWindow.version,
+            version: bundleReady === true ? windowPlugin.version : 'bundle missing',
             showing,
           }
         },
       })
       app.use(Quasar)
-      app.use(QWindow)
+      if (bundleReady === true) {
+        app.use(windowPlugin)
+      }
       app.mount("#q-app")
     </script>
   </body>
