@@ -1,20 +1,17 @@
 <template>
   <div ref="stage" class="q-pa-md q-window-demo-stage column q-gutter-md">
     <div class="demo-copy">
-      Floating windows normally stay fixed to the viewport. This demo opens beside the example and
-      uses `scroll-with-window`, so it stays attached to this document section as the page scrolls.
+      Floating windows normally stay fixed to the viewport. Open the helper, then scroll this page
+      to see `scroll-with-window` keep it attached to this document section.
     </div>
 
-    <div class="row q-gutter-sm">
-      <q-btn color="primary" unelevated label="Open scroll-linked window" @click="openWindow" />
-      <q-btn outline class="scroll-demo-button" label="Scroll demo area" @click="scrollDemo" />
-    </div>
+    <q-btn color="primary" unelevated label="Open scroll-linked window" @click="openWindow" />
 
-    <div ref="scrollArea" class="scroll-demo">
+    <div class="scroll-demo">
       <div class="scroll-marker">
         <div class="text-weight-bold">Annotated document area</div>
         <div class="text-caption">
-          Open the helper, then scroll this page to see it stay aligned with this section.
+          Scroll the page after opening the helper to see it stay aligned with this section.
         </div>
       </div>
       <div class="scroll-spacer" />
@@ -56,7 +53,6 @@ import "@quasar/quasar-ui-qwindow/src/index.scss";
 
 const showing = ref(false);
 const stage = ref<HTMLElement | null>(null);
-const scrollArea = ref<HTMLElement | null>(null);
 const windowActions = ["pinned", "close"];
 const startX = ref(130);
 const startY = ref(170);
@@ -87,10 +83,6 @@ async function openWindow() {
   }
 
   showing.value = true;
-}
-
-function scrollDemo() {
-  scrollArea.value?.scrollIntoView({ behavior: "smooth", block: "end" });
 }
 
 const windowStyle = {
@@ -164,15 +156,5 @@ const titlebarStyle = {
   color: #075985;
   background: #e0f2fe;
   border: 1px solid rgba(14, 165, 233, 0.22);
-}
-
-.scroll-demo-button {
-  color: #075985 !important;
-  border-color: rgba(7, 89, 133, 0.45) !important;
-}
-
-:global(.body--dark) .scroll-demo-button {
-  color: #bae6fd !important;
-  border-color: rgba(186, 230, 253, 0.7) !important;
 }
 </style>
