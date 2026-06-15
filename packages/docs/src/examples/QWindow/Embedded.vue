@@ -25,7 +25,7 @@
           </div>
 
           <q-input dense outlined label="Label" model-value="Launch workspace" readonly />
-          <q-toggle dense model-value color="teal" label="Show icon" readonly />
+          <q-toggle dense :model-value="true" color="teal" label="Show icon" readonly />
 
           <q-banner rounded class="bg-teal-1 text-teal-10">
             Embedded windows work well for inspectors, side panels, and builder controls that belong
