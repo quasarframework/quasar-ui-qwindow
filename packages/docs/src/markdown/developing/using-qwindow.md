@@ -9,8 +9,6 @@ QWindow provides floating, movable, and resizable panels for Quasar applications
 your interface needs desktop-style working areas, inspectors, tool palettes, or draggable helper
 panels without turning everything into modal dialogs.
 
-## API
-
 <script import>
 import QWindowApi from '@quasar/quasar-ui-qwindow/dist/api/QWindow.json'
 </script>
