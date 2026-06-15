@@ -601,6 +601,10 @@ export default defineComponent({
     const _this = instance?.proxy;
 
     onMounted(() => {
+      // Initialize before first visible positioning so windows opened on scrolled pages do not
+      // wait for a scroll event before aligning with the viewport.
+      onScroll();
+
       const startX = toNumber(props.startX, defaultX * QWindowCount);
       const startY = toNumber(props.startY, defaultY * QWindowCount);
       const width = toNumber(props.width, 400);
