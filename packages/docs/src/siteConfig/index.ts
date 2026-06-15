@@ -3,7 +3,49 @@ import type { MenuItem } from "@md-plugins/vite-md-plugin";
 import { version } from "../../../ui/package.json";
 import { slugify } from "../.q-press/components/markdown-utils";
 
-const codepenPackageVersion = version.includes("-beta.") ? "beta" : version;
+const codepenPackageVersion = version.includes("-beta.")
+  ? "beta"
+  : version.includes("-rc.")
+    ? "latest"
+    : version;
+const codepenQWindowGlobal = `(() => {
+  const plugin = (globalThis as any).QWindow || {}
+
+  return {
+    ...plugin,
+    useQWindowResponsiveProps:
+      plugin.useQWindowResponsiveProps ||
+      ((options) => {
+        const $q = Quasar.useQuasar()
+
+        return Vue.computed(() => {
+          const isMobile =
+            options.mobilePredicate?.($q.screen) ??
+            $q.screen.lt[options.mobileBreakpoint || 'sm']
+
+          if (isMobile !== true) {
+            return {
+              height: options.height,
+              startX: options.startX,
+              startY: options.startY,
+              width: options.width,
+            }
+          }
+
+          const viewportPadding = options.viewportPadding || 32
+          const minViewportWidth = options.minViewportWidth || 280
+          const safeViewportWidth = Math.max(minViewportWidth, $q.screen.width - viewportPadding)
+
+          return {
+            height: options.mobileHeight ?? options.height,
+            startX: options.mobileStartX ?? 16,
+            startY: options.mobileStartY ?? 96,
+            width: Math.min(options.mobileWidth ?? options.width, safeViewportWidth),
+          }
+        })
+      }),
+  }
+})()`;
 const repoBranch = "v3-beta";
 const productName = "QWindow";
 
@@ -278,12 +320,17 @@ const config: SiteConfig = {
     globalPackages: [
       {
         packageName: "@quasar/quasar-ui-qwindow",
-        globalName: "(globalThis as any).QWindow",
+        globalName: codepenQWindowGlobal,
       },
     ],
-    jsSetup: ["const QWindowPlugin = (globalThis as any).QWindow", "app.use(QWindowPlugin)"].join(
-      "\n",
-    ),
+    jsSetup: [
+      "const QWindowPlugin = (globalThis as any).QWindow",
+      "if (QWindowPlugin !== void 0) {",
+      "  app.use(QWindowPlugin)",
+      "} else {",
+      "  console.error('QWindow UMD bundle did not load. Check the CodePen external JS URL.')",
+      "}",
+    ].join("\n"),
   },
   copyright: {
     line1: `Copyright © 2019-${new Date().getFullYear()} Jeff Galbraith`,
