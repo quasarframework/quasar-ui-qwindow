@@ -41,7 +41,10 @@ export default function useResize(
 
     return h("div", {
       ref: resizeHandle,
-      style: `border-color: ${props.gripperBorderColor}`,
+      style: {
+        backgroundColor: props.gripperBackgroundColor,
+        borderColor: props.gripperBorderColor,
+      },
       class: `gripper gripper-${resizeHandle}${props.roundGrippers === true ? " gripper-round" : ""}`,
       onMousedown: (e: MouseEvent) => onMouseDown(e, resizeHandle),
       onTouchstart: (e: TouchEvent) => onTouchStart(e, resizeHandle),

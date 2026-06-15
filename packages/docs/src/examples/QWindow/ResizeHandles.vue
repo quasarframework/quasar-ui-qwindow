@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pa-md q-window-demo-stage column q-gutter-md">
+  <div ref="stageRef" class="q-pa-md q-window-demo-stage column q-gutter-md">
     <div class="demo-copy">
       Use `resizable` to decide which sides and corners can resize the window. Pick a preset, open
       the window, then pull the available handles to compare each resize pattern.
@@ -31,6 +31,7 @@
                 :color="preset.chipColor"
                 :text-color="preset.chipTextColor"
               >
+                <q-icon :name="handleMeta[handle].icon" size="14px" class="q-mr-xs" />
                 {{ handle }}
               </q-chip>
             </div>
@@ -50,6 +51,8 @@
       v-if="showing"
       v-model="showing"
       v-bind="windowProps"
+      :start-x="startX"
+      :start-y="startY"
       :title="`Resize: ${selectedPreset.title}`"
       :actions="windowActions"
       :resizable="selectedPreset.handles"
@@ -65,12 +68,45 @@
           {{ selectedPreset.windowCopy }}
         </div>
 
+        <div class="handle-map" :style="handleMapStyle">
+          <div class="handle-map__panel">
+            <div class="text-weight-bold">Preview</div>
+            <div class="text-caption">
+              {{ selectedPreset.hideGrippers === true ? "Hidden hit areas" : "Visible grippers" }}
+            </div>
+          </div>
+
+          <div
+            v-for="handle in allResizeHandles"
+            :key="handle"
+            class="handle-marker"
+            :class="[
+              `handle-marker--${handle}`,
+              { 'handle-marker--active': isHandleActive(handle) },
+            ]"
+          >
+            <q-icon :name="handleMeta[handle].icon" size="16px" />
+          </div>
+        </div>
+
+        <q-banner rounded class="resize-color-note">
+          <span class="text-weight-bold">Color props:</span>
+          border
+          <span class="color-swatch" :style="{ backgroundColor: selectedPreset.borderColor }" />
+          and background
+          <span class="color-swatch" :style="{ backgroundColor: selectedPreset.gripperColor }" />
+          are passed through `gripper-border-color` and `gripper-background-color`.
+        </q-banner>
+
         <q-list dense bordered separator class="resize-list rounded-borders bg-white">
           <q-item v-for="handle in selectedPreset.handles" :key="handle">
             <q-item-section avatar>
-              <q-icon name="open_in_full" :color="selectedPreset.accentColor" />
+              <q-icon :name="handleMeta[handle].icon" :color="selectedPreset.accentColor" />
             </q-item-section>
-            <q-item-section>{{ handle }}</q-item-section>
+            <q-item-section>
+              <q-item-label>{{ handleMeta[handle].label }}</q-item-label>
+              <q-item-label caption>{{ handleMeta[handle].cursor }} cursor</q-item-label>
+            </q-item-section>
           </q-item>
         </q-list>
 
@@ -87,6 +123,16 @@ import { computed, nextTick, ref } from "vue";
 import { QWindow, useQWindowResponsiveProps } from "@quasar/quasar-ui-qwindow";
 import "@quasar/quasar-ui-qwindow/src/index.scss";
 
+type ResizeHandle =
+  | "top"
+  | "right"
+  | "bottom"
+  | "left"
+  | "top-left"
+  | "top-right"
+  | "bottom-left"
+  | "bottom-right";
+
 type ResizePreset = {
   id: string;
   title: string;
@@ -94,7 +140,7 @@ type ResizePreset = {
   description: string;
   windowCopy: string;
   icon: string;
-  handles: string[];
+  handles: ResizeHandle[];
   accentColor: string;
   borderColor: string;
   chipColor: string;
@@ -104,7 +150,67 @@ type ResizePreset = {
   hideGrippers?: boolean;
 };
 
+type HandleMeta = {
+  cursor: string;
+  icon: string;
+  label: string;
+};
+
+const allResizeHandles: ResizeHandle[] = [
+  "top",
+  "right",
+  "bottom",
+  "left",
+  "top-left",
+  "top-right",
+  "bottom-left",
+  "bottom-right",
+];
+const handleMeta: Record<ResizeHandle, HandleMeta> = {
+  top: {
+    cursor: "n-resize",
+    icon: "north",
+    label: "Top edge",
+  },
+  right: {
+    cursor: "e-resize",
+    icon: "east",
+    label: "Right edge",
+  },
+  bottom: {
+    cursor: "s-resize",
+    icon: "south",
+    label: "Bottom edge",
+  },
+  left: {
+    cursor: "w-resize",
+    icon: "west",
+    label: "Left edge",
+  },
+  "top-left": {
+    cursor: "nw-resize",
+    icon: "north_west",
+    label: "Top-left corner",
+  },
+  "top-right": {
+    cursor: "ne-resize",
+    icon: "north_east",
+    label: "Top-right corner",
+  },
+  "bottom-left": {
+    cursor: "sw-resize",
+    icon: "south_west",
+    label: "Bottom-left corner",
+  },
+  "bottom-right": {
+    cursor: "se-resize",
+    icon: "south_east",
+    label: "Bottom-right corner",
+  },
+};
+
 const showing = ref(false);
+const stageRef = ref<HTMLElement | null>(null);
 const windowActions = ["pinned", "close"];
 const selectedPresetId = ref("drawer");
 const resizePresets: ResizePreset[] = [
@@ -210,23 +316,49 @@ const selectedPreset = computed<ResizePreset>(
   () => resizePresets.find((preset) => preset.id === selectedPresetId.value) ?? defaultResizePreset,
 );
 const windowProps = useQWindowResponsiveProps({
-  width: 380,
-  height: 310,
+  width: 430,
+  height: 420,
   startX: 112,
   startY: 132,
-  mobileWidth: 300,
-  mobileHeight: 330,
+  mobileWidth: 320,
+  mobileHeight: 420,
   mobileStartY: 96,
 });
+const startX = ref(112);
+const startY = ref(132);
 
 function selectPreset(id: string) {
   selectedPresetId.value = id;
 }
 
+function clamp(value: number, min: number, max: number) {
+  return Math.min(Math.max(value, min), max);
+}
+
+function updateWindowStart() {
+  const rect = stageRef.value?.getBoundingClientRect();
+  const width = windowProps.value.width;
+  const height = windowProps.value.height;
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+  const maxX = Math.max(16, viewportWidth - width - 16);
+  const maxY = Math.max(64, viewportHeight - height - 16);
+  const viewportX = clamp((rect?.left ?? 24) + 24, 16, maxX);
+  const viewportY = clamp((rect?.top ?? 80) + 160, 64, maxY);
+
+  startX.value = window.scrollX + viewportX;
+  startY.value = window.scrollY + viewportY;
+}
+
 async function openSelectedPreset() {
   showing.value = false;
+  updateWindowStart();
   await nextTick();
   showing.value = true;
+}
+
+function isHandleActive(handle: ResizeHandle) {
+  return selectedPreset.value.handles.includes(handle);
 }
 
 const windowStyle = computed(() => ({
@@ -241,6 +373,11 @@ const titlebarStyle = computed(() => ({
   borderColor: "rgba(255, 255, 255, 0.16)",
   borderTopLeftRadius: "14px",
   borderTopRightRadius: "14px",
+}));
+
+const handleMapStyle = computed<Record<string, string>>(() => ({
+  "--resize-gripper-border-color": selectedPreset.value.borderColor,
+  "--resize-gripper-background-color": selectedPreset.value.gripperColor,
 }));
 </script>
 
@@ -285,6 +422,100 @@ const titlebarStyle = computed(() => ({
   gap: 4px;
 }
 
+.handle-map {
+  position: relative;
+  min-height: 150px;
+  margin: 0 10px;
+  border: 1px dashed rgba(96, 125, 139, 0.36);
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.9), transparent 34%),
+    linear-gradient(135deg, #ffffff, #eef6fb);
+}
+
+.handle-map__panel {
+  position: absolute;
+  inset: 32px 42px;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  color: #546e7a;
+  border: 1px solid rgba(84, 110, 122, 0.16);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.84);
+}
+
+.handle-marker {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  color: #90a4ae;
+  background: #eceff1;
+  border: 2px solid #cfd8dc;
+  border-radius: 999px;
+  opacity: 0.45;
+  transition:
+    background-color 0.16s ease,
+    border-color 0.16s ease,
+    color 0.16s ease,
+    opacity 0.16s ease,
+    transform 0.16s ease;
+}
+
+.handle-marker--active {
+  color: var(--resize-gripper-border-color);
+  background: var(--resize-gripper-background-color);
+  border-color: var(--resize-gripper-border-color);
+  box-shadow: 0 8px 20px rgba(15, 118, 110, 0.16);
+  opacity: 1;
+}
+
+.handle-marker--top {
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.handle-marker--right {
+  top: 50%;
+  right: -15px;
+  transform: translateY(-50%);
+}
+
+.handle-marker--bottom {
+  bottom: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.handle-marker--left {
+  top: 50%;
+  left: -15px;
+  transform: translateY(-50%);
+}
+
+.handle-marker--top-left {
+  top: -15px;
+  left: -15px;
+}
+
+.handle-marker--top-right {
+  top: -15px;
+  right: -15px;
+}
+
+.handle-marker--bottom-left {
+  bottom: -15px;
+  left: -15px;
+}
+
+.handle-marker--bottom-right {
+  right: -15px;
+  bottom: -15px;
+}
+
 .resize-window {
   display: grid;
   align-content: flex-start;
@@ -301,6 +532,22 @@ const titlebarStyle = computed(() => ({
 .resize-list {
   min-width: 0;
   width: 100%;
+}
+
+.resize-color-note {
+  color: #455a64;
+  background: #ffffff;
+  border: 1px solid rgba(84, 110, 122, 0.14);
+}
+
+.color-swatch {
+  display: inline-block;
+  width: 0.85em;
+  height: 0.85em;
+  margin: 0 0.2em;
+  vertical-align: -0.08em;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  border-radius: 999px;
 }
 
 .resize-note {

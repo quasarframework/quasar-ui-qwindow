@@ -86,8 +86,9 @@ the action list focused so users only see controls that make sense for the curre
 
 ## Resize Handles
 
-Use `resizable` when only some edges should resize. This is especially helpful for tool panels that
-should grow in one direction without drifting into nearby UI.
+Use `resizable` when only some edges or corners should resize. Combine it with
+`round-grippers`, `gripper-border-color`, `gripper-background-color`, or `hide-grippers` when the
+visible handles need to match a specific interaction style.
 
 <MarkdownExample title="Resize Handles" file="ResizeHandles"/>
 
