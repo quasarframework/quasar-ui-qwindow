@@ -23,6 +23,32 @@
       type="text/css"
     />
     <link href="dist/index.css?ae=qwindow" rel="stylesheet" type="text/css" />
+    <style>
+      .window-demo-page {
+        min-height: calc(100vh - 50px);
+        background: linear-gradient(135deg, #eef5f8 0%, #f8fbfd 55%, #e6f2ef 100%);
+      }
+
+      .window-demo {
+        background: #ffffff;
+        border-color: rgba(28, 80, 105, 0.22);
+        box-shadow: 0 18px 40px rgba(28, 58, 82, 0.22);
+      }
+
+      .window-demo-body {
+        width: 100%;
+        height: 100%;
+        padding: 24px;
+        background: linear-gradient(180deg, #ffffff 0%, #f3f8fb 100%);
+      }
+
+      .window-demo-panel {
+        height: 100%;
+        border-radius: 8px;
+        border: 1px solid rgba(28, 80, 105, 0.16);
+        background: #ffffff;
+      }
+    </style>
   </head>
   <body>
     <div id="q-app">
@@ -36,9 +62,28 @@
         </q-header>
 
         <q-page-container>
-          <q-page padding>
-            <q-window v-model="showing" title="UMD QWindow" :width="360" :height="220">
-              <div class="q-pa-md">This panel is loaded from the UMD bundle.</div>
+          <q-page padding class="window-demo-page">
+            <q-window
+              v-model="showing"
+              title="UMD QWindow"
+              :width="380"
+              :height="240"
+              content-class="window-demo"
+              background-color="#1976d2"
+            >
+              <div class="window-demo-body">
+                <div class="window-demo-panel q-pa-md column justify-between">
+                  <div>
+                    <div class="text-h6 text-primary">Floating panel</div>
+                    <div class="text-body2 text-grey-8 q-mt-sm">
+                      This panel is loaded from the UMD bundle.
+                    </div>
+                  </div>
+                  <q-chip dense color="primary" text-color="white" icon="open_in_new">
+                    QWindow smoke test
+                  </q-chip>
+                </div>
+              </div>
             </q-window>
           </q-page>
         </q-page-container>
