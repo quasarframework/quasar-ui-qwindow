@@ -1,8 +1,8 @@
 <template>
   <div ref="stageRef" class="q-pa-md q-window-demo-stage column q-gutter-md">
     <div class="demo-copy">
-      Use `resizable` to decide which sides and corners can resize the window. Pick a preset, open
-      the window, then pull the available handles to compare each resize pattern.
+      Use `resizable` to decide which sides and corners can resize the window. Choose `Try me!` on
+      any preset, then pull the available handles to compare each resize pattern.
     </div>
 
     <div class="resize-presets row q-col-gutter-sm">
@@ -15,9 +15,22 @@
           @click="selectPreset(preset.id)"
         >
           <q-card-section class="q-pa-sm">
-            <div class="row items-center no-wrap q-gutter-sm">
+            <div class="resize-preset-heading row items-start no-wrap">
               <q-icon :name="preset.icon" size="22px" :color="preset.accentColor" />
-              <div class="text-subtitle2 text-weight-bold">{{ preset.title }}</div>
+              <div class="resize-preset-title text-subtitle2 text-weight-bold">
+                {{ preset.title }}
+              </div>
+              <q-btn
+                class="resize-preset-action"
+                dense
+                unelevated
+                no-caps
+                size="sm"
+                label="Try me!"
+                :color="preset.accentColor"
+                :aria-label="`Try ${preset.shortLabel} resize demo`"
+                @click.stop="openPreset(preset.id)"
+              />
             </div>
             <div class="text-caption text-blue-grey-7 q-mt-xs">
               {{ preset.description }}
@@ -39,13 +52,6 @@
         </q-card>
       </div>
     </div>
-
-    <q-btn
-      color="teal"
-      unelevated
-      :label="`Open ${selectedPreset.shortLabel} demo`"
-      @click="openSelectedPreset"
-    />
 
     <q-window
       v-if="showing"
@@ -350,7 +356,8 @@ function updateWindowStart() {
   startY.value = window.scrollY + viewportY;
 }
 
-async function openSelectedPreset() {
+async function openPreset(id: string) {
+  selectPreset(id);
   showing.value = false;
   updateWindowStart();
   await nextTick();
@@ -414,6 +421,19 @@ const handleMapStyle = computed<Record<string, string>>(() => ({
 
 .resize-preset-card--active {
   background: linear-gradient(135deg, rgba(204, 251, 241, 0.56), rgba(255, 255, 255, 0.92));
+}
+
+.resize-preset-heading {
+  gap: 8px;
+}
+
+.resize-preset-title {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.resize-preset-action {
+  flex: 0 0 auto;
 }
 
 .resize-preset-handles {
