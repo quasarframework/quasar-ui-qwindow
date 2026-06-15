@@ -53,6 +53,23 @@ you declared it.
 
 :::
 
+:::details Q. Should start positions include the page scroll offset?
+
+It depends on the positioning mode.
+
+By default, floating QWindow instances are viewport-relative. Treat `start-x` and `start-y` like
+coordinates inside the visible browser viewport, and do not add `window.scrollX` or `window.scrollY`
+when calculating those values.
+
+When `scroll-with-window` is enabled, QWindow is document-relative. Use this mode when a helper
+window should stay connected to page content as the user scrolls. If you calculate the start position
+from an element's `getBoundingClientRect()`, add the current scroll offset in this mode.
+
+If a floating window only appears after scrolling, update to a current QWindow version. Current
+versions initialize the scroll position before the first visible placement.
+
+:::
+
 :::details Q. Is QWindow SSR-safe?
 
 The v3 component guards browser-only drag, resize, scroll, and Teleport setup so server rendering does
