@@ -352,8 +352,8 @@ function updateWindowStart() {
   const viewportX = clamp((rect?.left ?? 24) + 24, 16, maxX);
   const viewportY = clamp((rect?.top ?? 80) + 160, 64, maxY);
 
-  startX.value = window.scrollX + viewportX;
-  startY.value = window.scrollY + viewportY;
+  startX.value = viewportX;
+  startY.value = viewportY;
 }
 
 async function openPreset(id: string) {
