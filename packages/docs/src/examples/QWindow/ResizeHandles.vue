@@ -78,7 +78,7 @@
           <div class="handle-map__panel">
             <div class="text-weight-bold">Preview</div>
             <div class="text-caption">
-              {{ selectedPreset.hideGrippers === true ? "Hidden hit areas" : "Visible grippers" }}
+              {{ selectedPreset.hideGrippers === true ? 'Hidden hit areas' : 'Visible grippers' }}
             </div>
           </div>
 
@@ -125,202 +125,202 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, ref } from "vue";
-import { QWindow, useQWindowResponsiveProps } from "@quasar/quasar-ui-qwindow";
-import "@quasar/quasar-ui-qwindow/src/index.scss";
+import { computed, nextTick, ref } from 'vue'
+import { QWindow, useQWindowResponsiveProps } from '@quasar/quasar-ui-qwindow'
+import '@quasar/quasar-ui-qwindow/src/index.scss'
 
 type ResizeHandle =
-  | "top"
-  | "right"
-  | "bottom"
-  | "left"
-  | "top-left"
-  | "top-right"
-  | "bottom-left"
-  | "bottom-right";
+  | 'top'
+  | 'right'
+  | 'bottom'
+  | 'left'
+  | 'top-left'
+  | 'top-right'
+  | 'bottom-left'
+  | 'bottom-right'
 
 type ResizePreset = {
-  id: string;
-  title: string;
-  shortLabel: string;
-  description: string;
-  windowCopy: string;
-  icon: string;
-  handles: ResizeHandle[];
-  accentColor: string;
-  borderColor: string;
-  chipColor: string;
-  chipTextColor: string;
-  gradient: string;
-  gripperColor: string;
-  hideGrippers?: boolean;
-};
+  id: string
+  title: string
+  shortLabel: string
+  description: string
+  windowCopy: string
+  icon: string
+  handles: ResizeHandle[]
+  accentColor: string
+  borderColor: string
+  chipColor: string
+  chipTextColor: string
+  gradient: string
+  gripperColor: string
+  hideGrippers?: boolean
+}
 
 type HandleMeta = {
-  cursor: string;
-  icon: string;
-  label: string;
-};
+  cursor: string
+  icon: string
+  label: string
+}
 
 const allResizeHandles: ResizeHandle[] = [
-  "top",
-  "right",
-  "bottom",
-  "left",
-  "top-left",
-  "top-right",
-  "bottom-left",
-  "bottom-right",
-];
+  'top',
+  'right',
+  'bottom',
+  'left',
+  'top-left',
+  'top-right',
+  'bottom-left',
+  'bottom-right',
+]
 const handleMeta: Record<ResizeHandle, HandleMeta> = {
   top: {
-    cursor: "n-resize",
-    icon: "north",
-    label: "Top edge",
+    cursor: 'n-resize',
+    icon: 'north',
+    label: 'Top edge',
   },
   right: {
-    cursor: "e-resize",
-    icon: "east",
-    label: "Right edge",
+    cursor: 'e-resize',
+    icon: 'east',
+    label: 'Right edge',
   },
   bottom: {
-    cursor: "s-resize",
-    icon: "south",
-    label: "Bottom edge",
+    cursor: 's-resize',
+    icon: 'south',
+    label: 'Bottom edge',
   },
   left: {
-    cursor: "w-resize",
-    icon: "west",
-    label: "Left edge",
+    cursor: 'w-resize',
+    icon: 'west',
+    label: 'Left edge',
   },
-  "top-left": {
-    cursor: "nw-resize",
-    icon: "north_west",
-    label: "Top-left corner",
+  'top-left': {
+    cursor: 'nw-resize',
+    icon: 'north_west',
+    label: 'Top-left corner',
   },
-  "top-right": {
-    cursor: "ne-resize",
-    icon: "north_east",
-    label: "Top-right corner",
+  'top-right': {
+    cursor: 'ne-resize',
+    icon: 'north_east',
+    label: 'Top-right corner',
   },
-  "bottom-left": {
-    cursor: "sw-resize",
-    icon: "south_west",
-    label: "Bottom-left corner",
+  'bottom-left': {
+    cursor: 'sw-resize',
+    icon: 'south_west',
+    label: 'Bottom-left corner',
   },
-  "bottom-right": {
-    cursor: "se-resize",
-    icon: "south_east",
-    label: "Bottom-right corner",
+  'bottom-right': {
+    cursor: 'se-resize',
+    icon: 'south_east',
+    label: 'Bottom-right corner',
   },
-};
+}
 
-const showing = ref(false);
-const stageRef = ref<HTMLElement | null>(null);
-const windowActions = ["pinned", "close"];
-const selectedPresetId = ref("drawer");
+const showing = ref(false)
+const stageRef = ref<HTMLElement | null>(null)
+const windowActions = ['pinned', 'close']
+const selectedPresetId = ref('drawer')
 const resizePresets: ResizePreset[] = [
   {
-    id: "all",
-    title: "Full perimeter",
-    shortLabel: "full perimeter",
-    description: "Default behavior with every edge and corner enabled.",
-    windowCopy: "All eight handles are active. Pull any side or corner to resize freely.",
-    icon: "select_all",
+    id: 'all',
+    title: 'Full perimeter',
+    shortLabel: 'full perimeter',
+    description: 'Default behavior with every edge and corner enabled.',
+    windowCopy: 'All eight handles are active. Pull any side or corner to resize freely.',
+    icon: 'select_all',
     handles: [
-      "top",
-      "right",
-      "bottom",
-      "left",
-      "top-left",
-      "top-right",
-      "bottom-left",
-      "bottom-right",
+      'top',
+      'right',
+      'bottom',
+      'left',
+      'top-left',
+      'top-right',
+      'bottom-left',
+      'bottom-right',
     ],
-    accentColor: "blue-7",
-    borderColor: "#2563eb",
-    chipColor: "blue-1",
-    chipTextColor: "blue-10",
-    gradient: "linear-gradient(90deg, #1d4ed8, #2563eb)",
-    gripperColor: "#dbeafe",
+    accentColor: 'blue-7',
+    borderColor: '#2563eb',
+    chipColor: 'blue-1',
+    chipTextColor: 'blue-10',
+    gradient: 'linear-gradient(90deg, #1d4ed8, #2563eb)',
+    gripperColor: '#dbeafe',
   },
   {
-    id: "edges",
-    title: "Edges only",
-    shortLabel: "edges only",
-    description: "Useful when corners should stay visually quiet.",
-    windowCopy: "Only the top, right, bottom, and left edges are active. Corners stay locked.",
-    icon: "border_outer",
-    handles: ["top", "right", "bottom", "left"],
-    accentColor: "indigo-7",
-    borderColor: "#4f46e5",
-    chipColor: "indigo-1",
-    chipTextColor: "indigo-10",
-    gradient: "linear-gradient(90deg, #3730a3, #4f46e5)",
-    gripperColor: "#e0e7ff",
+    id: 'edges',
+    title: 'Edges only',
+    shortLabel: 'edges only',
+    description: 'Useful when corners should stay visually quiet.',
+    windowCopy: 'Only the top, right, bottom, and left edges are active. Corners stay locked.',
+    icon: 'border_outer',
+    handles: ['top', 'right', 'bottom', 'left'],
+    accentColor: 'indigo-7',
+    borderColor: '#4f46e5',
+    chipColor: 'indigo-1',
+    chipTextColor: 'indigo-10',
+    gradient: 'linear-gradient(90deg, #3730a3, #4f46e5)',
+    gripperColor: '#e0e7ff',
   },
   {
-    id: "corners",
-    title: "Corners only",
-    shortLabel: "corners only",
-    description: "Diagonal resizing without side-edge handles.",
-    windowCopy: "Only the four corner handles are active. Side edges do not resize the window.",
-    icon: "crop_free",
-    handles: ["top-left", "top-right", "bottom-left", "bottom-right"],
-    accentColor: "deep-purple-7",
-    borderColor: "#7c3aed",
-    chipColor: "deep-purple-1",
-    chipTextColor: "deep-purple-10",
-    gradient: "linear-gradient(90deg, #5b21b6, #7c3aed)",
-    gripperColor: "#ede9fe",
+    id: 'corners',
+    title: 'Corners only',
+    shortLabel: 'corners only',
+    description: 'Diagonal resizing without side-edge handles.',
+    windowCopy: 'Only the four corner handles are active. Side edges do not resize the window.',
+    icon: 'crop_free',
+    handles: ['top-left', 'top-right', 'bottom-left', 'bottom-right'],
+    accentColor: 'deep-purple-7',
+    borderColor: '#7c3aed',
+    chipColor: 'deep-purple-1',
+    chipTextColor: 'deep-purple-10',
+    gradient: 'linear-gradient(90deg, #5b21b6, #7c3aed)',
+    gripperColor: '#ede9fe',
   },
   {
-    id: "drawer",
-    title: "Drawer growth",
-    shortLabel: "drawer growth",
-    description: "Constrained resizing from the lower-right side.",
+    id: 'drawer',
+    title: 'Drawer growth',
+    shortLabel: 'drawer growth',
+    description: 'Constrained resizing from the lower-right side.',
     windowCopy:
-      "Only the bottom, right, and bottom-right handles are active. The top and left sides stay locked.",
-    icon: "open_in_full",
-    handles: ["right", "bottom", "bottom-right"],
-    accentColor: "teal-7",
-    borderColor: "#0f766e",
-    chipColor: "teal-1",
-    chipTextColor: "teal-10",
-    gradient: "linear-gradient(90deg, #134e4a, #0f766e)",
-    gripperColor: "#ccfbf1",
+      'Only the bottom, right, and bottom-right handles are active. The top and left sides stay locked.',
+    icon: 'open_in_full',
+    handles: ['right', 'bottom', 'bottom-right'],
+    accentColor: 'teal-7',
+    borderColor: '#0f766e',
+    chipColor: 'teal-1',
+    chipTextColor: 'teal-10',
+    gradient: 'linear-gradient(90deg, #134e4a, #0f766e)',
+    gripperColor: '#ccfbf1',
   },
   {
-    id: "hidden",
-    title: "Invisible handles",
-    shortLabel: "invisible handles",
-    description: "All resize zones remain active without visible grippers.",
+    id: 'hidden',
+    title: 'Invisible handles',
+    shortLabel: 'invisible handles',
+    description: 'All resize zones remain active without visible grippers.',
     windowCopy:
-      "All eight resize hit areas are active, but the visible gripper squares are hidden for a cleaner panel.",
-    icon: "visibility_off",
+      'All eight resize hit areas are active, but the visible gripper squares are hidden for a cleaner panel.',
+    icon: 'visibility_off',
     handles: [
-      "top",
-      "right",
-      "bottom",
-      "left",
-      "top-left",
-      "top-right",
-      "bottom-left",
-      "bottom-right",
+      'top',
+      'right',
+      'bottom',
+      'left',
+      'top-left',
+      'top-right',
+      'bottom-left',
+      'bottom-right',
     ],
-    accentColor: "cyan-8",
-    borderColor: "#0891b2",
-    chipColor: "cyan-1",
-    chipTextColor: "cyan-10",
-    gradient: "linear-gradient(90deg, #155e75, #0891b2)",
-    gripperColor: "#cffafe",
+    accentColor: 'cyan-8',
+    borderColor: '#0891b2',
+    chipColor: 'cyan-1',
+    chipTextColor: 'cyan-10',
+    gradient: 'linear-gradient(90deg, #155e75, #0891b2)',
+    gripperColor: '#cffafe',
     hideGrippers: true,
   },
-];
-const defaultResizePreset = resizePresets.find((preset) => preset.id === "drawer") as ResizePreset;
+]
+const defaultResizePreset = resizePresets.find((preset) => preset.id === 'drawer') as ResizePreset
 const selectedPreset = computed<ResizePreset>(
   () => resizePresets.find((preset) => preset.id === selectedPresetId.value) ?? defaultResizePreset,
-);
+)
 const windowProps = useQWindowResponsiveProps({
   width: 430,
   height: 420,
@@ -329,63 +329,63 @@ const windowProps = useQWindowResponsiveProps({
   mobileWidth: 320,
   mobileHeight: 420,
   mobileStartY: 96,
-});
-const startX = ref(112);
-const startY = ref(132);
+})
+const startX = ref(112)
+const startY = ref(132)
 
 function selectPreset(id: string) {
-  selectedPresetId.value = id;
+  selectedPresetId.value = id
 }
 
 function clamp(value: number, min: number, max: number) {
-  return Math.min(Math.max(value, min), max);
+  return Math.min(Math.max(value, min), max)
 }
 
 function updateWindowStart() {
-  const rect = stageRef.value?.getBoundingClientRect();
-  const width = windowProps.value.width;
-  const height = windowProps.value.height;
-  const viewportWidth = window.innerWidth;
-  const viewportHeight = window.innerHeight;
-  const maxX = Math.max(16, viewportWidth - width - 16);
-  const maxY = Math.max(64, viewportHeight - height - 16);
-  const viewportX = clamp((rect?.left ?? 24) + 24, 16, maxX);
-  const viewportY = clamp((rect?.top ?? 80) + 160, 64, maxY);
+  const rect = stageRef.value?.getBoundingClientRect()
+  const width = windowProps.value.width
+  const height = windowProps.value.height
+  const viewportWidth = window.innerWidth
+  const viewportHeight = window.innerHeight
+  const maxX = Math.max(16, viewportWidth - width - 16)
+  const maxY = Math.max(64, viewportHeight - height - 16)
+  const viewportX = clamp((rect?.left ?? 24) + 24, 16, maxX)
+  const viewportY = clamp((rect?.top ?? 80) + 160, 64, maxY)
 
-  startX.value = viewportX;
-  startY.value = viewportY;
+  startX.value = viewportX
+  startY.value = viewportY
 }
 
 async function openPreset(id: string) {
-  selectPreset(id);
-  showing.value = false;
-  updateWindowStart();
-  await nextTick();
-  showing.value = true;
+  selectPreset(id)
+  showing.value = false
+  updateWindowStart()
+  await nextTick()
+  showing.value = true
 }
 
 function isHandleActive(handle: ResizeHandle) {
-  return selectedPreset.value.handles.includes(handle);
+  return selectedPreset.value.handles.includes(handle)
 }
 
 const windowStyle = computed(() => ({
-  background: "#f8fafc",
+  background: '#f8fafc',
   borderColor: selectedPreset.value.borderColor,
-  borderRadius: "16px",
-}));
+  borderRadius: '16px',
+}))
 
 const titlebarStyle = computed(() => ({
   background: selectedPreset.value.gradient,
-  color: "#ecfeff",
-  borderColor: "rgba(255, 255, 255, 0.16)",
-  borderTopLeftRadius: "14px",
-  borderTopRightRadius: "14px",
-}));
+  color: '#ecfeff',
+  borderColor: 'rgba(255, 255, 255, 0.16)',
+  borderTopLeftRadius: '14px',
+  borderTopRightRadius: '14px',
+}))
 
 const handleMapStyle = computed<Record<string, string>>(() => ({
-  "--resize-gripper-border-color": selectedPreset.value.borderColor,
-  "--resize-gripper-background-color": selectedPreset.value.gripperColor,
-}));
+  '--resize-gripper-border-color': selectedPreset.value.borderColor,
+  '--resize-gripper-background-color': selectedPreset.value.gripperColor,
+}))
 </script>
 
 <style lang="scss" scoped>

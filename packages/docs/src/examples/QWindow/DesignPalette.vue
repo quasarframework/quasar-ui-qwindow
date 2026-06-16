@@ -67,25 +67,25 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import { QWindow, useQWindowResponsiveProps } from "@quasar/quasar-ui-qwindow";
-import "@quasar/quasar-ui-qwindow/src/index.scss";
+import { computed, ref } from 'vue'
+import { QWindow, useQWindowResponsiveProps } from '@quasar/quasar-ui-qwindow'
+import '@quasar/quasar-ui-qwindow/src/index.scss'
 
-const showing = ref(false);
-const opacity = ref(86);
-const stroke = ref(14);
-const selectedColor = ref("#f97316");
-const paletteActions = ["pinned", "fullscreen", "close"];
-const previewSize = computed(() => stroke.value * 3);
-const previewAlpha = computed(() => opacity.value / 100);
-const previewColor = computed(() => toRgba(selectedColor.value, previewAlpha.value));
+const showing = ref(false)
+const opacity = ref(86)
+const stroke = ref(14)
+const selectedColor = ref('#f97316')
+const paletteActions = ['pinned', 'fullscreen', 'close']
+const previewSize = computed(() => stroke.value * 3)
+const previewAlpha = computed(() => opacity.value / 100)
+const previewColor = computed(() => toRgba(selectedColor.value, previewAlpha.value))
 const previewShadow = computed(
   () =>
     `0 0 ${12 + Math.round(previewAlpha.value * 26)}px ${toRgba(
       selectedColor.value,
       Math.min(previewAlpha.value, 0.72),
     )}`,
-);
+)
 const windowProps = useQWindowResponsiveProps({
   width: 300,
   height: 560,
@@ -94,40 +94,40 @@ const windowProps = useQWindowResponsiveProps({
   mobileWidth: 300,
   mobileHeight: 560,
   mobileStartY: 96,
-});
+})
 
 const swatches = [
-  "#f97316",
-  "#f59e0b",
-  "#84cc16",
-  "#14b8a6",
-  "#38bdf8",
-  "#6366f1",
-  "#a855f7",
-  "#ec4899",
-];
+  '#f97316',
+  '#f59e0b',
+  '#84cc16',
+  '#14b8a6',
+  '#38bdf8',
+  '#6366f1',
+  '#a855f7',
+  '#ec4899',
+]
 
 const windowStyle = {
-  background: "#151820",
-  borderColor: "rgba(248, 250, 252, 0.16)",
-  borderRadius: "18px",
-  overflow: "hidden",
-  boxShadow: "0 24px 80px rgba(0, 0, 0, 0.46)",
-};
+  background: '#151820',
+  borderColor: 'rgba(248, 250, 252, 0.16)',
+  borderRadius: '18px',
+  overflow: 'hidden',
+  boxShadow: '0 24px 80px rgba(0, 0, 0, 0.46)',
+}
 
 const titlebarStyle = {
-  background: "linear-gradient(90deg, #2f1b12, #1b2430)",
-  color: "#fff7ed",
-  borderColor: "rgba(255, 237, 213, 0.18)",
-};
+  background: 'linear-gradient(90deg, #2f1b12, #1b2430)',
+  color: '#fff7ed',
+  borderColor: 'rgba(255, 237, 213, 0.18)',
+}
 
 function toRgba(hex: string, alpha: number): string {
-  const color = hex.replace("#", "");
-  const red = Number.parseInt(color.slice(0, 2), 16);
-  const green = Number.parseInt(color.slice(2, 4), 16);
-  const blue = Number.parseInt(color.slice(4, 6), 16);
+  const color = hex.replace('#', '')
+  const red = Number.parseInt(color.slice(0, 2), 16)
+  const green = Number.parseInt(color.slice(2, 4), 16)
+  const blue = Number.parseInt(color.slice(4, 6), 16)
 
-  return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+  return `rgba(${red}, ${green}, ${blue}, ${alpha})`
 }
 </script>
 

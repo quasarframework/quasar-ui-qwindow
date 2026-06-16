@@ -51,13 +51,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { QWindow, useQWindowResponsiveProps } from "@quasar/quasar-ui-qwindow";
-import "@quasar/quasar-ui-qwindow/src/index.scss";
+import { ref } from 'vue'
+import { QWindow, useQWindowResponsiveProps } from '@quasar/quasar-ui-qwindow'
+import '@quasar/quasar-ui-qwindow/src/index.scss'
 
-const showing = ref(false);
-const alignment = ref("left");
-const toolbarActions = ["pinned", "close"];
+const showing = ref(false)
+const alignment = ref('left')
+const toolbarActions = ['pinned', 'close']
 const windowProps = useQWindowResponsiveProps({
   width: 520,
   height: 126,
@@ -66,27 +66,27 @@ const windowProps = useQWindowResponsiveProps({
   mobileWidth: 320,
   mobileHeight: 188,
   mobileStartY: 96,
-});
+})
 
 const alignmentOptions = [
-  { label: "Left", value: "left", icon: "format_align_left" },
-  { label: "Center", value: "center", icon: "format_align_center" },
-  { label: "Right", value: "right", icon: "format_align_right" },
-];
+  { label: 'Left', value: 'left', icon: 'format_align_left' },
+  { label: 'Center', value: 'center', icon: 'format_align_center' },
+  { label: 'Right', value: 'right', icon: 'format_align_right' },
+]
 
 const windowStyle = {
-  background: "#111827",
-  borderColor: "rgba(148, 163, 184, 0.42)",
-  borderRadius: "16px",
-  overflow: "hidden",
-  boxShadow: "0 22px 70px rgba(0, 0, 0, 0.42)",
-};
+  background: '#111827',
+  borderColor: 'rgba(148, 163, 184, 0.42)',
+  borderRadius: '16px',
+  overflow: 'hidden',
+  boxShadow: '0 22px 70px rgba(0, 0, 0, 0.42)',
+}
 
 const titlebarStyle = {
-  background: "rgba(15, 23, 42, 0.94)",
-  color: "#e5e7eb",
-  borderColor: "rgba(148, 163, 184, 0.22)",
-};
+  background: 'rgba(15, 23, 42, 0.94)',
+  color: '#e5e7eb',
+  borderColor: 'rgba(148, 163, 184, 0.22)',
+}
 </script>
 
 <style lang="scss" scoped>
@@ -121,14 +121,14 @@ const titlebarStyle = {
     background-color: #1e3a5f !important;
   }
 
-  :deep(.toolbar-toggle .q-btn[aria-pressed="true"]) {
+  :deep(.toolbar-toggle .q-btn[aria-pressed='true']) {
     color: #06111f !important;
     background-color: #67e8f9 !important;
     border-color: #67e8f9;
   }
 
-  :deep(.toolbar-toggle .q-btn[aria-pressed="true"]:hover),
-  :deep(.toolbar-toggle .q-btn[aria-pressed="true"]:focus-visible) {
+  :deep(.toolbar-toggle .q-btn[aria-pressed='true']:hover),
+  :deep(.toolbar-toggle .q-btn[aria-pressed='true']:focus-visible) {
     color: #06111f !important;
     background-color: #a5f3fc !important;
   }

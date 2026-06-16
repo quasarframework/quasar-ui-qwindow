@@ -27,11 +27,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { QWindow, useQWindowResponsiveProps } from "@quasar/quasar-ui-qwindow";
-import "@quasar/quasar-ui-qwindow/src/index.scss";
+import { ref } from 'vue'
+import { QWindow, useQWindowResponsiveProps } from '@quasar/quasar-ui-qwindow'
+import '@quasar/quasar-ui-qwindow/src/index.scss'
 
-const showing = ref(true);
+const showing = ref(true)
 const windowProps = useQWindowResponsiveProps({
   width: 420,
   height: 260,
@@ -40,21 +40,21 @@ const windowProps = useQWindowResponsiveProps({
   mobileWidth: 320,
   mobileHeight: 280,
   mobileStartY: 88,
-});
+})
 
 const windowStyle = {
-  background: "#f8fafc",
-  borderColor: "#8aa1b2",
-  borderRadius: "14px",
-};
+  background: '#f8fafc',
+  borderColor: '#8aa1b2',
+  borderRadius: '14px',
+}
 
 const titlebarStyle = {
-  background: "linear-gradient(90deg, #102033, #193d55)",
-  color: "#f8fafc",
-  borderColor: "rgba(255, 255, 255, 0.14)",
-  borderTopLeftRadius: "12px",
-  borderTopRightRadius: "12px",
-};
+  background: 'linear-gradient(90deg, #102033, #193d55)',
+  color: '#f8fafc',
+  borderColor: 'rgba(255, 255, 255, 0.14)',
+  borderTopLeftRadius: '12px',
+  borderTopRightRadius: '12px',
+}
 </script>
 
 <style lang="scss" scoped>

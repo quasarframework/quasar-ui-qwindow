@@ -1,25 +1,25 @@
-import { QBtn, QIcon, QItem, QItemSection, QList, QMenu, QSeparator } from "quasar";
-import { computed, h, withDirectives, resolveDirective } from "vue";
-import type { Ref, Slots } from "vue";
-import { MENU_ITEM_SEPARATOR } from "../QWindow";
+import { QBtn, QIcon, QItem, QItemSection, QList, QMenu, QSeparator } from 'quasar'
+import { computed, h, withDirectives, resolveDirective } from 'vue'
+import type { Ref, Slots } from 'vue'
+import { MENU_ITEM_SEPARATOR } from '../QWindow'
 
-const CLOSE_POPUP_DIRECTIVE_NAME = "close-popup";
+const CLOSE_POPUP_DIRECTIVE_NAME = 'close-popup'
 type MenuDataAction = {
-  key?: string;
-  state: boolean;
+  key?: string
+  state: boolean
   on: {
-    label: string;
-    icon: string;
-    func: () => boolean | void;
-  };
+    label: string
+    icon: string
+    func: () => boolean | void
+  }
   off: {
-    label: string;
-    icon: string;
-    func: () => boolean | void;
-  };
-};
+    label: string
+    icon: string
+    func: () => boolean | void
+  }
+}
 
-type MenuDataItem = typeof MENU_ITEM_SEPARATOR | MenuDataAction;
+type MenuDataItem = typeof MENU_ITEM_SEPARATOR | MenuDataAction
 
 export default function useToolbar(
   props: Record<string, any>,
@@ -33,41 +33,41 @@ export default function useToolbar(
   renderResizeHandle: (name: string, actionsWidth?: number) => unknown,
 ) {
   const tbHeight = computed(() => {
-    return props.headless === true ? 0 : props.dense === true ? 28 : 40;
-  });
+    return props.headless === true ? 0 : props.dense === true ? 28 : 40
+  })
   const tbStaticClass = computed(() => {
     return (
-      "q-window__titlebar" +
-      (props.hideToolbarDivider !== true ? " q-window__titlebar--divider" : "") +
-      (props.dense === true ? " q-window__titlebar--dense" : "") +
-      (isEmbedded.value !== true && isMinimized.value !== true ? " absolute" : "") +
-      (isDragging.value === true ? " q-window__touch-action" : "") +
-      " row justify-between items-center"
-    );
-  });
+      'q-window__titlebar' +
+      (props.hideToolbarDivider !== true ? ' q-window__titlebar--divider' : '') +
+      (props.dense === true ? ' q-window__titlebar--dense' : '') +
+      (isEmbedded.value !== true && isMinimized.value !== true ? ' absolute' : '') +
+      (isDragging.value === true ? ' q-window__touch-action' : '') +
+      ' row justify-between items-center'
+    )
+  })
 
   const tbStyle = computed(() => {
-    const titleHeight = `${tbHeight.value}px`;
-    let style: any = { height: titleHeight };
+    const titleHeight = `${tbHeight.value}px`
+    let style: any = { height: titleHeight }
 
     if (props.titlebarStyle) {
-      if (typeof props.titlebarStyle === "object") {
-        style = Object.assign(props.titlebarStyle, style);
-      } else if (typeof props.titlebarStyle === "string") {
-        style = props.titlebarStyle + "; height:" + titleHeight;
+      if (typeof props.titlebarStyle === 'object') {
+        style = Object.assign(props.titlebarStyle, style)
+      } else if (typeof props.titlebarStyle === 'string') {
+        style = props.titlebarStyle + '; height:' + titleHeight
       } else if (Array.isArray(props.titlebarStyle)) {
-        style = props.titlebarStyle;
-        style.push({ height: titleHeight });
+        style = props.titlebarStyle
+        style.push({ height: titleHeight })
       }
     }
-    return style;
-  });
+    return style
+  })
 
   function renderMenuItem(stateInfo: MenuDataItem) {
     if (stateInfo === MENU_ITEM_SEPARATOR) {
-      return h(QSeparator);
+      return h(QSeparator)
     }
-    const action = stateInfo as MenuDataAction;
+    const action = stateInfo as MenuDataAction
 
     return withDirectives(
       h(
@@ -100,13 +100,13 @@ export default function useToolbar(
         ],
       ),
       [[resolveDirective(CLOSE_POPUP_DIRECTIVE_NAME), true]],
-    );
+    )
   }
 
   function renderMenu(menuData: MenuDataItem[]) {
     // let user manipulate menu
     if (props.menuFunc) {
-      props.menuFunc(menuData);
+      props.menuFunc(menuData)
     }
 
     return h(QMenu, () => [
@@ -123,58 +123,58 @@ export default function useToolbar(
         },
         () => [...menuData.map((stateInfo) => renderMenuItem(stateInfo))],
       ),
-    ]);
+    ])
   }
 
   function renderMenuButton(menuData: MenuDataItem[]) {
     if (props.noMenu === true) {
-      return "";
+      return ''
     }
 
     return h(
       QBtn,
       {
-        class: "q-window__titlebar--actions",
+        class: 'q-window__titlebar--actions',
         flat: true,
         round: true,
         dense: true,
-        icon: "more_vert",
+        icon: 'more_vert',
       },
       () => [renderMenu(menuData)],
-    );
+    )
   }
 
   function renderTitle() {
     return h(
-      "div",
+      'div',
       {
-        class: "q-window__title col ellipsis",
+        class: 'q-window__title col ellipsis',
       },
       props.title,
-    );
+    )
   }
 
   function renderTitleBar() {
     if (props.headless === true) {
-      return "";
+      return ''
     }
-    const menuData = [...computedMenuData.value];
-    const titlebarSlot = slots.titlebar;
+    const menuData = [...computedMenuData.value]
+    const titlebarSlot = slots.titlebar
 
     return h(
-      "div",
+      'div',
       {
         class: [tbStaticClass.value, props.titlebarClass],
         style: tbStyle.value,
       },
       [
-        titlebarSlot === void 0 ? renderTitle() : "",
-        titlebarSlot === void 0 ? renderMenuButton(menuData) : "",
-        titlebarSlot !== void 0 ? titlebarSlot({ menuData }) : "",
-        canDrag() === true && renderResizeHandle("titlebar", props.noMenu ? 0 : 35), // width of more button
+        titlebarSlot === void 0 ? renderTitle() : '',
+        titlebarSlot === void 0 ? renderMenuButton(menuData) : '',
+        titlebarSlot !== void 0 ? titlebarSlot({ menuData }) : '',
+        canDrag() === true && renderResizeHandle('titlebar', props.noMenu ? 0 : 35), // width of more button
       ] as any,
-    );
+    )
   }
 
-  return { renderTitleBar };
+  return { renderTitleBar }
 }

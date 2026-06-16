@@ -1,9 +1,9 @@
 ---
 name: Bug report
 about: Create a report to help us improve
-title: ""
-labels: ""
-assignees: ""
+title: ''
+labels: ''
+assignees: ''
 ---
 
 For a legitimate bug, in order to process faster, please go [here](https://codepen.io/Hawkeye64/pen/wvGOKbE), fork the codepen, add code to reproduce the bug and submit link here (don't forget to save your codepen):

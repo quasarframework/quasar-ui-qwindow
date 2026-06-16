@@ -58,20 +58,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { QWindow, useQWindowResponsiveProps } from "@quasar/quasar-ui-qwindow";
-import "@quasar/quasar-ui-qwindow/src/index.scss";
+import { ref } from 'vue'
+import { QWindow, useQWindowResponsiveProps } from '@quasar/quasar-ui-qwindow'
+import '@quasar/quasar-ui-qwindow/src/index.scss'
 
 type PositionPayload = {
-  left?: number;
-  top?: number;
-  width?: number;
-  height?: number;
-};
+  left?: number
+  top?: number
+  width?: number
+  height?: number
+}
 
-const showing = ref(false);
-const messages = ref<string[]>([]);
-const windowActions = ["pinned", "maximize", "fullscreen", "close"];
+const showing = ref(false)
+const messages = ref<string[]>([])
+const windowActions = ['pinned', 'maximize', 'fullscreen', 'close']
 const windowProps = useQWindowResponsiveProps({
   width: 390,
   height: 220,
@@ -80,18 +80,18 @@ const windowProps = useQWindowResponsiveProps({
   mobileWidth: 320,
   mobileHeight: 230,
   mobileStartY: 104,
-});
+})
 
 function addMessage(message: string) {
-  messages.value = [message, ...messages.value].slice(0, 8);
+  messages.value = [message, ...messages.value].slice(0, 8)
 }
 
 function logBoolean(name: string, value: boolean) {
-  addMessage(`${name}: ${value}`);
+  addMessage(`${name}: ${value}`)
 }
 
 function logText(name: string) {
-  addMessage(name);
+  addMessage(name)
 }
 
 function logPosition(position: PositionPayload) {
@@ -99,22 +99,22 @@ function logPosition(position: PositionPayload) {
     `position: ${Math.round(position.left ?? 0)}, ${Math.round(position.top ?? 0)} / ${Math.round(
       position.width ?? 0,
     )} x ${Math.round(position.height ?? 0)}`,
-  );
+  )
 }
 
 const windowStyle = {
-  background: "#f8fafc",
-  borderColor: "#a78bfa",
-  borderRadius: "16px",
-};
+  background: '#f8fafc',
+  borderColor: '#a78bfa',
+  borderRadius: '16px',
+}
 
 const titlebarStyle = {
-  background: "linear-gradient(90deg, #4c1d95, #6d28d9)",
-  color: "#faf5ff",
-  borderColor: "rgba(255, 255, 255, 0.16)",
-  borderTopLeftRadius: "14px",
-  borderTopRightRadius: "14px",
-};
+  background: 'linear-gradient(90deg, #4c1d95, #6d28d9)',
+  color: '#faf5ff',
+  borderColor: 'rgba(255, 255, 255, 0.16)',
+  borderTopLeftRadius: '14px',
+  borderTopRightRadius: '14px',
+}
 </script>
 
 <style lang="scss" scoped>

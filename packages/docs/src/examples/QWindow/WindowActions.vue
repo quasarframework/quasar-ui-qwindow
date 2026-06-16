@@ -36,13 +36,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { QWindow, useQWindowResponsiveProps } from "@quasar/quasar-ui-qwindow";
-import "@quasar/quasar-ui-qwindow/src/index.scss";
+import { ref } from 'vue'
+import { QWindow, useQWindowResponsiveProps } from '@quasar/quasar-ui-qwindow'
+import '@quasar/quasar-ui-qwindow/src/index.scss'
 
-const showing = ref(false);
-const windowActions = ["pinned", "maximize", "fullscreen", "close"];
-const actionChips = ["pinned", "maximize", "fullscreen", "close"];
+const showing = ref(false)
+const windowActions = ['pinned', 'maximize', 'fullscreen', 'close']
+const actionChips = ['pinned', 'maximize', 'fullscreen', 'close']
 const windowProps = useQWindowResponsiveProps({
   width: 430,
   height: 230,
@@ -51,21 +51,21 @@ const windowProps = useQWindowResponsiveProps({
   mobileWidth: 320,
   mobileHeight: 270,
   mobileStartY: 96,
-});
+})
 
 const windowStyle = {
-  background: "#f8fafc",
-  borderColor: "#818cf8",
-  borderRadius: "16px",
-};
+  background: '#f8fafc',
+  borderColor: '#818cf8',
+  borderRadius: '16px',
+}
 
 const titlebarStyle = {
-  background: "linear-gradient(90deg, #312e81, #3730a3)",
-  color: "#eef2ff",
-  borderColor: "rgba(255, 255, 255, 0.16)",
-  borderTopLeftRadius: "14px",
-  borderTopRightRadius: "14px",
-};
+  background: 'linear-gradient(90deg, #312e81, #3730a3)',
+  color: '#eef2ff',
+  borderColor: 'rgba(255, 255, 255, 0.16)',
+  borderTopLeftRadius: '14px',
+  borderTopRightRadius: '14px',
+}
 </script>
 
 <style lang="scss" scoped>

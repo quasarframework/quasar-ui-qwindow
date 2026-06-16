@@ -47,15 +47,15 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, ref } from "vue";
-import { QWindow, useQWindowResponsiveProps } from "@quasar/quasar-ui-qwindow";
-import "@quasar/quasar-ui-qwindow/src/index.scss";
+import { nextTick, ref } from 'vue'
+import { QWindow, useQWindowResponsiveProps } from '@quasar/quasar-ui-qwindow'
+import '@quasar/quasar-ui-qwindow/src/index.scss'
 
-const showing = ref(false);
-const stage = ref<HTMLElement | null>(null);
-const windowActions = ["pinned", "close"];
-const startX = ref(130);
-const startY = ref(170);
+const showing = ref(false)
+const stage = ref<HTMLElement | null>(null)
+const windowActions = ['pinned', 'close']
+const startX = ref(130)
+const startY = ref(170)
 const windowProps = useQWindowResponsiveProps({
   width: 380,
   height: 240,
@@ -64,40 +64,40 @@ const windowProps = useQWindowResponsiveProps({
   mobileWidth: 300,
   mobileHeight: 270,
   mobileStartY: 120,
-});
+})
 
 async function openWindow() {
-  showing.value = false;
-  await nextTick();
+  showing.value = false
+  await nextTick()
 
-  const rect = stage.value?.getBoundingClientRect();
-  const win = window;
+  const rect = stage.value?.getBoundingClientRect()
+  const win = window
 
   if (rect !== void 0) {
-    const safePadding = 16;
-    const targetLeft = win.scrollX + rect.left + 24;
-    const maxVisibleLeft = win.scrollX + win.innerWidth - windowProps.value.width - safePadding;
+    const safePadding = 16
+    const targetLeft = win.scrollX + rect.left + 24
+    const maxVisibleLeft = win.scrollX + win.innerWidth - windowProps.value.width - safePadding
 
-    startX.value = Math.max(win.scrollX + safePadding, Math.min(targetLeft, maxVisibleLeft));
-    startY.value = win.scrollY + rect.top + 136;
+    startX.value = Math.max(win.scrollX + safePadding, Math.min(targetLeft, maxVisibleLeft))
+    startY.value = win.scrollY + rect.top + 136
   }
 
-  showing.value = true;
+  showing.value = true
 }
 
 const windowStyle = {
-  background: "#f8fafc",
-  borderColor: "#0ea5e9",
-  borderRadius: "16px",
-};
+  background: '#f8fafc',
+  borderColor: '#0ea5e9',
+  borderRadius: '16px',
+}
 
 const titlebarStyle = {
-  background: "linear-gradient(90deg, #0c4a6e, #0369a1)",
-  color: "#f0f9ff",
-  borderColor: "rgba(255, 255, 255, 0.18)",
-  borderTopLeftRadius: "14px",
-  borderTopRightRadius: "14px",
-};
+  background: 'linear-gradient(90deg, #0c4a6e, #0369a1)',
+  color: '#f0f9ff',
+  borderColor: 'rgba(255, 255, 255, 0.18)',
+  borderTopLeftRadius: '14px',
+  borderTopRightRadius: '14px',
+}
 </script>
 
 <style lang="scss" scoped>

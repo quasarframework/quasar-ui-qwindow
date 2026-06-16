@@ -3,21 +3,21 @@
 </template>
 
 <script setup lang="ts">
-import { useMeta } from "quasar";
-import { useDark } from "@/.q-press/composables/dark";
+import { useMeta } from 'quasar'
+import { useDark } from '@/.q-press/composables/dark'
 
-import getMeta from "@/.q-press/assets/get-meta";
+import getMeta from '@/.q-press/assets/get-meta'
 
-const { initDark } = useDark();
-initDark();
+const { initDark } = useDark()
+initDark()
 
 useMeta({
-  title: "QWindow for Vue and Quasar",
+  title: 'QWindow for Vue and Quasar',
   titleTemplate: (title) => `${title} | QWindow`,
 
   meta: getMeta(
-    "QWindow - floating windows for Vue and Quasar",
-    "QWindow is a Vue and Quasar component for building movable and resizable workspace panels.",
+    'QWindow - floating windows for Vue and Quasar',
+    'QWindow is a Vue and Quasar component for building movable and resizable workspace panels.',
   ),
-});
+})
 </script>

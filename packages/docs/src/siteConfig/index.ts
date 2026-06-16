@@ -1,13 +1,13 @@
-import { fabGithub, fabXTwitter } from "@quasar/extras/fontawesome-v7";
-import type { MenuItem } from "@md-plugins/vite-md-plugin";
-import { version } from "../../../ui/package.json";
-import { slugify } from "../.q-press/components/markdown-utils";
+import { fabGithub, fabXTwitter } from '@quasar/extras/fontawesome-v7'
+import type { MenuItem } from '@md-plugins/vite-md-plugin'
+import { version } from '../../../ui/package.json'
+import { slugify } from '../.q-press/components/markdown-utils'
 
-const codepenPackageVersion = version.includes("-beta.")
-  ? "beta"
-  : version.includes("-rc.")
-    ? "latest"
-    : version;
+const codepenPackageVersion = version.includes('-beta.')
+  ? 'beta'
+  : version.includes('-rc.')
+    ? 'latest'
+    : version
 const codepenQWindowGlobal = `(() => {
   const plugin = (globalThis as any).QWindow || {}
 
@@ -45,124 +45,124 @@ const codepenQWindowGlobal = `(() => {
         })
       }),
   }
-})()`;
-const repoBranch = "v3-beta";
-const productName = "QWindow";
+})()`
+const repoBranch = 'v3-beta'
+const productName = 'QWindow'
 
 export interface SocialLink {
-  name: string;
-  icon: string;
-  path: string;
-  external?: boolean;
+  name: string
+  icon: string
+  path: string
+  external?: boolean
 }
 
 export interface SiteMenuItem extends MenuItem {
-  about?: string;
-  expanded?: boolean;
-  external?: boolean;
-  children?: SiteMenuItem[];
-  separator?: boolean;
-  header?: string;
-  mq?: number;
-  extract?: string;
-  image?: string;
-  maxWidth?: string;
+  about?: string
+  expanded?: boolean
+  external?: boolean
+  children?: SiteMenuItem[]
+  separator?: boolean
+  header?: string
+  mq?: number
+  extract?: string
+  image?: string
+  maxWidth?: string
 }
 
 export interface LinksConfig {
-  primaryHeaderLinks: SiteMenuItem[];
-  secondaryHeaderLinks: SiteMenuItem[];
-  moreLinks: SiteMenuItem[];
-  footerLinks: SiteMenuItem[];
-  socialLinks: SocialLink[];
+  primaryHeaderLinks: SiteMenuItem[]
+  secondaryHeaderLinks: SiteMenuItem[]
+  moreLinks: SiteMenuItem[]
+  footerLinks: SiteMenuItem[]
+  socialLinks: SocialLink[]
 }
 
 export interface LogoConfig {
-  showLogo: boolean;
-  logoLight: string;
-  logoDark: string;
-  logoAlt: string;
+  showLogo: boolean
+  logoLight: string
+  logoDark: string
+  logoAlt: string
 }
 
 export interface VersionConfig {
-  showTitle: boolean;
-  showVersion: boolean;
-  showOnHeader: boolean;
-  showOnSidebar: boolean;
+  showTitle: boolean
+  showVersion: boolean
+  showOnHeader: boolean
+  showOnSidebar: boolean
 }
 
 export interface UIConfig {
-  usePrimaryHeader: boolean;
-  useSecondaryHeader: boolean;
-  headerHeightHint: number;
-  useMoreLinks: boolean;
-  useFooter: boolean;
-  useSidebar: boolean;
-  useToc: boolean;
+  usePrimaryHeader: boolean
+  useSecondaryHeader: boolean
+  headerHeightHint: number
+  useMoreLinks: boolean
+  useFooter: boolean
+  useSidebar: boolean
+  useToc: boolean
 }
 
 export interface CopyrightConfig {
-  line1: string;
-  line2: string;
+  line1: string
+  line2: string
 }
 
 export interface LicenseConfig {
-  label: string;
-  link: string;
+  label: string
+  link: string
 }
 
 export interface PrivacyConfig {
-  label: string;
-  link: string;
+  label: string
+  link: string
 }
 
 export interface CodepenGlobalPackage {
-  packageName: string;
-  globalName: string;
+  packageName: string
+  globalName: string
 }
 
 export interface CodepenModulePackage {
-  packageName: string;
-  importUrl: string;
+  packageName: string
+  importUrl: string
 }
 
 export interface CodepenConfig {
-  head?: string;
-  cssExternal?: string[];
-  jsExternal?: string[];
-  jsPreProcessor?: string;
-  titleSuffix?: string;
-  jsSetup?: string;
-  globalPackages?: CodepenGlobalPackage[];
-  modulePackages?: CodepenModulePackage[];
+  head?: string
+  cssExternal?: string[]
+  jsExternal?: string[]
+  jsPreProcessor?: string
+  titleSuffix?: string
+  jsSetup?: string
+  globalPackages?: CodepenGlobalPackage[]
+  modulePackages?: CodepenModulePackage[]
 }
 
 export interface SiteConfig {
-  lang: string;
-  title: string;
-  description: string;
-  theme: string;
-  version: string;
-  copyright: CopyrightConfig;
-  githubEditRootSrc: string;
-  githubSourceRootSrc?: string;
-  codepen?: CodepenConfig;
-  license: LicenseConfig;
-  privacy: PrivacyConfig;
-  logoConfig: LogoConfig;
-  versionConfig: VersionConfig;
-  config: UIConfig;
-  links: LinksConfig;
-  sidebar: SiteMenuItem[];
+  lang: string
+  title: string
+  description: string
+  theme: string
+  version: string
+  copyright: CopyrightConfig
+  githubEditRootSrc: string
+  githubSourceRootSrc?: string
+  codepen?: CodepenConfig
+  license: LicenseConfig
+  privacy: PrivacyConfig
+  logoConfig: LogoConfig
+  versionConfig: VersionConfig
+  config: UIConfig
+  links: LinksConfig
+  sidebar: SiteMenuItem[]
 }
 
 function getSidebarPath(item: SiteMenuItem): string {
   if (item.external === true) {
-    return item.path ?? slugify(item.name);
+    return item.path ?? slugify(item.name)
   }
 
-  const path = item.path?.replace(/^\/+/, "").split("/").filter(Boolean).pop();
-  return path ?? slugify(item.name);
+  const path = item.path?.replace(/^\/+/, '').split('/').filter(Boolean).pop()
+  return path ?? slugify(item.name)
 }
 
 function processMenuItem(item: SiteMenuItem): SiteMenuItem {
@@ -176,46 +176,46 @@ function processMenuItem(item: SiteMenuItem): SiteMenuItem {
     external: item.external,
     expanded: item.expanded ?? false,
     children: item.children ? item.children.map(processMenuItem) : undefined,
-  };
+  }
 }
 
 const socialLinks = {
-  name: "Social",
+  name: 'Social',
   mq: 1400,
   children: [
     {
-      name: "GitHub",
+      name: 'GitHub',
       icon: fabGithub,
       path: `https://github.com/quasarframework/quasar-ui-qwindow/tree/${repoBranch}`,
       external: true,
     },
     {
-      name: "X (Twitter)",
+      name: 'X (Twitter)',
       icon: fabXTwitter,
-      path: "https://twitter.com/jgalbraith64",
+      path: 'https://twitter.com/jgalbraith64',
       external: true,
     },
   ],
-};
+}
 
 const netlifyLink = {
-  path: "https://www.netlify.com",
+  path: 'https://www.netlify.com',
   external: true,
-  image: "https://www.netlify.com/assets/badges/netlify-badge-color-accent.svg",
-  name: "Deploys by Netlify",
-  maxWidth: "120px",
-};
+  image: 'https://www.netlify.com/assets/badges/netlify-badge-color-accent.svg',
+  name: 'Deploys by Netlify',
+  maxWidth: '120px',
+}
 
 const sponsorLink = {
-  path: "https://github.com/sponsors/hawkeye64",
+  path: 'https://github.com/sponsors/hawkeye64',
   external: true,
-  image: "https://github.com/hawkeye64.png?size=96",
-  name: "Sponsor Jeff",
-  maxWidth: "24px",
-};
+  image: 'https://github.com/hawkeye64.png?size=96',
+  name: 'Sponsor Jeff',
+  maxWidth: '24px',
+}
 
 const SponsorsLinks = {
-  name: "Sponsors",
+  name: 'Sponsors',
   children: [
     {
       name: netlifyLink.name,
@@ -232,7 +232,7 @@ const SponsorsLinks = {
       maxWidth: sponsorLink.maxWidth,
     },
   ],
-};
+}
 
 const footerLinks = [
   {
@@ -243,73 +243,73 @@ const footerLinks = [
     name: socialLinks.name,
     children: [...socialLinks.children],
   },
-];
+]
 const docsMenus: SiteMenuItem[] = [
   {
-    name: "Getting Started",
+    name: 'Getting Started',
     mq: 470,
     children: [
-      { name: "Introduction", path: "/getting-started/introduction" },
-      { name: "Installation Types", path: "/getting-started/installation-types" },
+      { name: 'Introduction', path: '/getting-started/introduction' },
+      { name: 'Installation Types', path: '/getting-started/installation-types' },
     ],
   },
   {
-    name: "Developing",
+    name: 'Developing',
     mq: 600,
     children: [
-      { name: "Using QWindow", path: "/developing/using-qwindow" },
-      { name: "FAQ", path: "/developing/faq" },
+      { name: 'Using QWindow', path: '/developing/using-qwindow' },
+      { name: 'FAQ', path: '/developing/faq' },
     ],
   },
   {
-    name: "Other",
+    name: 'Other',
     mq: 760,
     children: [
-      { name: "Upgrade Guide", path: "/other/upgrade-guide" },
-      { name: "Releases", path: "/other/releases" },
-      { name: "Contact", path: "/other/contact" },
+      { name: 'Upgrade Guide', path: '/other/upgrade-guide' },
+      { name: 'Releases', path: '/other/releases' },
+      { name: 'Contact', path: '/other/contact' },
       {
-        name: "Contributing",
+        name: 'Contributing',
         children: [
-          { name: "Overview", path: "/other/contributing/overview" },
+          { name: 'Overview', path: '/other/contributing/overview' },
           {
-            name: "Bugs and Feature Requests",
-            path: "/other/contributing/bugs-and-feature-requests",
+            name: 'Bugs and Feature Requests',
+            path: '/other/contributing/bugs-and-feature-requests',
           },
-          { name: "Components", path: "/other/contributing/components" },
-          { name: "Documentation", path: "/other/contributing/documentation" },
-          { name: "Call to Action", path: "/other/contributing/call-to-action" },
-          { name: "Sponsor", path: "/other/contributing/sponsor" },
+          { name: 'Components', path: '/other/contributing/components' },
+          { name: 'Documentation', path: '/other/contributing/documentation' },
+          { name: 'Call to Action', path: '/other/contributing/call-to-action' },
+          { name: 'Sponsor', path: '/other/contributing/sponsor' },
         ],
       },
     ],
   },
-];
+]
 
 const processedMenus = docsMenus.map((menu) => ({
   name: menu.name,
   path: slugify(menu.name),
   expanded: menu.expanded ?? false,
   children: menu.children ? menu.children.map(processMenuItem) : [],
-}));
+}))
 
 export const moreLinks: SiteMenuItem[] = [
   {
-    name: "More",
+    name: 'More',
     children: [...docsMenus, socialLinks],
   },
-];
+]
 
-export const sidebar = processedMenus;
+export const sidebar = processedMenus
 
 const config: SiteConfig = {
-  lang: "en-US",
+  lang: 'en-US',
   title: productName,
-  description: "Floating, movable, resizable windows for Vue and Quasar applications",
-  theme: "doc",
+  description: 'Floating, movable, resizable windows for Vue and Quasar applications',
+  theme: 'doc',
   version,
   codepen: {
-    jsPreProcessor: "typescript",
+    jsPreProcessor: 'typescript',
     titleSuffix: `QWindow v${version}`,
     cssExternal: [
       `https://cdn.jsdelivr.net/npm/@quasar/quasar-ui-qwindow@${codepenPackageVersion}/dist/index.min.css`,
@@ -319,38 +319,38 @@ const config: SiteConfig = {
     ],
     globalPackages: [
       {
-        packageName: "@quasar/quasar-ui-qwindow",
+        packageName: '@quasar/quasar-ui-qwindow',
         globalName: codepenQWindowGlobal,
       },
     ],
     jsSetup: [
-      "const QWindowPlugin = (globalThis as any).QWindow",
-      "if (QWindowPlugin !== void 0) {",
-      "  app.use(QWindowPlugin)",
-      "} else {",
+      'const QWindowPlugin = (globalThis as any).QWindow',
+      'if (QWindowPlugin !== void 0) {',
+      '  app.use(QWindowPlugin)',
+      '} else {',
       "  console.error('QWindow UMD bundle did not load. Check the CodePen external JS URL.')",
-      "}",
-    ].join("\n"),
+      '}',
+    ].join('\n'),
   },
   copyright: {
     line1: `Copyright © 2019-${new Date().getFullYear()} Jeff Galbraith`,
-    line2: "",
+    line2: '',
   },
   githubEditRootSrc: `https://github.com/quasarframework/quasar-ui-qwindow/edit/${repoBranch}/packages/docs/src`,
   githubSourceRootSrc: `https://github.com/quasarframework/quasar-ui-qwindow/tree/${repoBranch}/packages/docs/src`,
   license: {
-    label: "MIT License",
+    label: 'MIT License',
     link: `https://github.com/quasarframework/quasar-ui-qwindow/blob/${repoBranch}/LICENSE`,
   },
   privacy: {
-    label: "Contact",
-    link: "/other/contact",
+    label: 'Contact',
+    link: '/other/contact',
   },
   logoConfig: {
     showLogo: true,
-    logoLight: "/app-logo.svg",
-    logoDark: "/app-logo.svg",
-    logoAlt: "QWindow Logo",
+    logoLight: '/app-logo.svg',
+    logoDark: '/app-logo.svg',
+    logoAlt: 'QWindow Logo',
   },
   versionConfig: {
     showTitle: true,
@@ -375,7 +375,7 @@ const config: SiteConfig = {
     socialLinks: [...socialLinks.children],
   },
   sidebar,
-};
+}
 
-export { sidebar as menu };
-export default config;
+export { sidebar as menu }
+export default config

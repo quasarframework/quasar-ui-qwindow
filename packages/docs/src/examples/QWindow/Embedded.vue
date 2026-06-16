@@ -38,24 +38,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { QWindow } from "@quasar/quasar-ui-qwindow";
-import "@quasar/quasar-ui-qwindow/src/index.scss";
+import { ref } from 'vue'
+import { QWindow } from '@quasar/quasar-ui-qwindow'
+import '@quasar/quasar-ui-qwindow/src/index.scss'
 
-const showing = ref(true);
+const showing = ref(true)
 
 const windowStyle = {
-  background: "#f8fafc",
-  borderColor: "#7f9a9a",
-  borderRadius: "14px",
-  overflow: "hidden",
-};
+  background: '#f8fafc',
+  borderColor: '#7f9a9a',
+  borderRadius: '14px',
+  overflow: 'hidden',
+}
 
 const titlebarStyle = {
-  background: "linear-gradient(90deg, #123c3c, #176869)",
-  color: "#ecfeff",
-  borderColor: "rgba(255, 255, 255, 0.16)",
-};
+  background: 'linear-gradient(90deg, #123c3c, #176869)',
+  color: '#ecfeff',
+  borderColor: 'rgba(255, 255, 255, 0.16)',
+}
 </script>
 
 <style lang="scss" scoped>

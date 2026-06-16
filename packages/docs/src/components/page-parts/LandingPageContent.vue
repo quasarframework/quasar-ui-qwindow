@@ -184,87 +184,87 @@
 </template>
 
 <script setup lang="ts">
-import { fabGithub } from "@quasar/extras/fontawesome-v7";
-import { biArrowRightCircle } from "@quasar/extras/bootstrap-icons";
-import siteConfig from "../../siteConfig";
+import { fabGithub } from '@quasar/extras/fontawesome-v7'
+import { biArrowRightCircle } from '@quasar/extras/bootstrap-icons'
+import siteConfig from '../../siteConfig'
 
-const productName = "QWindow";
-const logoSrc = "/app-logo.svg";
-const logoAlt = "QWindow Logo";
-const githubTreeUrl = "https://github.com/quasarframework/quasar-ui-qwindow/tree/v3-beta";
-const githubRepoUrl = "https://github.com/quasarframework/quasar-ui-qwindow";
-const heroEyebrow = "Vue 3 + Quasar 2";
+const productName = 'QWindow'
+const logoSrc = '/app-logo.svg'
+const logoAlt = 'QWindow Logo'
+const githubTreeUrl = 'https://github.com/quasarframework/quasar-ui-qwindow/tree/v3-beta'
+const githubRepoUrl = 'https://github.com/quasarframework/quasar-ui-qwindow'
+const heroEyebrow = 'Vue 3 + Quasar 2'
 const heroLede =
-  "Build workspace-style panels, inspectors, and floating tool windows without inventing your own dragging, resizing, and window chrome system from scratch.";
-const previewKicker = "Workspace Panels";
-const previewTitle = "Floating application windows that still feel like part of your product";
+  'Build workspace-style panels, inspectors, and floating tool windows without inventing your own dragging, resizing, and window chrome system from scratch.'
+const previewKicker = 'Workspace Panels'
+const previewTitle = 'Floating application windows that still feel like part of your product'
 const previewBody =
-  "QWindow helps you build desktop-like interfaces for admin tools, editors, dashboards, and inspectors while keeping the interaction model inside the Quasar component family.";
+  'QWindow helps you build desktop-like interfaces for admin tools, editors, dashboards, and inspectors while keeping the interaction model inside the Quasar component family.'
 const sectionTitle =
-  "A focused floating-window component for tool panels, inspectors, and workspace layouts";
+  'A focused floating-window component for tool panels, inspectors, and workspace layouts'
 const sectionText =
-  "QWindow keeps the surface compact: dragging, resizing, configurable chrome, and enough flexibility to support richer workspace patterns without a full desktop shell.";
+  'QWindow keeps the surface compact: dragging, resizing, configurable chrome, and enough flexibility to support richer workspace patterns without a full desktop shell.'
 
-const heroPills = ["Dragging", "Resizing", "Floating Panels", "Headless Mode", "Dashboards"];
+const heroPills = ['Dragging', 'Resizing', 'Floating Panels', 'Headless Mode', 'Dashboards']
 
 const previewImages = [
   {
-    src: "/qwindow.png",
-    alt: "QWindow preview",
+    src: '/qwindow.png',
+    alt: 'QWindow preview',
   },
   {
-    src: "/qwindow-floating.png",
-    alt: "QWindow floating panel preview",
+    src: '/qwindow-floating.png',
+    alt: 'QWindow floating panel preview',
   },
-];
+]
 
 const featureCards = [
   {
-    icon: "open_with",
-    title: "Draggable Panels",
-    body: "Move tools and inspectors around the workspace without building custom drag behavior from zero.",
+    icon: 'open_with',
+    title: 'Draggable Panels',
+    body: 'Move tools and inspectors around the workspace without building custom drag behavior from zero.',
   },
   {
-    icon: "fit_screen",
-    title: "Resizable Windows",
-    body: "Let users shape their workspace and prioritize the information they need most.",
+    icon: 'fit_screen',
+    title: 'Resizable Windows',
+    body: 'Let users shape their workspace and prioritize the information they need most.',
   },
   {
-    icon: "space_dashboard",
-    title: "Workspace Layouts",
-    body: "Use floating windows in dashboards, editors, power-user tools, and multi-panel application shells.",
+    icon: 'space_dashboard',
+    title: 'Workspace Layouts',
+    body: 'Use floating windows in dashboards, editors, power-user tools, and multi-panel application shells.',
   },
   {
-    icon: "web_asset",
-    title: "Configurable Chrome",
-    body: "Tune headers, handles, icons, and affordances so the window system matches the product tone.",
+    icon: 'web_asset',
+    title: 'Configurable Chrome',
+    body: 'Tune headers, handles, icons, and affordances so the window system matches the product tone.',
   },
   {
-    icon: "select_window",
-    title: "Headless-Friendly",
-    body: "Use the behavior without always relying on a heavy visual frame when a more custom shell is needed.",
+    icon: 'select_window',
+    title: 'Headless-Friendly',
+    body: 'Use the behavior without always relying on a heavy visual frame when a more custom shell is needed.',
   },
   {
-    icon: "extension",
-    title: "Quasar-Native Fit",
-    body: "Keep movable panels consistent with the rest of your component library instead of treating them like an embedded mini-app.",
+    icon: 'extension',
+    title: 'Quasar-Native Fit',
+    body: 'Keep movable panels consistent with the rest of your component library instead of treating them like an embedded mini-app.',
   },
-];
+]
 
 const supportItems = [
   {
-    title: "Introduction First",
-    body: "Start with the introduction and install docs to decide when a floating window is the right UX instead of a drawer or dialog.",
+    title: 'Introduction First',
+    body: 'Start with the introduction and install docs to decide when a floating window is the right UX instead of a drawer or dialog.',
   },
   {
-    title: "Examples for Layout Patterns",
-    body: "The main usage guide and examples are the fastest way to compare standard, headless, and heavily customized window setups.",
+    title: 'Examples for Layout Patterns',
+    body: 'The main usage guide and examples are the fastest way to compare standard, headless, and heavily customized window setups.',
   },
   {
-    title: "Discussions + Issues",
-    body: "Questions, bugs, and feature requests are easiest to track in the QWindow repo and GitHub Discussions.",
+    title: 'Discussions + Issues',
+    body: 'Questions, bugs, and feature requests are easiest to track in the QWindow repo and GitHub Discussions.',
   },
-];
+]
 </script>
 
 <style lang="scss" scoped>
@@ -335,7 +335,7 @@ const supportItems = [
   border-radius: 999px;
   background: rgba(246, 255, 254, 0.08);
   color: #c7f5ef;
-  font-family: "Syne", "Montserrat", "Segoe UI", sans-serif;
+  font-family: 'Syne', 'Montserrat', 'Segoe UI', sans-serif;
   font-size: 0.76rem;
   font-weight: 700;
   letter-spacing: 0.14em;
@@ -354,7 +354,7 @@ const supportItems = [
 
 .hero-title {
   margin: 0;
-  font-family: "Syne", "Montserrat", "Segoe UI", sans-serif;
+  font-family: 'Syne', 'Montserrat', 'Segoe UI', sans-serif;
   font-size: clamp(3.2rem, 8vw, 6rem);
   line-height: 0.95;
   font-weight: 800;
@@ -365,7 +365,7 @@ const supportItems = [
 .hero-subtitle {
   max-width: 620px;
   margin: 0;
-  font-family: "Syne", "Montserrat", "Segoe UI", sans-serif;
+  font-family: 'Syne', 'Montserrat', 'Segoe UI', sans-serif;
   font-size: clamp(1.15rem, 2vw, 1.45rem);
   line-height: 1.45;
   font-weight: 700;
@@ -438,7 +438,7 @@ const supportItems = [
   column-gap: 12px;
   min-width: 0;
   width: 100%;
-  font-family: "Syne", "Montserrat", "Segoe UI", sans-serif;
+  font-family: 'Syne', 'Montserrat', 'Segoe UI', sans-serif;
   font-size: 0.95rem;
   font-weight: 700;
 }
@@ -527,7 +527,7 @@ const supportItems = [
 .section-heading__title,
 .feature-card__title,
 .resource-card__title {
-  font-family: "Syne", "Montserrat", "Segoe UI", sans-serif;
+  font-family: 'Syne', 'Montserrat', 'Segoe UI', sans-serif;
   color: #f7fffe;
 }
 
@@ -555,7 +555,7 @@ const supportItems = [
 }
 
 .preview-stack::before {
-  content: "";
+  content: '';
   position: absolute;
   inset: 28px 18px 40px;
   z-index: -1;
@@ -653,7 +653,7 @@ const supportItems = [
 }
 
 .feature-card::before {
-  content: "";
+  content: '';
   position: absolute;
   inset: 0 auto auto 0;
   width: 100%;
@@ -729,7 +729,7 @@ const supportItems = [
 
 .resource-list__title {
   margin-bottom: 6px;
-  font-family: "Syne", "Montserrat", "Segoe UI", sans-serif;
+  font-family: 'Syne', 'Montserrat', 'Segoe UI', sans-serif;
   font-size: 0.96rem;
   font-weight: 700;
   color: #cff8f2;

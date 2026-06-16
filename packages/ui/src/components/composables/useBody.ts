@@ -1,5 +1,5 @@
-import { computed, h } from "vue";
-import type { Ref, Slots } from "vue";
+import { computed, h } from 'vue'
+import type { Ref, Slots } from 'vue'
 
 export default function useBody(
   props: Record<string, any>,
@@ -15,42 +15,42 @@ export default function useBody(
   const bodyStyle = computed(() => {
     if (isEmbedded.value === true) {
       return {
-        height: props.height - computedToolbarHeight.value + "px",
-      };
+        height: props.height - computedToolbarHeight.value + 'px',
+      }
     }
 
     if (isFullscreen.value === true) {
       return {
-        position: "fixed",
+        position: 'fixed',
         height: `calc(100% - ${computedToolbarHeight.value}px`,
-        top: computedToolbarHeight.value + "px",
-      };
+        top: computedToolbarHeight.value + 'px',
+      }
     }
     return {
-      position: "absolute",
-      top: computedToolbarHeight.value + "px",
-      height: computedHeight.value - computedToolbarHeight.value - 2 + "px",
-    };
-  });
+      position: 'absolute',
+      top: computedToolbarHeight.value + 'px',
+      height: computedHeight.value - computedToolbarHeight.value - 2 + 'px',
+    }
+  })
 
   function renderBody() {
-    const slot = slots && slots.default;
+    const slot = slots && slots.default
     return h(
-      "div",
+      'div',
       {
-        class: ["q-window__body row"],
+        class: ['q-window__body row'],
         style: bodyStyle.value,
       },
       [
-        slot ? slot({ zIndex: zIndex.value }) : "",
+        slot ? slot({ zIndex: zIndex.value }) : '',
         props.headless === true &&
           canDrag() === true &&
-          renderResizeHandle("titlebar", props.noMenu ? 0 : 44),
+          renderResizeHandle('titlebar', props.noMenu ? 0 : 44),
       ] as any,
-    );
+    )
   }
 
   return {
     renderBody,
-  };
+  }
 }

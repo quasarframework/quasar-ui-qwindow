@@ -1,28 +1,28 @@
-import type { ComputedRef } from "vue";
-import type { Screen } from "quasar";
+import type { ComputedRef } from 'vue'
+import type { Screen } from 'quasar'
 
-export type NumberArray = number[];
-export type StringArray = string[];
+export type NumberArray = number[]
+export type StringArray = string[]
 
 /**
  * Quasar screen breakpoints that can be used as the mobile cutoff.
  */
-export type QWindowResponsiveBreakpoint = keyof Screen["lt"];
+export type QWindowResponsiveBreakpoint = keyof Screen['lt']
 
 /**
  * Props commonly used to size and position a QWindow instance.
  */
 export interface QWindowResponsiveProps {
-  height: number;
-  startX: number;
-  startY: number;
-  width: number;
+  height: number
+  startX: number
+  startY: number
+  width: number
 }
 
 /**
  * Predicate used when an app wants custom responsive behavior instead of a fixed breakpoint.
  */
-export type QWindowResponsivePredicate = (screen: Screen) => boolean;
+export type QWindowResponsivePredicate = (screen: Screen) => boolean
 
 /**
  * Options for generating responsive QWindow size and position props.
@@ -31,42 +31,42 @@ export interface QWindowResponsivePropsOptions extends QWindowResponsiveProps {
   /**
    * Quasar breakpoint where mobile values start applying. Defaults to "sm".
    */
-  mobileBreakpoint?: QWindowResponsiveBreakpoint;
+  mobileBreakpoint?: QWindowResponsiveBreakpoint
 
   /**
    * Height to use while the current screen matches the mobile condition.
    */
-  mobileHeight?: number;
+  mobileHeight?: number
 
   /**
    * Custom predicate for deciding when mobile values should apply.
    */
-  mobilePredicate?: QWindowResponsivePredicate;
+  mobilePredicate?: QWindowResponsivePredicate
 
   /**
    * Horizontal start position to use while the current screen matches the mobile condition.
    */
-  mobileStartX?: number;
+  mobileStartX?: number
 
   /**
    * Vertical start position to use while the current screen matches the mobile condition.
    */
-  mobileStartY?: number;
+  mobileStartY?: number
 
   /**
    * Width to use while the current screen matches the mobile condition.
    */
-  mobileWidth?: number;
+  mobileWidth?: number
 
   /**
    * Minimum viewport width used when clamping the mobile width. Defaults to 280.
    */
-  minViewportWidth?: number;
+  minViewportWidth?: number
 
   /**
    * Horizontal viewport padding subtracted before clamping the mobile width. Defaults to 32.
    */
-  viewportPadding?: number;
+  viewportPadding?: number
 }
 
 /**
@@ -77,4 +77,4 @@ export interface QWindowResponsivePropsOptions extends QWindowResponsiveProps {
  */
 export function useQWindowResponsiveProps(
   options: QWindowResponsivePropsOptions,
-): ComputedRef<QWindowResponsiveProps>;
+): ComputedRef<QWindowResponsiveProps>

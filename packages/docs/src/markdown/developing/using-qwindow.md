@@ -27,10 +27,10 @@ passed directly to QWindow with `v-bind`.
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { QWindow, useQWindowResponsiveProps } from "@quasar/quasar-ui-qwindow";
+import { ref } from 'vue'
+import { QWindow, useQWindowResponsiveProps } from '@quasar/quasar-ui-qwindow'
 
-const showing = ref(true);
+const showing = ref(true)
 const windowProps = useQWindowResponsiveProps({
   width: 420,
   height: 260,
@@ -39,7 +39,7 @@ const windowProps = useQWindowResponsiveProps({
   mobileWidth: 320,
   mobileHeight: 280,
   mobileStartY: 88,
-});
+})
 </script>
 ```
 

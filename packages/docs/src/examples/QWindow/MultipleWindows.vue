@@ -51,13 +51,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { QWindow, useQWindowResponsiveProps } from "@quasar/quasar-ui-qwindow";
-import "@quasar/quasar-ui-qwindow/src/index.scss";
+import { ref } from 'vue'
+import { QWindow, useQWindowResponsiveProps } from '@quasar/quasar-ui-qwindow'
+import '@quasar/quasar-ui-qwindow/src/index.scss'
 
-const showInbox = ref(false);
-const showTasks = ref(false);
-const windowActions = ["pinned", "close"];
+const showInbox = ref(false)
+const showTasks = ref(false)
+const windowActions = ['pinned', 'close']
 const inboxWindowProps = useQWindowResponsiveProps({
   width: 340,
   height: 230,
@@ -65,7 +65,7 @@ const inboxWindowProps = useQWindowResponsiveProps({
   startY: 140,
   mobileWidth: 310,
   mobileStartY: 120,
-});
+})
 const tasksWindowProps = useQWindowResponsiveProps({
   width: 330,
   height: 210,
@@ -75,38 +75,38 @@ const tasksWindowProps = useQWindowResponsiveProps({
   mobileHeight: 220,
   mobileStartX: 28,
   mobileStartY: 238,
-});
+})
 
-const inboxItems = ["Release review", "Design feedback", "Netlify deploy"];
-const tasks = ["Check keyboard flow", "Review resize handles", "Capture beta notes"];
+const inboxItems = ['Release review', 'Design feedback', 'Netlify deploy']
+const tasks = ['Check keyboard flow', 'Review resize handles', 'Capture beta notes']
 
 const inboxStyle = {
-  background: "#f8fafc",
-  borderColor: "#60a5fa",
-  borderRadius: "16px",
-};
+  background: '#f8fafc',
+  borderColor: '#60a5fa',
+  borderRadius: '16px',
+}
 
 const inboxTitlebarStyle = {
-  background: "linear-gradient(90deg, #1d4ed8, #2563eb)",
-  color: "#eff6ff",
-  borderColor: "rgba(255, 255, 255, 0.16)",
-  borderTopLeftRadius: "14px",
-  borderTopRightRadius: "14px",
-};
+  background: 'linear-gradient(90deg, #1d4ed8, #2563eb)',
+  color: '#eff6ff',
+  borderColor: 'rgba(255, 255, 255, 0.16)',
+  borderTopLeftRadius: '14px',
+  borderTopRightRadius: '14px',
+}
 
 const taskStyle = {
-  background: "#fff7ed",
-  borderColor: "#fb923c",
-  borderRadius: "16px",
-};
+  background: '#fff7ed',
+  borderColor: '#fb923c',
+  borderRadius: '16px',
+}
 
 const taskTitlebarStyle = {
-  background: "linear-gradient(90deg, #9a3412, #ea580c)",
-  color: "#fff7ed",
-  borderColor: "rgba(255, 255, 255, 0.18)",
-  borderTopLeftRadius: "14px",
-  borderTopRightRadius: "14px",
-};
+  background: 'linear-gradient(90deg, #9a3412, #ea580c)',
+  color: '#fff7ed',
+  borderColor: 'rgba(255, 255, 255, 0.18)',
+  borderTopLeftRadius: '14px',
+  borderTopRightRadius: '14px',
+}
 </script>
 
 <style lang="scss" scoped>

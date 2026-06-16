@@ -40,14 +40,14 @@ npm install @quasar/quasar-ui-qwindow
 ```
 
 ```ts
-import { createApp } from "vue";
-import QWindow from "@quasar/quasar-ui-qwindow";
-import "@quasar/quasar-ui-qwindow/dist/index.css";
+import { createApp } from 'vue'
+import QWindow from '@quasar/quasar-ui-qwindow'
+import '@quasar/quasar-ui-qwindow/dist/index.css'
 
-const app = createApp(App);
+const app = createApp(App)
 
-app.use(QWindow);
-app.mount("#app");
+app.use(QWindow)
+app.mount('#app')
 ```
 
 ## Component
