@@ -185,4 +185,6 @@ minimumReleaseAgeExclude:
   - oxlint@1.70.0
   - vitest@4.1.9
   - vite-plugin-checker@0.14.4
+  - '@md-plugins/search-ui@0.1.0-rc.9'
+  - '@md-plugins/vite-search-plugin@0.1.0-rc.9'
 trustLockfile: true
