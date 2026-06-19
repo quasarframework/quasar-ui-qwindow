@@ -10,6 +10,23 @@ related:
 QWindow can be installed as a Quasar App Extension, as a Vue plugin, as a direct component import,
 or through the UMD bundle.
 
+## Recommended Path
+
+::: steps
+
+## Use the App Extension in Quasar CLI apps
+
+Choose the App Extension when you want Quasar to add the boot file and stylesheet for you.
+
+## Use the Vue plugin for manual registration
+
+Install the UI package directly when your app owns plugin registration or when you are not using the Quasar CLI App Extension flow.
+
+## Import the component and composables directly
+
+Import `QWindow` and helpers such as `useQWindowResponsiveProps` directly when you want targeted registration.
+:::
+
 ## Quasar CLI
 
 ### App Extension
