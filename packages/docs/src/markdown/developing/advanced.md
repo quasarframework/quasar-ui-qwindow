@@ -83,25 +83,25 @@ const maximized = ref(false)
 
 Template refs expose control methods for common window commands:
 
-| Method | Description |
-| --- | --- |
-| `show()` | Shows the window. |
-| `hide()` | Hides the window. |
-| `embed()` | Docks the window back into its page layout position. |
-| `float()` | Moves the window into floating mode. |
-| `toggleEmbedded()` | Switches between embedded and floating modes. |
-| `pin()` | Keeps the window above normal floating windows. |
-| `unpin()` | Returns the window to the normal floating stack. |
-| `togglePinned()` | Switches the pinned state. |
-| `maximize()` | Maximizes the floating window. |
-| `minimize()` | Collapses the window to its title bar. |
-| `restore()` | Restores from minimized, maximized, or fullscreen state. |
-| `toggleMaximized()` | Switches between maximized and restored state. |
-| `toggleMinimized()` | Switches between minimized and restored state. |
-| `enterFullscreen()` | Enters browser fullscreen when supported. |
-| `leaveFullscreen()` | Leaves browser fullscreen. |
-| `toggleFullscreen()` | Switches browser fullscreen state. |
-| `getPosition()` | Returns the current window position and size. |
+| Method               | Description                                              |
+| -------------------- | -------------------------------------------------------- |
+| `show()`             | Shows the window.                                        |
+| `hide()`             | Hides the window.                                        |
+| `embed()`            | Docks the window back into its page layout position.     |
+| `float()`            | Moves the window into floating mode.                     |
+| `toggleEmbedded()`   | Switches between embedded and floating modes.            |
+| `pin()`              | Keeps the window above normal floating windows.          |
+| `unpin()`            | Returns the window to the normal floating stack.         |
+| `togglePinned()`     | Switches the pinned state.                               |
+| `maximize()`         | Maximizes the floating window.                           |
+| `minimize()`         | Collapses the window to its title bar.                   |
+| `restore()`          | Restores from minimized, maximized, or fullscreen state. |
+| `toggleMaximized()`  | Switches between maximized and restored state.           |
+| `toggleMinimized()`  | Switches between minimized and restored state.           |
+| `enterFullscreen()`  | Enters browser fullscreen when supported.                |
+| `leaveFullscreen()`  | Leaves browser fullscreen.                               |
+| `toggleFullscreen()` | Switches browser fullscreen state.                       |
+| `getPosition()`      | Returns the current window position and size.            |
 
 Double-clicking the built-in title bar maximizes or restores a floating window. If you provide a
 custom `titlebar` slot, QWindow still handles title-bar double-clicks; stop the event on custom
