@@ -1,8 +1,32 @@
-import fs from 'node:fs'
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
+import fs, { existsSync, rmSync } from 'node:fs'
+import path, { extname, resolve } from 'node:path'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 
 import { createFolder, writeFile } from './build.utils'
+
+type QPressApiEntry = {
+  docsUrl?: string
+  generatedSuffix?: string
+  group?: 'functions' | 'methods'
+  input: string
+  output: string
+  type?: string
+}
+
+type QPressConfig = {
+  api?: {
+    entries?: QPressApiEntry[]
+  }
+}
+
+type QPressApiModule = {
+  generateQPressApi: (options: {
+    cwd: string
+    entries: QPressApiEntry[]
+    generatedSuffix?: string
+    writeOutput?: boolean
+  }) => Promise<unknown>
+}
 
 interface ApiEntry {
   desc?: string
@@ -12,44 +36,95 @@ interface ApiEntry {
 }
 
 interface ComponentApi {
-  type?: string
   props?: Record<string, ApiEntry>
   methods?: Record<string, ApiEntry>
   [key: string]: unknown
 }
 
-interface ComponentApiFile {
-  name: string
-  api: ComponentApi
-}
-
 const buildDir = path.dirname(fileURLToPath(import.meta.url))
 const rootDir = path.resolve(buildDir, '..')
-const srcDir = path.join(rootDir, 'src/components')
+const repoRoot = resolve(rootDir, '../..')
 const apiDir = path.join(rootDir, 'dist/api')
 const typesDir = path.join(rootDir, 'dist/types')
+const qpressConfigCandidates = ['qpress.config.mjs', 'qpress.config.js', 'qpress.config.json']
 const sourceTypesFile = path.join(rootDir, 'types/types.d.ts')
 const distTypesFile = path.join(typesDir, 'types.d.ts')
 const distIndexFile = path.join(typesDir, 'index.d.ts')
 
-function pascalCase(value: string): string {
-  return value
-    .split(/[-_\s]+/)
-    .filter(Boolean)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join('')
+function camelCase(value: string): string {
+  return value.replace(/-([a-z])/g, (_match, letter: string) => letter.toUpperCase())
 }
 
-function camelCase(value: string): string {
-  const name = pascalCase(value)
-  return name.charAt(0).toLowerCase() + name.slice(1)
+function resolveModuleSpecifier(specifier: string): string {
+  if (specifier.startsWith('.') || specifier.startsWith('/')) {
+    return pathToFileURL(resolve(process.cwd(), specifier)).href
+  }
+
+  return specifier
+}
+
+async function loadQPressApiModule(): Promise<QPressApiModule> {
+  const specifier =
+    process.env.QPRESS_API_MODULE ??
+    '@md-plugins/quasar-app-extension-q-press/dist/api/qpress-api.js'
+
+  return import(resolveModuleSpecifier(specifier)) as Promise<QPressApiModule>
+}
+
+async function readQPressConfig(): Promise<QPressConfig> {
+  const qpressConfigPath = qpressConfigCandidates
+    .map((file) => resolve(repoRoot, file))
+    .find((file) => existsSync(file))
+
+  if (qpressConfigPath === undefined) {
+    throw new Error(`Missing Q-Press config: ${qpressConfigCandidates.join(', ')}`)
+  }
+
+  if (extname(qpressConfigPath) === '.json') {
+    return JSON.parse(fs.readFileSync(qpressConfigPath, 'utf-8')) as QPressConfig
+  }
+
+  const configModule = (await import(pathToFileURL(qpressConfigPath).href)) as {
+    default?: QPressConfig
+  }
+
+  return configModule.default ?? (configModule as QPressConfig)
+}
+
+async function getQPressEntries(): Promise<QPressApiEntry[]> {
+  const config = await readQPressConfig()
+  const entries = config.api?.entries ?? []
+
+  if (entries.length === 0) {
+    throw new Error('No Q-Press API entries configured.')
+  }
+
+  return entries
+}
+
+async function generateApiJson(): Promise<ComponentApi> {
+  const entries = await getQPressEntries()
+  const qpressApi = await loadQPressApiModule()
+
+  rmSync(apiDir, { force: true, recursive: true })
+  createFolder('dist')
+  createFolder('dist/api')
+
+  await qpressApi.generateQPressApi({
+    cwd: repoRoot,
+    entries,
+    generatedSuffix: '',
+    writeOutput: true,
+  })
+
+  return JSON.parse(fs.readFileSync(path.join(apiDir, 'QWindow.json'), 'utf-8')) as ComponentApi
 }
 
 function getDescription(entry: ApiEntry): string {
   return typeof entry.desc === 'string' ? entry.desc.replace(/\*\//g, '* /') : ''
 }
 
-function getComment(entry: ApiEntry, indent = '    '): string {
+function getComment(entry: ApiEntry, indent = '  '): string {
   const desc = getDescription(entry)
 
   if (!desc) {
@@ -63,16 +138,26 @@ function normalizeType(type: string | string[] | undefined): string | undefined 
   return Array.isArray(type) ? type[0] : type
 }
 
+function getValueType(value: unknown, entryType: string | undefined): string {
+  if (entryType === 'Number' && typeof value === 'string' && /^-?\d+(\.\d+)?$/.test(value)) {
+    return value
+  }
+
+  return JSON.stringify(value)
+}
+
 function getType(entry: ApiEntry): string {
   if (entry.tsType) {
     return entry.tsType
   }
 
+  const normalizedType = normalizeType(entry.type)
+
   if (Array.isArray(entry.values) && entry.values.length > 0) {
-    return entry.values.map((value) => JSON.stringify(value)).join(' | ')
+    return entry.values.map((value) => getValueType(value, normalizedType)).join(' | ')
   }
 
-  switch (normalizeType(entry.type)) {
+  switch (normalizedType) {
     case 'Array':
       return 'unknown[]'
     case 'Boolean':
@@ -92,48 +177,14 @@ function getType(entry: ApiEntry): string {
 
 function getPropsTypes(api: ComponentApi): string {
   return Object.entries(api.props || {})
-    .map(([name, entry]) => {
-      const propName = camelCase(name)
-
-      return `${getComment(entry)}    ${propName}?: ${getType(entry)}`
-    })
+    .map(([name, entry]) => `${getComment(entry)}  ${camelCase(name)}?: ${getType(entry)}`)
     .join('\n')
 }
 
 function getMethodsTypes(api: ComponentApi): string {
   return Object.entries(api.methods || {})
-    .map(([name, entry]) => `${getComment(entry)}    ${name}(): void`)
+    .map(([name, entry]) => `${getComment(entry)}  ${name}(): void`)
     .join('\n')
-}
-
-function getComponentTypes(name: string, api: ComponentApi): string {
-  const parts = [getPropsTypes(api), getMethodsTypes(api)].filter(Boolean)
-
-  return `export interface ${name} extends ComponentPublicInstance {\n${parts.join('\n')}\n}\n`
-}
-
-function normalizeApi(file: string): ComponentApiFile {
-  const name = path.basename(file, '.json')
-  const source = path.join(srcDir, file)
-  const api = JSON.parse(fs.readFileSync(source, 'utf-8')) as ComponentApi
-
-  return {
-    name,
-    api: {
-      type: api.type || 'component',
-      ...api,
-    },
-  }
-}
-
-function writeApiFiles(components: ComponentApiFile[]): Promise<string[]> {
-  createFolder('dist/api')
-
-  return Promise.all(
-    components.map(({ name, api }) =>
-      writeFile(path.join(apiDir, `${name}.json`), JSON.stringify(api, null, 2) + '\n'),
-    ),
-  )
 }
 
 function getSourceTypeNames(): string[] {
@@ -162,7 +213,7 @@ function getSourceFunctionNames(): string[] {
   return names
 }
 
-function getTypesFile(components: ComponentApiFile[]): string {
+function getTypesFile(api: ComponentApi): string {
   const typeNames = fs.existsSync(sourceTypesFile) ? getSourceTypeNames() : []
   const functionNames = fs.existsSync(sourceTypesFile) ? getSourceFunctionNames() : []
   const sourceImports = [
@@ -171,55 +222,53 @@ function getTypesFile(components: ComponentApiFile[]): string {
   ]
     .filter(Boolean)
     .join('\n')
-  const imports = sourceImports.length > 0 ? `${sourceImports}\n\n` : ''
+  const imports = sourceImports.length > 0 ? `${sourceImports}\n` : ''
+  const props = getPropsTypes(api)
+  const methods = getMethodsTypes(api)
 
-  return `import type { ComponentPublicInstance, ComponentOptions } from 'vue'
-
-${components.map(({ name, api }) => getComponentTypes(name, api)).join('\n')}
-${imports}declare module 'vue' {
-    interface ComponentCustomProperties {
-    }
+  return `import type { App as Application, ComponentOptions, ComponentPublicInstance } from 'vue'
+${imports}
+export interface QWindow extends ComponentPublicInstance {
+${[props, methods].filter(Boolean).join('\n')}
 }
-export * from './types'
-export as namespace QWindow
-${components.map(({ name }) => `export const ${name}: ComponentOptions`).join('\n')}
+
+export interface QWindowProps {
+${props}
+}
 
 export const version: string
 
+export const QWindow: ComponentOptions
+
 export interface QWindowPlugin {
-    version: string
-${components.map(({ name }) => `    ${name}: ComponentOptions`).join('\n')}
-${functionNames.map((name) => `    ${name}: typeof ${name}`).join('\n')}
-    install(app: import('vue').App): void
+  version: string
+  QWindow: ComponentOptions
+${functionNames.map((name) => `  ${name}: typeof ${name}`).join('\n')}
+  install(app: Application): void
 }
 
 declare const plugin: QWindowPlugin
 export default plugin
+export * from './types'
+export as namespace QWindow
 `
 }
 
 export async function buildApi(): Promise<void> {
-  const files = fs
-    .readdirSync(srcDir)
-    .filter((file) => file.endsWith('.json'))
-    .sort((a, b) => a.localeCompare(b))
+  const api = await generateApiJson()
 
-  const components = files.map(normalizeApi)
-
-  createFolder('dist')
   createFolder('dist/types')
 
   if (fs.existsSync(sourceTypesFile)) {
     await writeFile(distTypesFile, fs.readFileSync(sourceTypesFile, 'utf-8'))
   }
 
-  await writeApiFiles(components)
-  await writeFile(distIndexFile, getTypesFile(components))
+  await writeFile(distIndexFile, getTypesFile(api))
 
-  console.log(` 🧾 Generated ${components.length} API file${components.length === 1 ? '' : 's'}`)
+  console.log(' 🧾 Generated 1 API file')
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (fileURLToPath(import.meta.url) === process.argv[1]) {
   buildApi().catch((err: unknown) => {
     console.error(err)
     process.exit(1)

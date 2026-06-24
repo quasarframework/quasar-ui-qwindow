@@ -71,9 +71,9 @@ async function openWindow() {
   await nextTick()
 
   const rect = stage.value?.getBoundingClientRect()
-  const win = window
+  const win = typeof window === 'undefined' ? undefined : window
 
-  if (rect !== void 0) {
+  if (rect !== void 0 && win !== undefined) {
     const safePadding = 16
     const targetLeft = win.scrollX + rect.left + 24
     const maxVisibleLeft = win.scrollX + win.innerWidth - windowProps.value.width - safePadding

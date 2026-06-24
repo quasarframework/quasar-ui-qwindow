@@ -9,6 +9,8 @@ import {
   Teleport,
   watch,
   getCurrentInstance,
+  type PropType,
+  type SlotsType,
 } from 'vue'
 import type { ComponentInternalInstance } from 'vue'
 
@@ -20,6 +22,55 @@ import useBody from './composables/useBody'
 
 type PointerLikeEvent = MouseEvent | TouchEvent
 type QWindowAction = string
+type SlotProps<T> = { scope: T }
+
+export interface QWindowActionMenuState {
+  /**
+   * Menu item label.
+   */
+  label: string
+  /**
+   * Quasar icon name.
+   */
+  icon: string
+  /**
+   * Function called when the menu item is selected.
+   */
+  func: () => boolean | void
+}
+
+export interface QWindowActionMenuItem {
+  /**
+   * Action key for the menu item.
+   */
+  key: string
+  /**
+   * Current action state.
+   */
+  state: boolean
+  /**
+   * Menu data used when the action is enabled.
+   */
+  on: QWindowActionMenuState
+  /**
+   * Menu data used when the action is disabled.
+   */
+  off: QWindowActionMenuState
+}
+
+export interface QWindowDefaultSlotScope {
+  /**
+   * Current z-index for the window body content.
+   */
+  zIndex: number
+}
+
+export interface QWindowTitlebarSlotScope {
+  /**
+   * Menu items generated for the current action state.
+   */
+  menuData: QWindowActionMenuItem[]
+}
 
 type ActionItem = {
   state: boolean
@@ -37,13 +88,43 @@ type ActionItem = {
 
 type ActionStateMap = Record<string, ActionItem>
 type WindowStyle = Record<string, string | number | undefined>
-type QWindowPosition = {
+
+export interface QWindowPosition {
+  /**
+   * Current window height.
+   */
   height: number
+  /**
+   * Current window left position.
+   */
   left: number
+  /**
+   * Current horizontal scroll offset used for floating placement.
+   */
   scrollX: number
+  /**
+   * Current vertical scroll offset used for floating placement.
+   */
   scrollY: number
+  /**
+   * Current window top position.
+   */
   top: number
+  /**
+   * Current window width.
+   */
   width: number
+}
+
+export interface QWindowSlots {
+  /**
+   * Window body content.
+   */
+  default?: SlotProps<QWindowDefaultSlotScope>
+  /**
+   * Custom title bar content.
+   */
+  titlebar?: SlotProps<QWindowTitlebarSlotScope>
 }
 
 function toNumber(value: string | number | undefined, fallback: number): number {
@@ -142,6 +223,9 @@ const ACTION_MAXIMIZE = 'maximize'
 const ACTION_MINIMIZE = 'minimize'
 const ACTION_CLOSE = 'close'
 export const MENU_ITEM_SEPARATOR = 'separator'
+const ICON_PIN = 'M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12Z'
+const ICON_PIN_OFF =
+  'M2,5.27L3.28,4L20,20.72L18.73,22L12.8,16.07V22H11.2V16H6V14L8,12V9.27L2,5.27M16,12L18,14V16H17V4H16V12Z'
 
 export default defineComponent({
   name: 'QWindow',
@@ -149,20 +233,83 @@ export default defineComponent({
     ClosePopup,
     Scroll,
   },
+  slots: Object as SlotsType<QWindowSlots>,
   props: {
+    /**
+     * `v-model`; controls visibility of the window.
+     *
+     * @category model
+     */
     modelValue: Boolean,
+    /**
+     * Text shown in the title bar.
+     *
+     * @category titlebar
+     */
     title: String,
+    /**
+     * Uses a shorter title bar.
+     *
+     * @category titlebar
+     */
     dense: Boolean,
+    /**
+     * Renders the window in place instead of floating it through Teleport.
+     *
+     * @category state
+     */
     embedded: Boolean,
+    /**
+     * Prevents the floating window from moving or resizing.
+     *
+     * @category state
+     */
     pinned: Boolean,
+    /**
+     * Starts the window in fullscreen mode.
+     *
+     * @category state
+     */
     fullscreen: Boolean,
+    /**
+     * Starts the window maximized.
+     *
+     * @category state
+     */
     maximized: Boolean,
+    /**
+     * Starts the window minimized.
+     *
+     * @category state
+     */
     minimized: Boolean,
+    /**
+     * Hides the title bar actions menu.
+     *
+     * @category titlebar
+     */
     noMenu: Boolean,
+    /**
+     * Disables dragging by the title bar.
+     *
+     * @category behavior
+     */
     noMove: Boolean,
+    /**
+     * Disables resize handles.
+     *
+     * @category behavior
+     */
     noResize: Boolean,
+    /**
+     * List of resize handles to enable.
+     *
+     * @category behavior
+     * @tsType string[]
+     * @example :resizable="['top', 'right', 'bottom', 'left']"
+     */
     resizable: {
-      type: Array,
+      type: Array as PropType<string[]>,
       default: () => [
         'top',
         'left',
@@ -174,52 +321,150 @@ export default defineComponent({
         'bottom-right',
       ],
     },
+    /**
+     * Keeps the floating position tied to document scroll.
+     *
+     * @category behavior
+     */
     scrollWithWindow: {
       type: Boolean,
       default: false,
     },
+    /**
+     * Automatically pins the window when its state requires it.
+     *
+     * @category behavior
+     */
     autoPin: Boolean,
 
+    /**
+     * Puts the window into a disabled visual state.
+     *
+     * @category state
+     */
     disabled: Boolean,
+    /**
+     * Hides the divider under the title bar.
+     *
+     * @category titlebar
+     */
     hideToolbarDivider: Boolean,
+    /**
+     * Hides visible resize grippers and uses invisible resize handles.
+     *
+     * @category appearance
+     */
     hideGrippers: Boolean,
+    /**
+     * Rounds visible resize grippers.
+     *
+     * @category appearance
+     */
     roundGrippers: Boolean,
+    /**
+     * Hides the title bar.
+     *
+     * @category titlebar
+     */
     headless: Boolean,
+    /**
+     * Overrides the menu action labels and icons.
+     *
+     * @category titlebar
+     */
     iconSet: Object,
+    /**
+     * CSS text color for the window.
+     *
+     * @category appearance
+     */
     color: {
       type: String,
       default: '#000000',
     },
+    /**
+     * CSS background color for the window.
+     *
+     * @category appearance
+     */
     backgroundColor: {
       type: String,
     },
+    /**
+     * CSS border color for resize grippers.
+     *
+     * @category appearance
+     */
     gripperBorderColor: {
       type: String,
     },
+    /**
+     * CSS background color for resize grippers.
+     *
+     * @category appearance
+     */
     gripperBackgroundColor: {
       type: String,
     },
+    /**
+     * CSS border width for the window.
+     *
+     * @category appearance
+     */
     borderWidth: {
       type: String,
       default: '1px',
     },
+    /**
+     * CSS border style for the window.
+     *
+     * @category appearance
+     */
     borderStyle: {
       type: String,
       default: 'solid',
     },
 
+    /**
+     * Initial left position for floating windows.
+     *
+     * @category position
+     */
     startX: [Number, String],
+    /**
+     * Initial top position for floating windows.
+     *
+     * @category position
+     */
     startY: [Number, String],
+    /**
+     * Initial window width.
+     *
+     * @category position
+     */
     width: {
       type: [Number, String],
       default: 400,
     },
+    /**
+     * Initial window height.
+     *
+     * @category position
+     */
     height: {
       type: [Number, String],
       default: 400,
     },
+    /**
+     * Menu actions shown in the title bar.
+     *
+     * @category titlebar
+     * @tsType string[]
+     * @values pinned | embedded | minimize | maximize | close | fullscreen
+     * @example :actions="['pinned', 'fullscreen', 'close']"
+     */
     actions: {
-      type: Array,
+      type: Array as PropType<string[]>,
       default: () => [ACTION_PINNED, ACTION_EMBEDDED, ACTION_CLOSE],
       validator: (v: unknown) =>
         Array.isArray(v) &&
@@ -236,30 +481,146 @@ export default defineComponent({
             ].includes(action),
         ),
     },
-    menuFunc: Function,
+    /**
+     * Receives and may mutate the generated menu item list before rendering.
+     *
+     * @category titlebar
+     * @tsType (menuData: QWindowActionMenuItem[]) => void
+     */
+    menuFunc: Function as PropType<(menuData: QWindowActionMenuItem[]) => void>,
+    /**
+     * Style applied to the title bar.
+     *
+     * @category titlebar
+     */
     titlebarStyle: [String, Object, Array],
+    /**
+     * Class applied to the title bar.
+     *
+     * @category titlebar
+     */
     titlebarClass: [String, Object, Array],
+    /**
+     * Class applied to the outer window.
+     *
+     * @category appearance
+     */
     contentClass: [String, Object, Array],
+    /**
+     * Style applied to the outer window.
+     *
+     * @category appearance
+     */
     contentStyle: [String, Object, Array],
   },
 
   emits: [
+    /**
+     * Emitted when selected state changes.
+     *
+     * @param value New selected state.
+     * @param-type value Boolean
+     * @param-ts-type value boolean
+     */
     'selected',
+    /**
+     * Legacy visible-state event kept for compatibility.
+     *
+     * @param value New visible state.
+     * @param-type value Boolean
+     * @param-ts-type value boolean
+     */
     'input',
+    /**
+     * Emitted when the visible state changes.
+     *
+     * @param value New visible state.
+     * @param-type value Boolean
+     * @param-ts-type value boolean
+     */
     'update:modelValue',
+    /**
+     * Emitted when fullscreen state changes.
+     *
+     * @param value New fullscreen state.
+     * @param-type value Boolean
+     * @param-ts-type value boolean
+     */
     'fullscreen',
+    /**
+     * Emitted when embedded mode changes.
+     *
+     * @param value New embedded state.
+     * @param-type value Boolean
+     * @param-ts-type value boolean
+     */
     'embedded',
+    /**
+     * Emitted when pinned mode changes.
+     *
+     * @param value New pinned state.
+     * @param-type value Boolean
+     * @param-ts-type value boolean
+     */
     'pinned',
+    /**
+     * Emitted when maximized state changes.
+     *
+     * @param value New maximized state.
+     * @param-type value Boolean
+     * @param-ts-type value boolean
+     */
     'maximize',
+    /**
+     * Emitted when minimized state changes.
+     *
+     * @param value New minimized state.
+     * @param-type value Boolean
+     * @param-ts-type value boolean
+     */
     'minimize',
+    /**
+     * Emitted after the window moves, resizes, or restores position.
+     *
+     * @param position Window position payload with left, top, width, height, scrollX, and scrollY.
+     * @param-type position Object
+     * @param-ts-type position QWindowPosition
+     */
     'position',
+    /**
+     * Emitted when an active drag or resize interaction is canceled.
+     *
+     * @param position Restored window position payload.
+     * @param-type position Object
+     * @param-ts-type position QWindowPosition
+     */
     'canceled',
+    /**
+     * Emitted before a drag or resize interaction starts.
+     *
+     * @param evt Pointer event that started the drag.
+     * @param-type evt Event
+     * @param-ts-type evt MouseEvent | TouchEvent
+     */
     'beforeDrag',
+    /**
+     * Emitted after a drag or resize interaction finishes.
+     *
+     * @param evt Pointer event that finished the drag.
+     * @param-type evt Event
+     * @param-ts-type evt MouseEvent | TouchEvent
+     */
     'afterDrag',
+    /**
+     * Emitted when the window becomes visible.
+     */
     'show',
+    /**
+     * Emitted when the window becomes hidden.
+     */
     'hide',
   ],
-  setup(props, { slots, emit }) {
+  setup(props, { slots, emit, expose }) {
     const iconSetTemplate = ref({
       visible: {
         on: {
@@ -283,11 +644,11 @@ export default defineComponent({
       },
       pinned: {
         on: {
-          icon: 'location_searching',
+          icon: ICON_PIN,
           label: 'Pin',
         },
         off: {
-          icon: 'gps_fixed',
+          icon: ICON_PIN_OFF,
           label: 'Unpin',
         },
       },
@@ -692,6 +1053,9 @@ export default defineComponent({
       removeEventListeners()
     })
 
+    /**
+     * Shows the window.
+     */
     function show() {
       if (checkActionState(ACTION_VISIBLE, true)) {
         setActionState(ACTION_VISIBLE, true)
@@ -700,7 +1064,9 @@ export default defineComponent({
       return false
     }
 
-    // hide the component
+    /**
+     * Hides the window.
+     */
     function hide() {
       if (checkActionState(ACTION_VISIBLE, false)) {
         setActionState(ACTION_VISIBLE, false)
@@ -727,7 +1093,24 @@ export default defineComponent({
       return false
     }
 
+    /**
+     * Embeds the window back into the page layout.
+     */
+    function embed() {
+      return lock()
+    }
+
+    /**
+     * Floats the window through Teleport so it can move and resize.
+     */
+    function float() {
+      return unlock()
+    }
+
     // pinned (can't move or re-size)
+    /**
+     * Pins the window so it cannot move or resize.
+     */
     function pin() {
       if (checkActionState(ACTION_PINNED, true)) {
         setActionState(ACTION_PINNED, true)
@@ -737,6 +1120,9 @@ export default defineComponent({
     }
 
     // move and resize available, if not embedded
+    /**
+     * Unpins the window so it can move and resize again.
+     */
     function unpin() {
       if (checkActionState(ACTION_PINNED, false)) {
         setActionState(ACTION_PINNED, false)
@@ -745,6 +1131,9 @@ export default defineComponent({
       return false
     }
 
+    /**
+     * Maximizes the window.
+     */
     function maximize() {
       if (checkActionState(ACTION_MAXIMIZE, true)) {
         //thisbringToFront()
@@ -758,6 +1147,9 @@ export default defineComponent({
       return false
     }
 
+    /**
+     * Minimizes the window.
+     */
     function minimize() {
       if (checkActionState(ACTION_MINIMIZE, true)) {
         savePositionAndState()
@@ -770,16 +1162,36 @@ export default defineComponent({
       return false
     }
 
+    /**
+     * Restores a maximized or minimized window.
+     */
     function restore() {
       if (getActionState(ACTION_VISIBLE) !== true) {
         // not allowed
-        return
+        return false
       }
       if (getActionState(ACTION_MAXIMIZE) === true) {
         setActionState(ACTION_MAXIMIZE, false)
+        return true
       } else if (getActionState(ACTION_MINIMIZE) === true) {
         setActionState(ACTION_MINIMIZE, false)
+        return true
       }
+      return false
+    }
+
+    /**
+     * Requests browser fullscreen for the window.
+     */
+    function enterFullscreen() {
+      return fullscreenEnter()
+    }
+
+    /**
+     * Leaves browser fullscreen for the window.
+     */
+    function leaveFullscreen() {
+      return fullscreenLeave()
     }
 
     function fullscreenEnter() {
@@ -1515,7 +1927,7 @@ export default defineComponent({
 
     const computedMenuData = computed(() => {
       // get stateInfo for each menu item
-      const menuData: Array<ActionItem & { key: string }> = []
+      const menuData: QWindowActionMenuItem[] = []
       computedActions.value.map((key) => {
         if (actionItems.value[key]) {
           menuData.push({ ...actionItems.value[key], key: key })
@@ -1636,6 +2048,21 @@ export default defineComponent({
       computedMenuData,
       renderResizeHandle,
     )
+
+    // expose public methods
+    expose({
+      show,
+      hide,
+      embed,
+      float,
+      pin,
+      unpin,
+      maximize,
+      minimize,
+      restore,
+      enterFullscreen,
+      leaveFullscreen,
+    })
 
     const { renderBody } = useBody(
       props,

@@ -150,3 +150,5 @@ minimumReleaseAgeExclude:
   - 'vue-tsc@3.3.5'
   - vite@8.1.0
 trustLockfile: true
+patchedDependencies:
+  '@md-plugins/quasar-app-extension-q-press@0.1.0-rc.15': patches/@md-plugins__quasar-app-extension-q-press@0.1.0-rc.15.patch

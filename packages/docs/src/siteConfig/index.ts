@@ -258,6 +258,7 @@ const docsMenus: SiteMenuItem[] = [
     mq: 1000,
     children: [
       { name: 'Using QWindow', path: '/developing/using-qwindow' },
+      { name: 'Advanced', path: '/developing/advanced' },
       { name: 'FAQ', path: '/developing/faq' },
     ],
   },

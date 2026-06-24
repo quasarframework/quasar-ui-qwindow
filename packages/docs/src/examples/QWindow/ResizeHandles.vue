@@ -345,8 +345,8 @@ function updateWindowStart() {
   const rect = stageRef.value?.getBoundingClientRect()
   const width = windowProps.value.width
   const height = windowProps.value.height
-  const viewportWidth = window.innerWidth
-  const viewportHeight = window.innerHeight
+  const viewportWidth = typeof window === 'undefined' ? width + 32 : window.innerWidth
+  const viewportHeight = typeof window === 'undefined' ? height + 80 : window.innerHeight
   const maxX = Math.max(16, viewportWidth - width - 16)
   const maxY = Math.max(64, viewportHeight - height - 16)
   const viewportX = clamp((rect?.left ?? 24) + 24, 16, maxX)

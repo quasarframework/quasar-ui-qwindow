@@ -129,6 +129,10 @@ function getPropertyType(prop: any, rawType: any): string {
   return getStringType(rawType)
 }
 
+function getStringList(value: any): string {
+  return Array.isArray(value) ? value.join(', ') : '' + value
+}
+
 const NAME_PROP_COLOR = ['orange-8', 'brand-primary', 'green-5', 'purple-5']
 const NAME_PROP_COLOR_LEN = NAME_PROP_COLOR.length
 
@@ -319,6 +323,10 @@ function getPropDetails(
     details.push(getDiv(3, 'Category', prop.category))
   }
 
+  if (prop.applicable !== void 0) {
+    details.push(getDiv(3, 'Applicable', getStringList(prop.applicable)))
+  }
+
   if (prop.deprecated !== void 0) {
     details.push(
       getDiv(
@@ -493,6 +501,7 @@ function getProp(
   const isExpandable =
     prop.extends !== void 0 ||
     prop.category !== void 0 ||
+    prop.applicable !== void 0 ||
     prop.deprecated !== void 0 ||
     prop.sync === true ||
     prop.default !== void 0 ||

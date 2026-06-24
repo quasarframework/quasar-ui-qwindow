@@ -15,36 +15,8 @@ import QWindowApi from '@quasar/quasar-ui-qwindow/dist/api/QWindow.json'
 
 <MarkdownApi :api="QWindowApi" name="QWindow"/>
 
-## Responsive Window Props
-
-Use `useQWindowResponsiveProps` when a floating or embedded window needs smaller dimensions and a
-safer start position on narrow screens. The composable returns a computed prop object, so it can be
-passed directly to QWindow with `v-bind`.
-
-```vue
-<template>
-  <q-window v-model="showing" v-bind="windowProps" title="Responsive panel"> ... </q-window>
-</template>
-
-<script setup lang="ts">
-import { ref } from 'vue'
-import { QWindow, useQWindowResponsiveProps } from '@quasar/quasar-ui-qwindow'
-
-const showing = ref(true)
-const windowProps = useQWindowResponsiveProps({
-  width: 420,
-  height: 260,
-  startX: 72,
-  startY: 104,
-  mobileWidth: 320,
-  mobileHeight: 280,
-  mobileStartY: 88,
-})
-</script>
-```
-
-By default, mobile values are used below Quasar's `sm` breakpoint. Pass `mobileBreakpoint` or
-`mobilePredicate` when an app needs a different cutoff.
+Need tighter responsive behavior, custom title bars, or native application styling? See the
+[Advanced QWindow patterns](/developing/advanced) page.
 
 ## Basic Example
 
