@@ -1,8 +1,18 @@
 import { describe, expect, it } from 'vitest'
-import { createSSRApp, h } from 'vue'
+import { createSSRApp, h, ref } from 'vue'
 import { renderToString } from 'vue/server-renderer'
 
 import Plugin, { install, QWindow, useQWindowResponsiveProps, version } from '../src'
+import useWindowGeometry from '../src/components/composables/useWindowGeometry'
+import useWindowRestoreState from '../src/components/composables/useWindowRestoreState'
+import useWindowStack from '../src/components/composables/useWindowStack'
+import useWindowState, {
+  ACTION_EMBEDDED,
+  ACTION_MAXIMIZE,
+  ACTION_MINIMIZE,
+  ACTION_PINNED,
+  ACTION_VISIBLE,
+} from '../src/components/composables/useWindowState'
 
 function installSsrQuasarStub(
   app: ReturnType<typeof createSSRApp>,
@@ -99,7 +109,147 @@ describe('QWindow exports', () => {
     const html = await renderToString(app)
 
     expect(html).toContain('q-window')
+    expect(html).toContain('role="region"')
+    expect(html).toContain('aria-label="SSR Window"')
     expect(html).toContain('SSR Window')
     expect(html).toContain('SSR window content')
+  })
+
+  it('models window state transitions and update events in one place', () => {
+    const events: unknown[][] = []
+    const state = useWindowState((event, ...args) => {
+      events.push([event, ...args])
+    })
+
+    expect(state.isVisible.value).toBe(true)
+    expect(state.isEmbedded.value).toBe(true)
+    expect(state.checkActionState(ACTION_PINNED, true)).toBe(false)
+
+    expect(state.setActionState(ACTION_EMBEDDED, false)).toBe(true)
+    expect(state.isEmbedded.value).toBe(false)
+    expect(state.checkActionState(ACTION_PINNED, true)).toBe(true)
+
+    expect(state.setActionState(ACTION_PINNED, true)).toBe(true)
+    expect(state.isPinned.value).toBe(true)
+
+    expect(state.setActionState(ACTION_VISIBLE, false)).toBe(true)
+
+    expect(events).toEqual([
+      ['embedded', false],
+      ['update:embedded', false],
+      ['pinned', true],
+      ['update:pinned', true],
+      ['update:modelValue', false],
+      ['input', false],
+      ['hide'],
+    ])
+  })
+
+  it('computes geometry from initial placement and scroll mode', () => {
+    const geometry = useWindowGeometry({
+      height: 260,
+      scrollWithWindow: false,
+      startX: 72,
+      startY: 104,
+      width: 420,
+    })
+
+    geometry.initializePosition(3, 20, 20)
+    geometry.updateScroll({ scrollX: 11, scrollY: 17 } as Window)
+
+    expect(geometry.computedPosition.value).toEqual({
+      height: 260,
+      left: 72,
+      scrollX: 83,
+      scrollY: 121,
+      top: 104,
+      width: 420,
+    })
+  })
+
+  it('tracks selected window stacking independently from component rendering', () => {
+    const first = useWindowStack(4000)
+    const second = useWindowStack(4000)
+
+    first.bringToFront()
+    second.bringToFront()
+
+    expect(first.selected.value).toBe(true)
+    expect(second.selected.value).toBe(true)
+    expect(second.zIndex.value).toBeGreaterThan(first.zIndex.value)
+
+    first.clearSelected()
+
+    expect(first.selected.value).toBe(false)
+  })
+
+  it('keeps fullscreen restore state separate from maximized restore state', () => {
+    const states = ref({
+      top: 80,
+      left: 96,
+      bottom: 360,
+      right: 536,
+    })
+    let zIndex = 4010
+    const actions = {
+      [ACTION_EMBEDDED]: false,
+      [ACTION_PINNED]: false,
+      [ACTION_MAXIMIZE]: false,
+      [ACTION_MINIMIZE]: false,
+    }
+
+    const restore = useWindowRestoreState({
+      states,
+      startingZIndex: zIndex,
+      getZIndex: () => zIndex,
+      setZIndex: (value) => {
+        zIndex = value
+      },
+      getActionState: (action) => actions[action as keyof typeof actions] === true,
+      setActionState: (action, value) => {
+        actions[action as keyof typeof actions] = value
+        return true
+      },
+    })
+
+    restore.savePositionAndState()
+
+    states.value = {
+      top: 0,
+      left: 0,
+      bottom: 800,
+      right: 1280,
+    }
+    actions[ACTION_MAXIMIZE] = true
+    restore.savePositionAndState(restore.fullscreenRestoreState.value)
+
+    states.value = {
+      top: 0,
+      left: 0,
+      bottom: 900,
+      right: 1440,
+    }
+    zIndex = 5900
+
+    restore.restorePositionAndState(restore.fullscreenRestoreState.value)
+
+    expect(states.value).toEqual({
+      top: 0,
+      left: 0,
+      bottom: 800,
+      right: 1280,
+    })
+    expect(actions[ACTION_MAXIMIZE]).toBe(true)
+
+    actions[ACTION_MAXIMIZE] = false
+    restore.restorePositionAndState()
+
+    expect(states.value).toEqual({
+      top: 80,
+      left: 96,
+      bottom: 360,
+      right: 536,
+    })
+    expect(actions[ACTION_MAXIMIZE]).toBe(false)
   })
 })

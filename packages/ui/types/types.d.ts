@@ -5,6 +5,86 @@ export type NumberArray = number[]
 export type StringArray = string[]
 
 /**
+ * Menu state entry used by one side of a QWindow action menu item.
+ */
+export interface QWindowActionMenuState {
+  /**
+   * Menu item label.
+   */
+  label: string
+
+  /**
+   * Quasar icon name or SVG path.
+   */
+  icon: string
+
+  /**
+   * Function called when the menu item is selected.
+   */
+  func: () => boolean | void
+}
+
+/**
+ * Menu item generated for a QWindow title bar action.
+ */
+export interface QWindowActionMenuItem {
+  /**
+   * Action key for the menu item.
+   */
+  key: string
+
+  /**
+   * Current action state.
+   */
+  state: boolean
+
+  /**
+   * Menu data used when the action is enabled.
+   */
+  on: QWindowActionMenuState
+
+  /**
+   * Menu data used when the action is disabled.
+   */
+  off: QWindowActionMenuState
+}
+
+/**
+ * Current QWindow position and dimensions.
+ */
+export interface QWindowPosition {
+  /**
+   * Current window height.
+   */
+  height: number
+
+  /**
+   * Current window left position.
+   */
+  left: number
+
+  /**
+   * Current horizontal scroll offset used for floating placement.
+   */
+  scrollX: number
+
+  /**
+   * Current vertical scroll offset used for floating placement.
+   */
+  scrollY: number
+
+  /**
+   * Current window top position.
+   */
+  top: number
+
+  /**
+   * Current window width.
+   */
+  width: number
+}
+
+/**
  * Quasar screen breakpoints that can be used as the mobile cutoff.
  */
 export type QWindowResponsiveBreakpoint = keyof Screen['lt']

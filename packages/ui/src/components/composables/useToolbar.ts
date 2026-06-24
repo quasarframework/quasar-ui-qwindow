@@ -30,7 +30,9 @@ export default function useToolbar(
   isEmbedded: Ref<boolean>,
   isMinimized: Ref<boolean>,
   computedMenuData: Ref<MenuDataItem[]>,
-  renderResizeHandle: (name: string, actionsWidth?: number) => unknown,
+  onTitlebarDoubleClick: (evt: MouseEvent) => void,
+  onTitlebarMouseDown: (evt: MouseEvent) => void,
+  onTitlebarTouchStart: (evt: TouchEvent) => void,
 ) {
   const tbHeight = computed(() => {
     return props.headless === true ? 0 : props.dense === true ? 28 : 40
@@ -40,6 +42,7 @@ export default function useToolbar(
       'q-window__titlebar' +
       (props.hideToolbarDivider !== true ? ' q-window__titlebar--divider' : '') +
       (props.dense === true ? ' q-window__titlebar--dense' : '') +
+      (canDrag() === true ? ' q-window__titlebar--movable' : '') +
       (isEmbedded.value !== true && isMinimized.value !== true ? ' absolute' : '') +
       (isDragging.value === true ? ' q-window__touch-action' : '') +
       ' row justify-between items-center'
@@ -166,12 +169,14 @@ export default function useToolbar(
       {
         class: [tbStaticClass.value, props.titlebarClass],
         style: tbStyle.value,
+        onDblclick: onTitlebarDoubleClick,
+        onMousedown: onTitlebarMouseDown,
+        onTouchstart: onTitlebarTouchStart,
       },
       [
         titlebarSlot === void 0 ? renderTitle() : '',
         titlebarSlot === void 0 ? renderMenuButton(menuData) : '',
         titlebarSlot !== void 0 ? titlebarSlot({ menuData }) : '',
-        canDrag() === true && renderResizeHandle('titlebar', props.noMenu ? 0 : 35), // width of more button
       ] as any,
     )
   }

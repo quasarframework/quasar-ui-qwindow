@@ -19,10 +19,23 @@ import useStyle from './composables/useStyle'
 import useResize from './composables/useResize'
 import useToolbar from './composables/useToolbar'
 import useBody from './composables/useBody'
+import useWindowGeometry from './composables/useWindowGeometry'
+import useWindowInteraction from './composables/useWindowInteraction'
+import useWindowRestoreState from './composables/useWindowRestoreState'
+import useWindowStack from './composables/useWindowStack'
+import useWindowState, {
+  ACTION_CLOSE,
+  ACTION_EMBEDDED,
+  ACTION_FULLSCREEN,
+  ACTION_MAXIMIZE,
+  ACTION_MINIMIZE,
+  ACTION_PINNED,
+  ACTION_VISIBLE,
+  type QWindowAction,
+} from './composables/useWindowState'
 
-type PointerLikeEvent = MouseEvent | TouchEvent
-type QWindowAction = string
 type SlotProps<T> = { scope: T }
+type QWindowActionMenuItemState = Omit<QWindowActionMenuItem, 'key'>
 
 export interface QWindowActionMenuState {
   /**
@@ -72,21 +85,6 @@ export interface QWindowTitlebarSlotScope {
   menuData: QWindowActionMenuItem[]
 }
 
-type ActionItem = {
-  state: boolean
-  on: {
-    label: string
-    icon: string
-    func: () => boolean | void
-  }
-  off: {
-    label: string
-    icon: string
-    func: () => boolean | void
-  }
-}
-
-type ActionStateMap = Record<string, ActionItem>
 type WindowStyle = Record<string, string | number | undefined>
 
 export interface QWindowPosition {
@@ -127,28 +125,6 @@ export interface QWindowSlots {
   titlebar?: SlotProps<QWindowTitlebarSlotScope>
 }
 
-function toNumber(value: string | number | undefined, fallback: number): number {
-  if (typeof value === 'number') {
-    return value
-  }
-
-  if (typeof value === 'string') {
-    const parsed = Number.parseFloat(value)
-    return Number.isFinite(parsed) ? parsed : fallback
-  }
-
-  return fallback
-}
-
-function prevent(e: Event): void {
-  e.preventDefault()
-}
-
-function stopAndPrevent(e: Event): void {
-  e.stopPropagation()
-  e.preventDefault()
-}
-
 function getWindow(): Window | undefined {
   return typeof window === 'undefined' ? undefined : window
 }
@@ -173,59 +149,70 @@ let QWindowCount = 0
 const defaultX = 20
 const defaultY = 20
 
-function getTouchPoint(e: TouchEvent): Touch | undefined {
-  return e.touches[0] ?? e.changedTouches[0] ?? e.targetTouches[0]
-}
-
-const getMousePosition = function (e: PointerLikeEvent, type = 'x') {
-  if ('touches' in e) {
-    const touch = getTouchPoint(e)
-    if (touch === void 0) {
-      return 0
-    }
-
-    if (type === 'x') {
-      return touch.pageX
-    }
-    return touch.pageY
-  } else {
-    if (type === 'x') {
-      return e.pageX
-    }
-    return e.pageY
-  }
-}
-const getMouseShift = function (e: PointerLikeEvent, rect: DOMRect, type = 'x') {
-  if ('touches' in e) {
-    const touch = getTouchPoint(e)
-    if (touch === void 0) {
-      return 0
-    }
-
-    if (type === 'x') {
-      return touch.clientX - rect.left
-    }
-    return touch.clientY - rect.top
-  } else {
-    if (type === 'x') {
-      return e.clientX - rect.left
-    }
-    return e.clientY - rect.top
-  }
-}
-
-const ACTION_HIDDEN = 'hidden'
-const ACTION_VISIBLE = 'visible'
-const ACTION_EMBEDDED = 'embedded'
-const ACTION_FULLSCREEN = 'fullscreen'
-const ACTION_PINNED = 'pinned'
-const ACTION_MAXIMIZE = 'maximize'
-const ACTION_MINIMIZE = 'minimize'
-const ACTION_CLOSE = 'close'
 export const MENU_ITEM_SEPARATOR = 'separator'
-const ICON_PIN = 'M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12Z'
-const ICON_PIN_OFF =
-  'M2,5.27L3.28,4L20,20.72L18.73,22L12.8,16.07V22H11.2V16H6V14L8,12V9.27L2,5.27M16,12L18,14V16H17V4H16V12Z'
+
+const defaultIconSet = {
+  [ACTION_VISIBLE]: {
+    on: {
+      icon: 'close',
+      label: 'Show',
+    },
+    off: {
+      icon: 'close',
+      label: 'Hide',
+    },
+  },
+  [ACTION_EMBEDDED]: {
+    on: {
+      icon: 'lock_outline',
+      label: 'Embed',
+    },
+    off: {
+      icon: 'lock_open',
+      label: 'Float',
+    },
+  },
+  [ACTION_PINNED]: {
+    on: {
+      icon: 'push_pin',
+      label: 'Pin',
+    },
+    off: {
+      icon: 'open_with',
+      label: 'Unpin',
+    },
+  },
+  [ACTION_MAXIMIZE]: {
+    on: {
+      icon: 'arrow_upward',
+      label: 'Maximize',
+    },
+    off: {
+      icon: 'restore',
+      label: 'Restore',
+    },
+  },
+  [ACTION_FULLSCREEN]: {
+    on: {
+      icon: 'fullscreen',
+      label: 'Enter fullscreen',
+    },
+    off: {
+      icon: 'fullscreen_exit',
+      label: 'Leave fullscreen',
+    },
+  },
+  [ACTION_MINIMIZE]: {
+    on: {
+      icon: 'arrow_downward',
+      label: 'Minimize',
+    },
+    off: {
+      icon: 'restore',
+      label: 'Restore',
+    },
+  },
+}
 
 export default defineComponent({
   name: 'QWindow',
@@ -343,6 +330,23 @@ export default defineComponent({
      * @category state
      */
     disabled: Boolean,
+    /**
+     * Accessible label for the window shell. Falls back to `title` when omitted.
+     *
+     * @category accessibility
+     */
+    ariaLabel: String,
+    /**
+     * ARIA role applied to the window shell.
+     *
+     * @category accessibility
+     * @default "region"
+     * @values region | dialog | complementary | application
+     */
+    ariaRole: {
+      type: String,
+      default: 'region',
+    },
     /**
      * Hides the divider under the title bar.
      *
@@ -548,6 +552,14 @@ export default defineComponent({
      */
     'fullscreen',
     /**
+     * Emitted when fullscreen state changes for `v-model:fullscreen`.
+     *
+     * @param value New fullscreen state.
+     * @param-type value Boolean
+     * @param-ts-type value boolean
+     */
+    'update:fullscreen',
+    /**
      * Emitted when embedded mode changes.
      *
      * @param value New embedded state.
@@ -555,6 +567,14 @@ export default defineComponent({
      * @param-ts-type value boolean
      */
     'embedded',
+    /**
+     * Emitted when embedded mode changes for `v-model:embedded`.
+     *
+     * @param value New embedded state.
+     * @param-type value Boolean
+     * @param-ts-type value boolean
+     */
+    'update:embedded',
     /**
      * Emitted when pinned mode changes.
      *
@@ -564,6 +584,14 @@ export default defineComponent({
      */
     'pinned',
     /**
+     * Emitted when pinned mode changes for `v-model:pinned`.
+     *
+     * @param value New pinned state.
+     * @param-type value Boolean
+     * @param-ts-type value boolean
+     */
+    'update:pinned',
+    /**
      * Emitted when maximized state changes.
      *
      * @param value New maximized state.
@@ -572,6 +600,14 @@ export default defineComponent({
      */
     'maximize',
     /**
+     * Emitted when maximized state changes for `v-model:maximized`.
+     *
+     * @param value New maximized state.
+     * @param-type value Boolean
+     * @param-ts-type value boolean
+     */
+    'update:maximized',
+    /**
      * Emitted when minimized state changes.
      *
      * @param value New minimized state.
@@ -579,6 +615,14 @@ export default defineComponent({
      * @param-ts-type value boolean
      */
     'minimize',
+    /**
+     * Emitted when minimized state changes for `v-model:minimized`.
+     *
+     * @param value New minimized state.
+     * @param-type value Boolean
+     * @param-ts-type value boolean
+     */
+    'update:minimized',
     /**
      * Emitted after the window moves, resizes, or restores position.
      *
@@ -621,338 +665,110 @@ export default defineComponent({
     'hide',
   ],
   setup(props, { slots, emit, expose }) {
-    const iconSetTemplate = ref({
-      visible: {
-        on: {
-          icon: 'close',
-          label: 'Show',
-        },
-        off: {
-          icon: 'close',
-          label: 'Hide',
-        },
-      },
-      embedded: {
-        on: {
-          icon: 'lock_outline',
-          label: 'Embed',
-        },
-        off: {
-          icon: 'lock_open',
-          label: 'Float',
-        },
-      },
-      pinned: {
-        on: {
-          icon: ICON_PIN,
-          label: 'Pin',
-        },
-        off: {
-          icon: ICON_PIN_OFF,
-          label: 'Unpin',
-        },
-      },
-      maximize: {
-        on: {
-          icon: 'arrow_upward',
-          label: 'Maximize',
-        },
-        off: {
-          icon: 'restore',
-          label: 'Restore',
-        },
-      },
-      fullscreen: {
-        on: {
-          icon: 'fullscreen',
-          label: 'Enter fullscreen',
-        },
-        off: {
-          icon: 'fullscreen_exit',
-          label: 'Leave fullscreen',
-        },
-      },
-      minimize: {
-        on: {
-          icon: 'arrow_downward',
-          label: 'Minimize',
-        },
-        off: {
-          icon: 'restore',
-          label: 'Restore',
-        },
-      },
-    })
+    const {
+      checkActionState,
+      computedVisibility,
+      emitVisibilityLifecycle,
+      getActionState,
+      getAvailableActions,
+      isEmbedded,
+      isFullscreen,
+      isMaximized,
+      isMinimized,
+      isPinned,
+      isVisible,
+      setActionState,
+      syncActionState,
+    } = useWindowState(emit)
 
-    const actionItems = ref<ActionStateMap>({
-      visible: {
-        state: true,
-        on: {
-          label:
-            props.iconSet !== void 0 &&
-            props.iconSet.visible !== void 0 &&
-            props.iconSet.visible.on !== void 0 &&
-            props.iconSet.visible.on.label !== void 0
-              ? props.iconSet.visible.on.label
-              : iconSetTemplate.value.visible.on.label,
-          icon:
-            props.iconSet !== void 0 &&
-            props.iconSet.visible !== void 0 &&
-            props.iconSet.visible.on !== void 0 &&
-            props.iconSet.visible.on.icon !== void 0
-              ? props.iconSet.visible.on.icon
-              : iconSetTemplate.value.visible.on.icon,
-          func: show,
-        },
-        off: {
-          label:
-            props.iconSet !== void 0 &&
-            props.iconSet.visible !== void 0 &&
-            props.iconSet.visible.off !== void 0 &&
-            props.iconSet.visible.off.label !== void 0
-              ? props.iconSet.visible.off.label
-              : iconSetTemplate.value.visible.off.label,
-          icon:
-            props.iconSet !== void 0 &&
-            props.iconSet.visible !== void 0 &&
-            props.iconSet.visible.off !== void 0 &&
-            props.iconSet.visible.off.icon !== void 0
-              ? props.iconSet.visible.off.icon
-              : iconSetTemplate.value.visible.off.icon,
-          func: hide,
-        },
-      },
-      embedded: {
-        state: true,
-        on: {
-          label:
-            props.iconSet !== void 0 &&
-            props.iconSet.embedded !== void 0 &&
-            props.iconSet.embedded.on !== void 0 &&
-            props.iconSet.embedded.on.label !== void 0
-              ? props.iconSet.embedded.on.label
-              : iconSetTemplate.value.embedded.on.label,
-          icon:
-            props.iconSet !== void 0 &&
-            props.iconSet.embedded !== void 0 &&
-            props.iconSet.embedded.on !== void 0 &&
-            props.iconSet.embedded.on.icon !== void 0
-              ? props.iconSet.embedded.on.icon
-              : iconSetTemplate.value.embedded.on.icon,
-          func: lock,
-        },
-        off: {
-          label:
-            props.iconSet !== void 0 &&
-            props.iconSet.embedded !== void 0 &&
-            props.iconSet.embedded.off !== void 0 &&
-            props.iconSet.embedded.off.label !== void 0
-              ? props.iconSet.embedded.off.label
-              : iconSetTemplate.value.embedded.off.label,
-          icon:
-            props.iconSet !== void 0 &&
-            props.iconSet.embedded !== void 0 &&
-            props.iconSet.embedded.off !== void 0 &&
-            props.iconSet.embedded.off.icon !== void 0
-              ? props.iconSet.embedded.off.icon
-              : iconSetTemplate.value.embedded.off.icon,
-          func: unlock,
-        },
-      },
-      pinned: {
-        state: false,
-        on: {
-          label:
-            props.iconSet !== void 0 &&
-            props.iconSet.pinned !== void 0 &&
-            props.iconSet.pinned.on !== void 0 &&
-            props.iconSet.pinned.on.label !== void 0
-              ? props.iconSet.pinned.on.label
-              : iconSetTemplate.value.pinned.on.label,
-          icon:
-            props.iconSet !== void 0 &&
-            props.iconSet.pinned !== void 0 &&
-            props.iconSet.pinned.on !== void 0 &&
-            props.iconSet.pinned.on.icon !== void 0
-              ? props.iconSet.pinned.on.icon
-              : iconSetTemplate.value.pinned.on.icon,
-          func: pin,
-        },
-        off: {
-          label:
-            props.iconSet !== void 0 &&
-            props.iconSet.pinned !== void 0 &&
-            props.iconSet.pinned.off !== void 0 &&
-            props.iconSet.pinned.off.label !== void 0
-              ? props.iconSet.pinned.off.label
-              : iconSetTemplate.value.pinned.off.label,
-          icon:
-            props.iconSet !== void 0 &&
-            props.iconSet.pinned !== void 0 &&
-            props.iconSet.pinned.off !== void 0 &&
-            props.iconSet.pinned.off.icon !== void 0
-              ? props.iconSet.pinned.off.icon
-              : iconSetTemplate.value.pinned.off.icon,
-          func: unpin,
-        },
-      },
-      fullscreen: {
-        state: false,
-        on: {
-          label:
-            props.iconSet !== void 0 &&
-            props.iconSet.fullscreen !== void 0 &&
-            props.iconSet.fullscreen.on !== void 0 &&
-            props.iconSet.fullscreen.on.label !== void 0
-              ? props.iconSet.fullscreen.on.label
-              : iconSetTemplate.value.fullscreen.on.label,
-          icon:
-            props.iconSet !== void 0 &&
-            props.iconSet.fullscreen !== void 0 &&
-            props.iconSet.fullscreen.on !== void 0 &&
-            props.iconSet.fullscreen.on.icon !== void 0
-              ? props.iconSet.fullscreen.on.icon
-              : iconSetTemplate.value.fullscreen.on.icon,
-          func: fullscreenEnter,
-        },
-        off: {
-          label:
-            props.iconSet !== void 0 &&
-            props.iconSet.fullscreen !== void 0 &&
-            props.iconSet.fullscreen.off !== void 0 &&
-            props.iconSet.fullscreen.off.label !== void 0
-              ? props.iconSet.fullscreen.off.label
-              : iconSetTemplate.value.fullscreen.off.label,
-          icon:
-            props.iconSet !== void 0 &&
-            props.iconSet.fullscreen !== void 0 &&
-            props.iconSet.fullscreen.off !== void 0 &&
-            props.iconSet.fullscreen.off.icon !== void 0
-              ? props.iconSet.fullscreen.off.icon
-              : iconSetTemplate.value.fullscreen.off.icon,
-          func: fullscreenLeave,
-        },
-      },
-      maximize: {
-        state: false,
-        on: {
-          label:
-            props.iconSet !== void 0 &&
-            props.iconSet.maximize !== void 0 &&
-            props.iconSet.maximize.on !== void 0 &&
-            props.iconSet.maximize.on.label !== void 0
-              ? props.iconSet.maximize.on.label
-              : iconSetTemplate.value.maximize.on.label,
-          icon:
-            props.iconSet !== void 0 &&
-            props.iconSet.maximize !== void 0 &&
-            props.iconSet.maximize.on !== void 0 &&
-            props.iconSet.maximize.on.icon !== void 0
-              ? props.iconSet.maximize.on.icon
-              : iconSetTemplate.value.maximize.on.icon,
-          func: maximize,
-        },
-        off: {
-          label:
-            props.iconSet !== void 0 &&
-            props.iconSet.maximize !== void 0 &&
-            props.iconSet.maximize.off !== void 0 &&
-            props.iconSet.maximize.off.label !== void 0
-              ? props.iconSet.maximize.off.label
-              : iconSetTemplate.value.maximize.off.label,
-          icon:
-            props.iconSet !== void 0 &&
-            props.iconSet.maximize !== void 0 &&
-            props.iconSet.maximize.off !== void 0 &&
-            props.iconSet.maximize.off.icon !== void 0
-              ? props.iconSet.maximize.off.icon
-              : iconSetTemplate.value.maximize.off.icon,
-          func: restore,
-        },
-      },
-      minimize: {
-        state: false,
-        on: {
-          label:
-            props.iconSet !== void 0 &&
-            props.iconSet.minimize !== void 0 &&
-            props.iconSet.minimize.on !== void 0 &&
-            props.iconSet.minimize.on.label !== void 0
-              ? props.iconSet.minimize.on.label
-              : iconSetTemplate.value.minimize.on.label,
-          icon:
-            props.iconSet !== void 0 &&
-            props.iconSet.minimize !== void 0 &&
-            props.iconSet.minimize.on !== void 0 &&
-            props.iconSet.minimize.on.icon !== void 0
-              ? props.iconSet.minimize.on.icon
-              : iconSetTemplate.value.minimize.on.icon,
-          func: minimize,
-        },
-        off: {
-          label:
-            props.iconSet !== void 0 &&
-            props.iconSet.minimize !== void 0 &&
-            props.iconSet.minimize.off !== void 0 &&
-            props.iconSet.minimize.off.label !== void 0
-              ? props.iconSet.minimize.off.label
-              : iconSetTemplate.value.minimize.off.label,
-          icon:
-            props.iconSet !== void 0 &&
-            props.iconSet.minimize !== void 0 &&
-            props.iconSet.minimize.off !== void 0 &&
-            props.iconSet.minimize.off.icon !== void 0
-              ? props.iconSet.minimize.off.icon
-              : iconSetTemplate.value.minimize.off.icon,
-          func: maximize,
-        },
-      },
-    })
+    function getIconSetValue(
+      action: keyof typeof defaultIconSet,
+      mode: 'on' | 'off',
+      field: 'label' | 'icon',
+    ) {
+      const customIconSet = props.iconSet as
+        | Record<string, Partial<Record<'on' | 'off', Partial<Record<'label' | 'icon', string>>>>>
+        | undefined
 
-    const shiftX = ref(0)
-    const shiftY = ref(0)
-    const mousePos = ref({
-      x: 0,
-      y: 0,
-    })
-    const statesTmp = ref({
-      tmpTop: 0,
-      tmpLeft: 0,
-      tmpRight: 0,
-      tmpBottom: 0,
-      tmpHeight: 0,
-      tmpWidth: 0,
-    })
+      return customIconSet?.[action]?.[mode]?.[field] ?? defaultIconSet[action][mode][field]
+    }
 
-    const states = ref({
-      top: 150,
-      left: 10,
-      bottom: 400,
-      right: 400,
-      minHeight: 100,
-      minWidth: 100,
-      shouldDrag: false,
-      dragging: false,
-    })
+    function createActionMenuItem(
+      action: keyof typeof defaultIconSet,
+      state: boolean,
+      onFunc: () => boolean | void,
+      offFunc: () => boolean | void,
+    ): QWindowActionMenuItemState {
+      return {
+        state,
+        on: {
+          label: getIconSetValue(action, 'on', 'label'),
+          icon: getIconSetValue(action, 'on', 'icon'),
+          func: onFunc,
+        },
+        off: {
+          label: getIconSetValue(action, 'off', 'label'),
+          icon: getIconSetValue(action, 'off', 'icon'),
+          func: offFunc,
+        },
+      }
+    }
 
-    const restoreState = ref({
-      top: 10,
-      left: 10,
-      bottom: 400,
-      right: 400,
-      zIndex: startingZIndex,
-      pinned: false,
-      embedded: false,
-      maximize: false,
-      minimize: false,
-    })
+    const actionItems = computed<Record<string, QWindowActionMenuItemState>>(() => ({
+      [ACTION_VISIBLE]: createActionMenuItem(ACTION_VISIBLE, isVisible.value, show, hide),
+      [ACTION_EMBEDDED]: createActionMenuItem(ACTION_EMBEDDED, isEmbedded.value, lock, unlock),
+      [ACTION_PINNED]: createActionMenuItem(ACTION_PINNED, isPinned.value, pin, unpin),
+      [ACTION_FULLSCREEN]: createActionMenuItem(
+        ACTION_FULLSCREEN,
+        isFullscreen.value,
+        fullscreenEnter,
+        fullscreenLeave,
+      ),
+      [ACTION_MAXIMIZE]: createActionMenuItem(
+        ACTION_MAXIMIZE,
+        isMaximized.value,
+        maximize,
+        restore,
+      ),
+      [ACTION_MINIMIZE]: createActionMenuItem(
+        ACTION_MINIMIZE,
+        isMinimized.value,
+        minimize,
+        restore,
+      ),
+    }))
+
+    const {
+      computedHeight,
+      computedPosition,
+      computedWidth,
+      initializePosition,
+      mousePos,
+      scrollX,
+      scrollY,
+      setFullWindowPosition,
+      setMinimizePosition,
+      shiftX,
+      shiftY,
+      states,
+      statesTmp,
+      updateScroll,
+    } = useWindowGeometry(props)
+
     QWindowCount = QWindowCount + 1
     const $q = useQuasar()
     const windowRef = ref<HTMLElement | null>(null)
-    const zIndex = ref(startingZIndex)
-    const scrollX = ref(0)
-    const scrollY = ref(0)
-    const selected = ref(false)
+    const { bringToFront, clearSelected, selected, setSelected, setZIndex, zIndex } =
+      useWindowStack(startingZIndex)
+    const { fullscreenRestoreState, restorePositionAndState, savePositionAndState } =
+      useWindowRestoreState({
+        states,
+        startingZIndex,
+        getZIndex: () => computedZIndex.value,
+        setZIndex,
+        getActionState,
+        setActionState,
+      })
     const resizeHandle = ref<string>()
     const fullscreenInitiated = ref(false)
     const teleportTarget = ref('#q-app')
@@ -965,29 +781,7 @@ export default defineComponent({
       // Initialize before first visible positioning so windows opened on scrolled pages do not
       // wait for a scroll event before aligning with the viewport.
       onScroll()
-
-      const startX = toNumber(props.startX, defaultX * QWindowCount)
-      const startY = toNumber(props.startY, defaultY * QWindowCount)
-      const width = toNumber(props.width, 400)
-      const height = toNumber(props.height, 400)
-
-      // calculate left starting position
-      if (startX > 0) {
-        states.value.left = startX
-      } else {
-        states.value.left = defaultX * QWindowCount
-      }
-      //
-      // calculate top starting position
-      if (startY > 0) {
-        states.value.top = startY
-      } else {
-        states.value.top = defaultY * QWindowCount
-      }
-
-      // calculate right and bottom starting positions
-      states.value.right = states.value.left + width
-      states.value.bottom = states.value.top + height
+      initializePosition(QWindowCount, defaultX, defaultY)
 
       if (props.modelValue !== void 0) {
         if (props.modelValue === true) {
@@ -1055,8 +849,11 @@ export default defineComponent({
 
     /**
      * Shows the window.
+     *
+     * @returns True when the window visibility changed.
+     * @example windowRef.value?.show()
      */
-    function show() {
+    function show(): boolean {
       if (checkActionState(ACTION_VISIBLE, true)) {
         setActionState(ACTION_VISIBLE, true)
         return true
@@ -1066,8 +863,11 @@ export default defineComponent({
 
     /**
      * Hides the window.
+     *
+     * @returns True when the window visibility changed.
+     * @example windowRef.value?.hide()
      */
-    function hide() {
+    function hide(): boolean {
       if (checkActionState(ACTION_VISIBLE, false)) {
         setActionState(ACTION_VISIBLE, false)
         return true
@@ -1076,7 +876,7 @@ export default defineComponent({
     }
 
     // embedded
-    function lock() {
+    function lock(): boolean {
       if (checkActionState(ACTION_EMBEDDED, true)) {
         setActionState(ACTION_EMBEDDED, true)
         return true
@@ -1085,7 +885,7 @@ export default defineComponent({
     }
 
     // floating
-    function unlock() {
+    function unlock(): boolean {
       if (checkActionState(ACTION_EMBEDDED, false)) {
         setActionState(ACTION_EMBEDDED, false)
         return true
@@ -1095,23 +895,42 @@ export default defineComponent({
 
     /**
      * Embeds the window back into the page layout.
+     *
+     * @returns True when embedded mode changed.
+     * @example windowRef.value?.embed()
      */
-    function embed() {
+    function embed(): boolean {
       return lock()
     }
 
     /**
      * Floats the window through Teleport so it can move and resize.
+     *
+     * @returns True when embedded mode changed.
+     * @example windowRef.value?.float()
      */
-    function float() {
+    function float(): boolean {
       return unlock()
+    }
+
+    /**
+     * Toggles between embedded and floating modes.
+     *
+     * @returns True when embedded mode changed.
+     * @example windowRef.value?.toggleEmbedded()
+     */
+    function toggleEmbedded(): boolean {
+      return getActionState(ACTION_EMBEDDED) === true ? float() : embed()
     }
 
     // pinned (can't move or re-size)
     /**
      * Pins the window so it cannot move or resize.
+     *
+     * @returns True when pinned mode changed.
+     * @example windowRef.value?.pin()
      */
-    function pin() {
+    function pin(): boolean {
       if (checkActionState(ACTION_PINNED, true)) {
         setActionState(ACTION_PINNED, true)
         return true
@@ -1122,8 +941,11 @@ export default defineComponent({
     // move and resize available, if not embedded
     /**
      * Unpins the window so it can move and resize again.
+     *
+     * @returns True when pinned mode changed.
+     * @example windowRef.value?.unpin()
      */
-    function unpin() {
+    function unpin(): boolean {
       if (checkActionState(ACTION_PINNED, false)) {
         setActionState(ACTION_PINNED, false)
         return true
@@ -1132,13 +954,26 @@ export default defineComponent({
     }
 
     /**
-     * Maximizes the window.
+     * Toggles pinned mode.
+     *
+     * @returns True when pinned mode changed.
+     * @example windowRef.value?.togglePinned()
      */
-    function maximize() {
+    function togglePinned(): boolean {
+      return getActionState(ACTION_PINNED) === true ? unpin() : pin()
+    }
+
+    /**
+     * Maximizes the window.
+     *
+     * @returns True when maximized mode changed.
+     * @example windowRef.value?.maximize()
+     */
+    function maximize(): boolean {
       if (checkActionState(ACTION_MAXIMIZE, true)) {
-        //thisbringToFront()
+        bringToFront()
         savePositionAndState()
-        setFullWindowPosition()
+        setFullWindowPosition($q.screen.width, $q.screen.height)
 
         setActionState(ACTION_EMBEDDED, false)
         setActionState(ACTION_MAXIMIZE, true)
@@ -1149,8 +984,11 @@ export default defineComponent({
 
     /**
      * Minimizes the window.
+     *
+     * @returns True when minimized mode changed.
+     * @example windowRef.value?.minimize()
      */
-    function minimize() {
+    function minimize(): boolean {
       if (checkActionState(ACTION_MINIMIZE, true)) {
         savePositionAndState()
         setMinimizePosition()
@@ -1164,8 +1002,11 @@ export default defineComponent({
 
     /**
      * Restores a maximized or minimized window.
+     *
+     * @returns True when the window restored from maximized or minimized mode.
+     * @example windowRef.value?.restore()
      */
-    function restore() {
+    function restore(): boolean {
       if (getActionState(ACTION_VISIBLE) !== true) {
         // not allowed
         return false
@@ -1181,20 +1022,66 @@ export default defineComponent({
     }
 
     /**
-     * Requests browser fullscreen for the window.
+     * Toggles maximized mode.
+     *
+     * @returns True when maximized mode changed.
+     * @example windowRef.value?.toggleMaximized()
      */
-    function enterFullscreen() {
+    function toggleMaximized(): boolean {
+      return getActionState(ACTION_MAXIMIZE) === true ? restore() : maximize()
+    }
+
+    /**
+     * Toggles minimized mode.
+     *
+     * @returns True when minimized mode changed.
+     * @example windowRef.value?.toggleMinimized()
+     */
+    function toggleMinimized(): boolean {
+      return getActionState(ACTION_MINIMIZE) === true ? restore() : minimize()
+    }
+
+    /**
+     * Requests browser fullscreen for the window.
+     *
+     * @returns True when fullscreen mode was requested.
+     * @example windowRef.value?.enterFullscreen()
+     */
+    function enterFullscreen(): boolean {
       return fullscreenEnter()
     }
 
     /**
      * Leaves browser fullscreen for the window.
+     *
+     * @returns True when fullscreen exit was requested.
+     * @example windowRef.value?.leaveFullscreen()
      */
-    function leaveFullscreen() {
+    function leaveFullscreen(): boolean {
       return fullscreenLeave()
     }
 
-    function fullscreenEnter() {
+    /**
+     * Toggles browser fullscreen mode.
+     *
+     * @returns True when fullscreen mode changed or was requested.
+     * @example windowRef.value?.toggleFullscreen()
+     */
+    function toggleFullscreen(): boolean {
+      return getActionState(ACTION_FULLSCREEN) === true ? leaveFullscreen() : enterFullscreen()
+    }
+
+    /**
+     * Returns the current window position and dimensions.
+     *
+     * @returns Current window position and dimensions.
+     * @example const position = windowRef.value?.getPosition()
+     */
+    function getPosition(): QWindowPosition {
+      return { ...computedPosition.value }
+    }
+
+    function fullscreenEnter(): boolean {
       if (checkActionState(ACTION_FULLSCREEN, true)) {
         fullscreenInitiated.value = true
         AppFullscreen.request(windowRef.value ?? undefined)
@@ -1204,181 +1091,12 @@ export default defineComponent({
     }
 
     // leave fullscreen mode
-    function fullscreenLeave() {
+    function fullscreenLeave(): boolean {
       if (checkActionState(ACTION_FULLSCREEN, false)) {
         AppFullscreen.exit()
         return true
       }
       return false
-    }
-
-    function checkActionState(mode: QWindowAction, state: boolean) {
-      let allowed = false
-      switch (mode) {
-        case ACTION_VISIBLE:
-          if (state) {
-            if (getActionState(ACTION_VISIBLE) !== true) {
-              allowed = true
-            }
-          } else {
-            if (getActionState(ACTION_VISIBLE) === true) {
-              allowed = true
-            }
-          }
-          break
-        case ACTION_EMBEDDED:
-          if (state) {
-            if (
-              getActionState(ACTION_EMBEDDED) !== true &&
-              getActionState(ACTION_FULLSCREEN) !== true
-            ) {
-              allowed = true
-            }
-          } else {
-            if (
-              getActionState(ACTION_EMBEDDED) === true &&
-              getActionState(ACTION_FULLSCREEN) !== true
-            ) {
-              allowed = true
-            }
-          }
-          break
-        case ACTION_PINNED:
-          if (state) {
-            if (
-              getActionState(ACTION_PINNED) !== true &&
-              getActionState(ACTION_EMBEDDED) !== true &&
-              getActionState(ACTION_MAXIMIZE) !== true &&
-              getActionState(ACTION_MINIMIZE) !== true &&
-              getActionState(ACTION_FULLSCREEN) !== true
-            ) {
-              allowed = true
-            }
-          } else {
-            if (
-              getActionState(ACTION_PINNED) === true &&
-              getActionState(ACTION_EMBEDDED) !== true &&
-              getActionState(ACTION_MAXIMIZE) !== true &&
-              getActionState(ACTION_MINIMIZE) !== true &&
-              getActionState(ACTION_FULLSCREEN) !== true
-            ) {
-              allowed = true
-            }
-          }
-          break
-        case ACTION_MAXIMIZE:
-          if (state) {
-            if (
-              getActionState(ACTION_MINIMIZE) !== true &&
-              getActionState(ACTION_EMBEDDED) !== true &&
-              getActionState(ACTION_MAXIMIZE) !== true &&
-              getActionState(ACTION_FULLSCREEN) !== true
-            ) {
-              allowed = true
-            }
-          } else {
-            if (
-              getActionState(ACTION_MAXIMIZE) === true &&
-              getActionState(ACTION_EMBEDDED) !== true &&
-              getActionState(ACTION_MINIMIZE) !== true &&
-              getActionState(ACTION_FULLSCREEN) !== true
-            ) {
-              allowed = true
-            }
-          }
-          break
-        case ACTION_FULLSCREEN:
-          if (state === true) {
-            if (
-              getActionState(ACTION_FULLSCREEN) !== true &&
-              getActionState(ACTION_EMBEDDED) !== true
-            ) {
-              allowed = true
-            }
-          } else {
-            if (
-              getActionState(ACTION_FULLSCREEN) === true &&
-              getActionState(ACTION_EMBEDDED) !== true
-            ) {
-              allowed = true
-            }
-          }
-          break
-        case ACTION_CLOSE:
-          if (state === true) {
-            if (getActionState(ACTION_EMBEDDED) !== true) {
-              allowed = true
-            }
-          } else {
-            allowed = true
-          }
-          break
-        default:
-          throw Error(`Unknown action type ${mode}`)
-      }
-      return allowed
-    }
-
-    //
-    function getActionState(name: QWindowAction) {
-      const item = actionItems.value[name]
-      if (item !== void 0) {
-        return item.state
-      }
-      return false
-    }
-
-    //
-    function setActionState(id: QWindowAction, val: boolean) {
-      const item = actionItems.value[id]
-      if (item !== void 0) {
-        const changed = item.state !== val
-        item.state = val
-        if (changed === true) {
-          emitActionState(id, val)
-        }
-        return true
-      }
-      return false
-    }
-
-    function syncActionState(id: QWindowAction, val: boolean) {
-      const item = actionItems.value[id]
-      if (item !== void 0) {
-        const changed = item.state !== val
-        item.state = val
-        return changed
-      }
-      return false
-    }
-
-    function emitVisibilityLifecycle(val: boolean) {
-      emit(val === true ? 'show' : 'hide')
-    }
-
-    function emitActionState(id: QWindowAction, val: boolean) {
-      switch (id) {
-        case ACTION_VISIBLE:
-          emit('update:modelValue', val)
-          emit('input', val)
-          emitVisibilityLifecycle(val)
-          break
-        case ACTION_EMBEDDED:
-          emit('embedded', val)
-          break
-        case ACTION_PINNED:
-          emit('pinned', val)
-          break
-        case ACTION_FULLSCREEN:
-          emit('fullscreen', val)
-          break
-        case ACTION_MAXIMIZE:
-          emit('maximize', val)
-          break
-        case ACTION_MINIMIZE:
-          emit('minimize', val)
-          break
-      }
     }
 
     function emitPosition() {
@@ -1390,6 +1108,61 @@ export default defineComponent({
       (val) => {
         if (syncActionState(ACTION_VISIBLE, val) === true) {
           emitVisibilityLifecycle(val)
+        }
+      },
+    )
+
+    watch(
+      () => props.embedded,
+      (val) => {
+        if (val === true) {
+          embed()
+        } else {
+          float()
+        }
+      },
+    )
+
+    watch(
+      () => props.pinned,
+      (val) => {
+        if (val === true) {
+          pin()
+        } else {
+          unpin()
+        }
+      },
+    )
+
+    watch(
+      () => props.fullscreen,
+      (val) => {
+        if (val === true) {
+          enterFullscreen()
+        } else {
+          leaveFullscreen()
+        }
+      },
+    )
+
+    watch(
+      () => props.maximized,
+      (val) => {
+        if (val === true) {
+          maximize()
+        } else if (getActionState(ACTION_MAXIMIZE) === true) {
+          restore()
+        }
+      },
+    )
+
+    watch(
+      () => props.minimized,
+      (val) => {
+        if (val === true) {
+          minimize()
+        } else if (getActionState(ACTION_MINIMIZE) === true) {
+          restore()
         }
       },
     )
@@ -1407,11 +1180,7 @@ export default defineComponent({
     })
 
     function onScroll() {
-      const win = getWindow()
-      if (win !== void 0) {
-        scrollY.value = win.scrollY
-        scrollX.value = win.scrollX
-      }
+      updateScroll(getWindow())
     }
 
     function canBeSelected(_x: number, _y: number): boolean {
@@ -1433,274 +1202,13 @@ export default defineComponent({
       return true
     }
 
-    //
-    function setFullWindowPosition() {
-      states.value.top = 0
-      states.value.left = 0
-      states.value.bottom = $q.screen.height
-      states.value.right = $q.screen.width
-    }
-
-    //
-    function setMinimizePosition() {
-      // Reserved for future docked minimization placement.
-    }
-
-    // //// MOUSE ACTIONS
-    function addEventListeners() {
-      const doc = getDocument()
-      if (doc === void 0) {
-        return
+    function selectWindow(x: number, y: number): boolean {
+      const canSelect = canBeSelected(x, y)
+      setSelected(canSelect)
+      if (canSelect === true) {
+        bringToFront()
       }
-
-      doc.body.addEventListener('mousemove', onMouseMove, { capture: true })
-      doc.body.addEventListener('mouseup', onMouseUp, { capture: true })
-      doc.body.addEventListener('keyup', onKeyUp, { capture: true })
-    }
-
-    function removeEventListeners() {
-      const doc = getDocument()
-      if (doc === void 0) {
-        return
-      }
-
-      doc.body.removeEventListener('mousemove', onMouseMove, { capture: true })
-      doc.body.removeEventListener('mouseup', onMouseUp, { capture: true })
-      doc.body.removeEventListener('keyup', onKeyUp, { capture: true })
-    }
-
-    function onMouseMove(evt: PointerLikeEvent, rh?: string) {
-      if (states.value.shouldDrag !== true || (!('touches' in evt) && evt.buttons !== 1)) {
-        removeEventListeners()
-        return
-      }
-
-      const mouseX = getMousePosition(evt, 'x')
-      const mouseY = getMousePosition(evt, 'y')
-      const win = getWindow()
-
-      // wait 3 pixel move to initiate drag
-      if (states.value.dragging !== true) {
-        if (Math.abs(mousePos.value.x - mouseX) >= 3 || Math.abs(mousePos.value.y - mouseY) >= 3) {
-          states.value.dragging = true
-          emit('beforeDrag', evt)
-        } else {
-          return
-        }
-      }
-
-      switch (rh || resizeHandle.value) {
-        case 'top':
-          states.value.top = mouseY - (win?.scrollY ?? 0) - shiftY.value
-          nextTick(() => {
-            if (computedHeight.value < states.value.minHeight) {
-              states.value.top = statesTmp.value.tmpBottom - states.value.minHeight
-            }
-          })
-          break
-        case 'left':
-          states.value.left = mouseX - (win?.pageXOffset ?? 0) - shiftX.value
-          nextTick(() => {
-            if (computedWidth.value < states.value.minWidth) {
-              states.value.left = statesTmp.value.tmpRight - states.value.minWidth
-            }
-          })
-          break
-        case 'right':
-          states.value.right = mouseX - (win?.pageXOffset ?? 0)
-          nextTick(() => {
-            if (computedWidth.value < states.value.minWidth) {
-              states.value.right = statesTmp.value.tmpLeft + states.value.minWidth
-            }
-          })
-          break
-        case 'bottom':
-          states.value.bottom = mouseY - (win?.scrollY ?? 0)
-          nextTick(() => {
-            if (computedHeight.value < states.value.minHeight) {
-              states.value.bottom = statesTmp.value.tmpTop + states.value.minHeight
-            }
-          })
-          break
-        case 'top-left':
-          onMouseMove(evt, 'top')
-          onMouseMove(evt, 'left')
-          break
-        case 'top-right':
-          onMouseMove(evt, 'top')
-          onMouseMove(evt, 'right')
-          break
-        case 'bottom-left':
-          onMouseMove(evt, 'bottom')
-          onMouseMove(evt, 'left')
-          break
-        case 'bottom-right':
-          onMouseMove(evt, 'bottom')
-          onMouseMove(evt, 'right')
-          break
-        case 'titlebar':
-          if (props.scrollWithWindow === true) {
-            states.value.top = mouseY - shiftY.value
-            states.value.left = mouseX - shiftX.value
-          } else {
-            states.value.top = mouseY - (win?.pageYOffset ?? 0) - shiftY.value
-            states.value.left = mouseX - (win?.pageXOffset ?? 0) - shiftX.value
-          }
-
-          states.value.bottom = states.value.top + statesTmp.value.tmpHeight
-          states.value.right = states.value.left + statesTmp.value.tmpWidth
-          break
-      }
-      stopAndPrevent(evt)
-    }
-
-    function onMouseDown(evt: PointerLikeEvent, rh?: string) {
-      removeEventListeners()
-      selected.value = false
-      if (!('touches' in evt) && evt.buttons !== 1) {
-        return
-      }
-
-      if (isEmbedded.value === true) {
-        states.value.shouldDrag = states.value.dragging = false
-        return
-      }
-
-      const x = getMousePosition(evt, 'x')
-      const y = getMousePosition(evt, 'y')
-
-      selected.value = canBeSelected(x - scrollX.value, y - scrollY.value)
-      if (selected.value !== true) {
-        return
-      }
-
-      //bringToFront()
-
-      resizeHandle.value = rh
-
-      mousePos.value.x = x
-      mousePos.value.y = y
-
-      if (windowRef.value === null) {
-        return
-      }
-
-      const rect = windowRef.value.getBoundingClientRect()
-      shiftX.value = getMouseShift(evt, rect, 'x')
-      shiftY.value = getMouseShift(evt, rect, 'y')
-
-      statesTmp.value.tmpTop = states.value.top
-      statesTmp.value.tmpLeft = states.value.left
-      statesTmp.value.tmpRight = states.value.right
-      statesTmp.value.tmpBottom = states.value.bottom
-      statesTmp.value.tmpHeight = statesTmp.value.tmpBottom - statesTmp.value.tmpTop
-      statesTmp.value.tmpWidth = statesTmp.value.tmpRight - statesTmp.value.tmpLeft
-
-      states.value.shouldDrag = true
-
-      addEventListeners()
-      if ('touches' in evt) {
-        const doc = getDocument()
-        if (doc !== void 0) {
-          addClass(doc.body, 'q-window__touch-action')
-        }
-      }
-      prevent(evt)
-    }
-
-    // mousedown for document.body
-    function onMouseDownBody(e: MouseEvent) {
-      if (isEmbedded.value) {
-        states.value.shouldDrag = states.value.dragging = false
-        return
-      }
-
-      // if dragging, already selected
-      if (states.value.dragging !== true) {
-        const x = getMousePosition(e, 'x')
-        const y = getMousePosition(e, 'y')
-
-        selected.value = canBeSelected(x - scrollX.value, y - scrollY.value)
-        if (selected.value) {
-          //bringToFront()
-        }
-      }
-    }
-
-    function onMouseUp(e: MouseEvent | TouchEvent) {
-      if (states.value.dragging === true) {
-        prevent(e)
-        removeEventListeners()
-        if ('touches' in e) {
-          const doc = getDocument()
-          if (doc !== void 0) {
-            removeClass(doc.body, 'q-window__touch-action')
-          }
-        }
-        states.value.shouldDrag = states.value.dragging = false
-        emit('afterDrag', e)
-        emitPosition()
-      }
-    }
-
-    function onKeyUp(e: KeyboardEvent) {
-      // if ESC key
-      if (e.keyCode === 27 && isDragging.value === true) {
-        prevent(e)
-        removeEventListeners()
-        states.value.shouldDrag = states.value.dragging = false
-        states.value.top = statesTmp.value.tmpTop
-        states.value.left = statesTmp.value.tmpLeft
-        states.value.right = statesTmp.value.tmpRight
-        states.value.bottom = statesTmp.value.tmpBottom
-        nextTick(() => {
-          emit('canceled', computedPosition.value)
-        })
-      }
-    }
-
-    function onTouchMove(e: TouchEvent, handle: string) {
-      stopAndPrevent(e)
-      resizeHandle.value = handle
-      onMouseMove(e)
-    }
-
-    function onTouchStart(e: TouchEvent, handle: string) {
-      stopAndPrevent(e)
-      onMouseDown(e, handle)
-    }
-
-    function onTouchEnd(e: TouchEvent, handle: string) {
-      stopAndPrevent(e)
-      resizeHandle.value = handle
-      onMouseUp(e)
-    }
-
-    const savePositionAndState = () => {
-      restoreState.value.top = states.value.top
-      restoreState.value.left = states.value.left
-      restoreState.value.bottom = states.value.bottom
-      restoreState.value.right = states.value.right
-
-      restoreState.value.zIndex = computedZIndex.value
-
-      restoreState.value.pinned = getActionState(ACTION_PINNED)
-      restoreState.value.embedded = getActionState(ACTION_EMBEDDED)
-      restoreState.value.maximize = getActionState(ACTION_MAXIMIZE)
-      restoreState.value.minimize = getActionState(ACTION_MINIMIZE)
-    }
-
-    const restorePositionAndState = () => {
-      states.value.top = restoreState.value.top
-      states.value.left = restoreState.value.left
-      states.value.bottom = restoreState.value.bottom
-      states.value.right = restoreState.value.right
-      zIndex.value = restoreState.value.zIndex
-
-      setActionState(ACTION_PINNED, restoreState.value.pinned)
-      setActionState(ACTION_EMBEDDED, restoreState.value.embedded)
-      setActionState(ACTION_MAXIMIZE, restoreState.value.maximize)
-      setActionState(ACTION_MINIMIZE, restoreState.value.minimize)
+      return canSelect
     }
 
     watch(
@@ -1738,10 +1246,10 @@ export default defineComponent({
           return
         }
         if (val === true) {
-          savePositionAndState()
-          zIndex.value = maxZIndex
+          savePositionAndState(fullscreenRestoreState.value)
+          setZIndex(maxZIndex)
         } else {
-          restorePositionAndState()
+          restorePositionAndState(fullscreenRestoreState.value)
           fullscreenInitiated.value = val
           nextTick(emitPosition)
         }
@@ -1775,30 +1283,6 @@ export default defineComponent({
         }
       },
     )
-    const isVisible = computed(() => {
-      return getActionState(ACTION_VISIBLE)
-    })
-
-    const isEmbedded = computed(() => {
-      return getActionState(ACTION_EMBEDDED)
-    })
-
-    const isPinned = computed(() => {
-      return getActionState(ACTION_PINNED)
-    })
-
-    const isFullscreen = computed(() => {
-      return getActionState(ACTION_FULLSCREEN)
-    })
-
-    const isMaximized = computed(() => {
-      return getActionState(ACTION_MAXIMIZE)
-    })
-
-    const isMinimized = computed(() => {
-      return getActionState(ACTION_MINIMIZE)
-    })
-
     const isDisabled = computed(() => {
       return props.disabled === true
     })
@@ -1826,57 +1310,91 @@ export default defineComponent({
       )
     }
 
-    const computedVisibility = computed(() => {
-      return isVisible.value === true ? ACTION_VISIBLE : ACTION_HIDDEN
+    const {
+      onMouseDown,
+      onMouseDownBody,
+      onTouchEnd,
+      onTouchMove,
+      onTouchStart,
+      removeEventListeners,
+    } = useWindowInteraction({
+      addClass,
+      clearSelected,
+      computedHeight,
+      computedPosition,
+      computedWidth,
+      emitAfterDrag: (evt) => emit('afterDrag', evt),
+      emitBeforeDrag: (evt) => emit('beforeDrag', evt),
+      emitCanceled: (position) => emit('canceled', position),
+      emitPosition,
+      isEmbedded,
+      isDragging,
+      mousePos,
+      props,
+      removeClass,
+      resizeHandle,
+      scrollX,
+      scrollY,
+      selectWindow,
+      shiftX,
+      shiftY,
+      states,
+      statesTmp,
+      windowRef,
     })
+
+    function onTitlebarDoubleClick(evt: MouseEvent) {
+      const target = evt.target
+
+      if (isTitlebarInteractiveTarget(target) === true) {
+        return
+      }
+
+      if (
+        isVisible.value === true &&
+        isEmbedded.value !== true &&
+        isFullscreen.value !== true &&
+        isMinimized.value !== true
+      ) {
+        toggleMaximized()
+      }
+    }
+
+    function isTitlebarInteractiveTarget(target: EventTarget | null) {
+      return (
+        target instanceof HTMLElement &&
+        target.closest('a, button, input, select, textarea, [role="button"]') !== null
+      )
+    }
+
+    function onTitlebarMouseDown(evt: MouseEvent) {
+      if (isTitlebarInteractiveTarget(evt.target) !== true) {
+        onMouseDown(evt, 'titlebar')
+      }
+    }
+
+    function onTitlebarTouchStart(evt: TouchEvent) {
+      if (isTitlebarInteractiveTarget(evt.target) !== true) {
+        onTouchStart(evt, 'titlebar')
+      }
+    }
+
+    function onWindowKeydown(evt: KeyboardEvent) {
+      if (evt.defaultPrevented === true || evt.key !== 'Escape') {
+        return
+      }
+
+      if (isFullscreen.value === true) {
+        leaveFullscreen()
+        evt.preventDefault()
+      } else if (isMaximized.value === true || isMinimized.value === true) {
+        restore()
+        evt.preventDefault()
+      }
+    }
 
     const computedToolbarHeight = computed(() => {
       return props.headless === true ? 0 : props.dense === true ? 28 : 40
-    })
-
-    const computedLeft = computed(() => {
-      return states.value.left
-    })
-
-    const computedTop = computed(() => {
-      return states.value.top
-    })
-
-    const computedRight = computed(() => {
-      return states.value.right
-    })
-
-    const computedBottom = computed(() => {
-      return states.value.bottom
-    })
-
-    const computedHeight = computed(() => {
-      const height = computedBottom.value - computedTop.value
-      return height
-    })
-
-    const computedWidth = computed(() => {
-      const width = computedRight.value - computedLeft.value
-      return width
-    })
-
-    const computedScrollX = computed(() => {
-      return computedLeft.value + (props.scrollWithWindow !== true ? scrollX.value : 0)
-    })
-
-    const computedScrollY = computed(() => {
-      return computedTop.value + (props.scrollWithWindow !== true ? scrollY.value : 0)
-    })
-
-    const computedPosition = computed<QWindowPosition>(() => {
-      return {
-        height: computedHeight.value,
-        left: computedLeft.value,
-        scrollX: computedScrollX.value,
-        scrollY: computedScrollY.value,
-        top: computedTop.value,
-        width: computedWidth.value,
-      }
     })
 
     const computedZIndex = computed(() => {
@@ -1885,45 +1403,7 @@ export default defineComponent({
       return zIndex.value + extra
     })
 
-    const computedActions = computed(() => {
-      // sort and pick ones that are visible based on user selection and state
-      const actions: QWindowAction[] = []
-      if (
-        props.actions.includes(ACTION_EMBEDDED) &&
-        (checkActionState(ACTION_EMBEDDED, true) || checkActionState(ACTION_EMBEDDED, false))
-      ) {
-        actions.push(ACTION_EMBEDDED)
-      }
-      if (
-        props.actions.includes(ACTION_PINNED) &&
-        (checkActionState(ACTION_PINNED, true) || checkActionState(ACTION_PINNED, false))
-      ) {
-        actions.push(ACTION_PINNED)
-      }
-      if (
-        props.actions.includes(ACTION_FULLSCREEN) &&
-        (checkActionState(ACTION_FULLSCREEN, true) || checkActionState(ACTION_FULLSCREEN, false))
-      ) {
-        actions.push(ACTION_FULLSCREEN)
-      }
-      if (
-        props.actions.includes(ACTION_MAXIMIZE) &&
-        (checkActionState(ACTION_MAXIMIZE, true) || checkActionState(ACTION_MAXIMIZE, false))
-      ) {
-        actions.push(ACTION_MAXIMIZE)
-      }
-      if (
-        props.actions.includes(ACTION_MINIMIZE) &&
-        (checkActionState(ACTION_MINIMIZE, true) || checkActionState(ACTION_MINIMIZE, false))
-      ) {
-        actions.push(ACTION_MINIMIZE)
-      }
-      if (props.actions.includes(ACTION_CLOSE) && checkActionState(ACTION_CLOSE, true)) {
-        actions.push(ACTION_VISIBLE)
-      }
-
-      return actions
-    })
+    const computedActions = computed<QWindowAction[]>(() => getAvailableActions(props.actions))
 
     const computedMenuData = computed(() => {
       // get stateInfo for each menu item
@@ -2046,7 +1526,9 @@ export default defineComponent({
       isEmbedded,
       isMinimized,
       computedMenuData,
-      renderResizeHandle,
+      onTitlebarDoubleClick,
+      onTitlebarMouseDown,
+      onTitlebarTouchStart,
     )
 
     // expose public methods
@@ -2055,13 +1537,19 @@ export default defineComponent({
       hide,
       embed,
       float,
+      toggleEmbedded,
       pin,
       unpin,
+      togglePinned,
       maximize,
       minimize,
       restore,
+      toggleMaximized,
+      toggleMinimized,
       enterFullscreen,
       leaveFullscreen,
+      toggleFullscreen,
+      getPosition,
     })
 
     const { renderBody } = useBody(
@@ -2083,6 +1571,11 @@ export default defineComponent({
           class: ['q-window', __classes.value, props.contentClass],
           style: __style.value,
           ref: windowRef,
+          role: props.ariaRole,
+          tabindex: isEnabled.value === true ? 0 : -1,
+          'aria-label': props.ariaLabel ?? props.title ?? 'QWindow',
+          'aria-disabled': isEnabled.value === true ? void 0 : 'true',
+          onKeydown: onWindowKeydown,
         },
         [
           canDrag() === true && [...renderResizeHandles()],

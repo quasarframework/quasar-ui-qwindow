@@ -77,6 +77,10 @@ body {
       font-size: 0.8rem !important;
     }
 
+    &--movable {
+      cursor: move !important;
+    }
+
     &--title {
       display: flex;
       flex-wrap: nowrap;

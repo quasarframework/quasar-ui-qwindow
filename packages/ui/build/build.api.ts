@@ -32,6 +32,7 @@ interface ApiEntry {
   desc?: string
   type?: string | string[]
   tsType?: string
+  tsSignature?: string
   values?: unknown[]
 }
 
@@ -183,8 +184,18 @@ function getPropsTypes(api: ComponentApi): string {
 
 function getMethodsTypes(api: ComponentApi): string {
   return Object.entries(api.methods || {})
-    .map(([name, entry]) => `${getComment(entry)}  ${name}(): void`)
+    .map(([name, entry]) => `${getComment(entry)}  ${getMethodSignature(name, entry)}`)
     .join('\n')
+}
+
+function getMethodSignature(name: string, entry: ApiEntry): string {
+  const match = entry.tsSignature?.match(/^function\s+[^(]+\((.*)\):\s*(.+)$/)
+
+  if (match !== undefined && match !== null) {
+    return `${name}(${match[1]}): ${match[2]}`
+  }
+
+  return `${name}(): void`
 }
 
 function getSourceTypeNames(): string[] {
