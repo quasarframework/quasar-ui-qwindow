@@ -1,13 +1,14 @@
 <template>
   <div class="q-pa-md q-window-native-stage column items-center justify-center">
     <q-window
-      v-if="showing"
+      ref="windowRef"
       v-model="showing"
-      embedded
+      v-model:embedded="embedded"
+      v-model:maximized="maximized"
+      v-bind="windowProps"
       no-menu
       hide-grippers
       hide-toolbar-divider
-      :height="340"
       :content-style="windowStyle"
       :titlebar-style="titlebarStyle"
     >
@@ -17,15 +18,30 @@
             <button
               class="mac-control mac-control--close"
               type="button"
-              aria-label="Close macOS window"
+              aria-label="Embed macOS window"
               @pointerdown.stop
-              @click.stop="showing = false"
+              @click.stop="dockWindow"
             />
             <span class="mac-control mac-control--minimize" aria-hidden="true" />
-            <span class="mac-control mac-control--zoom" aria-hidden="true" />
+            <button
+              class="mac-control mac-control--zoom"
+              type="button"
+              aria-label="Maximize macOS window"
+              @pointerdown.stop
+              @click.stop="toggleZoom"
+            />
           </div>
           <div class="mac-title col text-center">Notes</div>
-          <div class="mac-toolbar-spacer" />
+          <div class="mac-toolbar-spacer row justify-end">
+            <button
+              class="mac-titlebar-action"
+              type="button"
+              @pointerdown.stop
+              @click.stop="toggleEmbeddedMode"
+            >
+              {{ embedded ? 'Float' : 'Embed' }}
+            </button>
+          </div>
         </div>
       </template>
 
@@ -55,31 +71,64 @@
         </section>
       </div>
     </q-window>
-
-    <div v-else class="native-reopen column items-center justify-center text-center">
-      <div class="text-subtitle2 text-weight-bold">macOS-style window closed</div>
-      <div class="text-body2 text-blue-grey-7 q-mt-xs">
-        The custom close control updates the QWindow model just like the built-in close action.
-      </div>
-      <q-btn
-        class="q-mt-md"
-        color="primary"
-        unelevated
-        label="Reopen macOS window"
-        @click="showing = true"
-      />
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { QWindow } from '@quasar/quasar-ui-qwindow'
+import { nextTick, ref } from 'vue'
+import { QWindow, useQWindowResponsiveProps } from '@quasar/quasar-ui-qwindow'
 import '@quasar/quasar-ui-qwindow/src/index.scss'
 
+type WindowRef = {
+  embed: () => boolean
+  float: () => boolean
+  restore: () => boolean
+  toggleMaximized: () => boolean
+}
+
+const windowRef = ref<WindowRef | null>(null)
 const showing = ref(true)
+const embedded = ref(true)
+const maximized = ref(false)
 const activeFolder = ref('Today')
 const folders = ['Today', 'Pinned', 'Archive']
+const windowProps = useQWindowResponsiveProps({
+  width: 720,
+  height: 340,
+  startX: 96,
+  startY: 132,
+  mobileWidth: 340,
+  mobileHeight: 440,
+  mobileStartX: 16,
+  mobileStartY: 88,
+})
+
+async function dockWindow() {
+  if (maximized.value === true) {
+    windowRef.value?.restore()
+    await nextTick()
+  }
+
+  windowRef.value?.embed()
+}
+
+async function toggleEmbeddedMode() {
+  if (embedded.value === true) {
+    windowRef.value?.float()
+    return
+  }
+
+  await dockWindow()
+}
+
+async function toggleZoom() {
+  if (embedded.value === true) {
+    windowRef.value?.float()
+    await nextTick()
+  }
+
+  windowRef.value?.toggleMaximized()
+}
 
 const windowStyle = {
   border: '1px solid rgba(15, 23, 42, 0.16)',
@@ -100,16 +149,6 @@ const titlebarStyle = {
 .q-window-native-stage {
   min-height: 460px;
   background: linear-gradient(135deg, #eff6ff, #f8fafc 48%, #eef2ff);
-}
-
-.native-reopen {
-  width: min(100%, 520px);
-  padding: 20px;
-  border: 1px solid rgba(148, 163, 184, 0.34);
-  border-radius: 14px;
-  color: #1e293b;
-  background: rgba(255, 255, 255, 0.84);
-  box-shadow: 0 12px 34px rgba(15, 23, 42, 0.12);
 }
 
 .mac-titlebar {
@@ -135,7 +174,8 @@ const titlebarStyle = {
   box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.16);
 }
 
-button.mac-control {
+button.mac-control,
+.mac-titlebar-action {
   cursor: pointer;
 }
 
@@ -174,6 +214,21 @@ button.mac-control {
 
 .mac-toolbar-spacer {
   width: 76px;
+}
+
+.mac-titlebar-action {
+  padding: 3px 9px;
+  border: 1px solid rgba(148, 163, 184, 0.34);
+  border-radius: 999px;
+  color: #334155;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.mac-titlebar-action:hover {
+  background: #ffffff;
 }
 
 .mac-window {
@@ -260,10 +315,6 @@ button.mac-control {
   .q-window-native-stage {
     min-height: 430px;
     padding: 12px;
-  }
-
-  .native-reopen {
-    padding: 16px;
   }
 
   .mac-window {

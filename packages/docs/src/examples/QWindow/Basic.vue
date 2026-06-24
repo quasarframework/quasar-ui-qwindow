@@ -5,6 +5,7 @@
       v-bind="windowProps"
       embedded
       title="Project Notes"
+      :actions="windowActions"
       :content-style="windowStyle"
       :titlebar-style="titlebarStyle"
       gripper-background-color="#f8fafc"
@@ -32,6 +33,7 @@ import { QWindow, useQWindowResponsiveProps } from '@quasar/quasar-ui-qwindow'
 import '@quasar/quasar-ui-qwindow/src/index.scss'
 
 const showing = ref(true)
+const windowActions = ['pinned', 'embedded']
 const windowProps = useQWindowResponsiveProps({
   width: 420,
   height: 260,

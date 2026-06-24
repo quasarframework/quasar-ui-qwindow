@@ -1,13 +1,14 @@
 <template>
   <div class="q-pa-md q-window-native-stage column items-center justify-center">
     <q-window
-      v-if="showing"
+      ref="windowRef"
       v-model="showing"
-      embedded
+      v-model:embedded="embedded"
+      v-model:maximized="maximized"
+      v-bind="windowProps"
       no-menu
       hide-grippers
       hide-toolbar-divider
-      :height="340"
       :content-style="windowStyle"
       :titlebar-style="titlebarStyle"
     >
@@ -20,15 +21,29 @@
             <span />
           </div>
           <div class="win-title col ellipsis">QWindow Studio</div>
+          <button
+            class="win-titlebar-action"
+            type="button"
+            @pointerdown.stop
+            @click.stop="toggleEmbeddedMode"
+          >
+            {{ embedded ? 'Float' : 'Embed' }}
+          </button>
           <div class="win-controls row no-wrap">
             <span class="win-control" aria-hidden="true">-</span>
-            <span class="win-control win-control--maximize" aria-hidden="true" />
+            <button
+              class="win-control win-control--maximize"
+              type="button"
+              aria-label="Maximize Windows window"
+              @pointerdown.stop
+              @click.stop="toggleZoom"
+            />
             <button
               class="win-control win-control--close"
               type="button"
-              aria-label="Close Windows window"
+              aria-label="Embed Windows window"
               @pointerdown.stop
-              @click.stop="showing = false"
+              @click.stop="dockWindow"
             />
           </div>
         </div>
@@ -78,29 +93,25 @@
         </div>
       </div>
     </q-window>
-
-    <div v-else class="native-reopen column items-center justify-center text-center">
-      <div class="text-subtitle2 text-weight-bold">Windows-style window closed</div>
-      <div class="text-body2 text-blue-grey-7 q-mt-xs">
-        The custom close button updates the QWindow model while the example stays embedded.
-      </div>
-      <q-btn
-        class="q-mt-md"
-        color="primary"
-        unelevated
-        label="Reopen Windows window"
-        @click="showing = true"
-      />
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { QWindow } from '@quasar/quasar-ui-qwindow'
+import { nextTick, ref } from 'vue'
+import { QWindow, useQWindowResponsiveProps } from '@quasar/quasar-ui-qwindow'
 import '@quasar/quasar-ui-qwindow/src/index.scss'
 
+type WindowRef = {
+  embed: () => boolean
+  float: () => boolean
+  restore: () => boolean
+  toggleMaximized: () => boolean
+}
+
+const windowRef = ref<WindowRef | null>(null)
 const showing = ref(true)
+const embedded = ref(true)
+const maximized = ref(false)
 const activeCommand = ref('View')
 const activeNav = ref('Dashboard')
 const commands = ['File', 'Edit', 'View']
@@ -110,6 +121,43 @@ const metrics = [
   { label: 'Pinned', value: '4' },
   { label: 'Events', value: '38' },
 ]
+const windowProps = useQWindowResponsiveProps({
+  width: 740,
+  height: 340,
+  startX: 220,
+  startY: 210,
+  mobileWidth: 340,
+  mobileHeight: 480,
+  mobileStartX: 16,
+  mobileStartY: 128,
+})
+
+async function dockWindow() {
+  if (maximized.value === true) {
+    windowRef.value?.restore()
+    await nextTick()
+  }
+
+  windowRef.value?.embed()
+}
+
+async function toggleEmbeddedMode() {
+  if (embedded.value === true) {
+    windowRef.value?.float()
+    return
+  }
+
+  await dockWindow()
+}
+
+async function toggleZoom() {
+  if (embedded.value === true) {
+    windowRef.value?.float()
+    await nextTick()
+  }
+
+  windowRef.value?.toggleMaximized()
+}
 
 const windowStyle = {
   border: '1px solid rgba(15, 23, 42, 0.22)',
@@ -132,16 +180,6 @@ const titlebarStyle = {
   background:
     linear-gradient(120deg, rgba(59, 130, 246, 0.14), transparent 42%),
     linear-gradient(135deg, #f8fafc, #e0f2fe);
-}
-
-.native-reopen {
-  width: min(100%, 520px);
-  padding: 20px;
-  border: 1px solid rgba(148, 163, 184, 0.34);
-  border-radius: 14px;
-  color: #1e293b;
-  background: rgba(255, 255, 255, 0.84);
-  box-shadow: 0 12px 34px rgba(15, 23, 42, 0.12);
 }
 
 .win-titlebar {
@@ -173,6 +211,22 @@ const titlebarStyle = {
 .win-controls {
   height: 100%;
   margin-left: auto;
+}
+
+.win-titlebar-action {
+  padding: 4px 10px;
+  border: 1px solid #dbe4ef;
+  border-radius: 4px;
+  color: #334155;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.win-titlebar-action:hover {
+  background: #e0f2fe;
 }
 
 .win-control {
@@ -329,10 +383,6 @@ const titlebarStyle = {
   .q-window-native-stage {
     min-height: 430px;
     padding: 12px;
-  }
-
-  .native-reopen {
-    padding: 16px;
   }
 
   .win-content {

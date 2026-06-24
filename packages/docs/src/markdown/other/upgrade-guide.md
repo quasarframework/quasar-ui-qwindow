@@ -13,7 +13,7 @@ tooling.
 ## Requirements
 
 - Vue 3 and Quasar v2.
-- Quasar CLI Vite with `@quasar/app-vite` >=3.0.0-rc.2 for the App Extension.
+- Quasar CLI Vite with `@quasar/app-vite` >=3.0.0-rc.3 for the App Extension.
 - Node.js 22.13 or newer.
 - pnpm 11.4 or newer when working in this repository.
 
@@ -67,3 +67,18 @@ Quasar and Vite ecosystem.
 
 The v3 docs include updated examples for embedded windows, floating windows, resize handles, toolbar
 style palettes, and multiple windows. Review those examples when updating custom window layouts.
+
+## State And Chrome
+
+QWindow v3 keeps the legacy visibility `input` event for compatibility, but Vue 3 applications
+should use `v-model` / `update:model-value`. Additional state models are available for embedded,
+pinned, fullscreen, maximized, and minimized state.
+
+Custom title bars should treat interactive controls as real buttons or links and stop pointer/click
+events on those controls. The title bar itself can drag floating windows, and double-clicking it
+maximizes or restores the window. Native-style close controls can call the public `embed()` method
+when they should dock the window back into the page instead of hiding it.
+
+The window shell is focusable and now carries an ARIA role and label. Use `aria-label` and
+`aria-role` when the default `region` role or title-based label is not specific enough for your
+application.
