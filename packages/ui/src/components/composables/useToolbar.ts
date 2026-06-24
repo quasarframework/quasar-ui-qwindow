@@ -141,7 +141,7 @@ export default function useToolbar(
         flat: true,
         round: true,
         dense: true,
-        icon: 'more_vert',
+        icon: props.menuIcon,
       },
       () => [renderMenu(menuData)],
     )

@@ -95,6 +95,7 @@ describe('QWindow exports', () => {
           QWindow,
           {
             embedded: true,
+            menuIcon: 'more_horiz',
             modelValue: true,
             title: 'SSR Window',
           },
@@ -111,6 +112,7 @@ describe('QWindow exports', () => {
     expect(html).toContain('q-window')
     expect(html).toContain('role="region"')
     expect(html).toContain('aria-label="SSR Window"')
+    expect(html).toContain('more_horiz')
     expect(html).toContain('SSR Window')
     expect(html).toContain('SSR window content')
   })

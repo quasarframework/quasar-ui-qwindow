@@ -277,6 +277,17 @@ export default defineComponent({
      */
     noMenu: Boolean,
     /**
+     * Icon used by the built-in title bar actions menu button.
+     *
+     * @category titlebar
+     * @default "more_vert"
+     * @example menu-icon="more_horiz"
+     */
+    menuIcon: {
+      type: String,
+      default: 'more_vert',
+    },
+    /**
      * Disables dragging by the title bar.
      *
      * @category behavior
