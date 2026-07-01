@@ -4,13 +4,12 @@
   "singleQuote": true,
   "printWidth": 100,
   "bracketSpacing": true,
-  "files": {
-    "ignore": [
-      "node_modules",
-      "packages/*/node_modules",
-      "packages/*/dist",
-      "packages/docs/.quasar",
-      "packages/docs/dist"
-    ]
-  }
+  "ignorePatterns": [
+    "**/node_modules/**",
+    "**/.quasar/**",
+    "**/dist/**",
+    "**/coverage/**",
+    "packages/docs/src/.q-press/**",
+    "pnpm-lock.yaml"
+  ]
 }
