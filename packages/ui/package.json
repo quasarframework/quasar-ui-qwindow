@@ -80,7 +80,7 @@
     "prepack": "pnpm build"
   },
   "devDependencies": {
-    "@md-plugins/quasar-app-extension-q-press": "0.1.0-rc.18",
+    "@md-plugins/quasar-app-extension-q-press": "1.0.0",
     "@types/node": "^26.0.1",
     "@types/rtlcss": "^3.5.4",
     "@types/uglify-js": "^3.17.5",
