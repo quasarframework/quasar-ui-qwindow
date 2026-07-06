@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta
+      name="viewport"
+      content="user-scalable=no,initial-scale=1,maximum-scale=1,minimum-scale=1,width=device-width"
+    />
+
+    <link rel="icon" href="data:," />
+    <title>UMD test</title>
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/quasar@^2.0.0/dist/quasar.prod.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link href="dist/index.css?ae=qwindow" rel="stylesheet" type="text/css" />
+    <style>
+      .window-demo-page {
+        min-height: calc(100vh - 50px);
+        background: linear-gradient(135deg, #eef5f8 0%, #f8fbfd 55%, #e6f2ef 100%);
+      }
+
+      .window-demo {
+        background: #ffffff;
+        border-color: rgba(28, 80, 105, 0.22);
+        box-shadow: 0 18px 40px rgba(28, 58, 82, 0.22);
+      }
+
+      .window-demo-body {
+        width: 100%;
+        height: 100%;
+        padding: 24px;
+        background: linear-gradient(180deg, #ffffff 0%, #f3f8fb 100%);
+      }
+
+      .window-demo-panel {
+        height: 100%;
+        border-radius: 8px;
+        border: 1px solid rgba(28, 80, 105, 0.16);
+        background: #ffffff;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="q-app">
+      <q-layout view="lHh Lpr fff">
+        <q-header class="glossy bg-primary">
+          <q-toolbar>
+            <q-toolbar-title> QWindow v{{ version }} </q-toolbar-title>
+
+            <div>Quasar v{{ $q.version }}</div>
+          </q-toolbar>
+        </q-header>
+
+        <q-page-container>
+          <q-page padding class="window-demo-page">
+            <q-window
+              v-model="showing"
+              v-bind="windowProps"
+              title="UMD QWindow"
+              content-class="window-demo"
+              background-color="#1976d2"
+            >
+              <div class="window-demo-body">
+                <div class="window-demo-panel q-pa-md column justify-between">
+                  <div>
+                    <div class="text-h6 text-primary">Floating panel</div>
+                    <div class="text-body2 text-grey-8 q-mt-sm">
+                      This panel is loaded from the UMD bundle.
+                    </div>
+                  </div>
+                  <q-chip dense color="primary" text-color="white" icon="open_in_new">
+                    QWindow smoke test
+                  </q-chip>
+                </div>
+              </div>
+            </q-window>
+          </q-page>
+        </q-page-container>
+      </q-layout>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@^3.0.0/dist/vue.global.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/quasar@^2.0.0/dist/quasar.umd.prod.js"></script>
+    <script src="dist/index.umd.js?ae=qwindow"></script>
+
+    <script>
+      const { computed, ref } = Vue
+      const windowPlugin = globalThis.QWindow
+      const bundleReady =
+        windowPlugin !== void 0 &&
+        typeof windowPlugin.install === 'function' &&
+        typeof windowPlugin.useQWindowResponsiveProps === 'function' &&
+        windowPlugin.QWindow !== void 0
+
+      const app = Vue.createApp({
+        setup() {
+          const showing = ref(true)
+          const windowProps =
+            bundleReady === true
+              ? windowPlugin.useQWindowResponsiveProps({
+                  width: 380,
+                  height: 240,
+                  startX: 40,
+                  startY: 90,
+                  mobileWidth: 320,
+                  mobileHeight: 260,
+                  mobileStartY: 84,
+                })
+              : computed(() => ({
+                  width: 380,
+                  height: 240,
+                  startX: 40,
+                  startY: 90,
+                }))
+
+          return {
+            version: bundleReady === true ? windowPlugin.version : 'bundle missing',
+            windowProps,
+            showing,
+          }
+        },
+      })
+      app.use(Quasar)
+      if (bundleReady === true) {
+        app.use(windowPlugin)
+      }
+      app.mount('#q-app')
+    </script>
+  </body>
+</html>

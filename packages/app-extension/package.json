@@ -1,0 +1,60 @@
+{
+  "name": "@quasar/quasar-app-extension-qwindow",
+  "version": "3.0.0-rc.2",
+  "description": "A Quasar App Extension for @quasar/quasar-ui-qwindow",
+  "keywords": [
+    "app",
+    "app extension",
+    "extension",
+    "floating",
+    "quasar",
+    "quasarframework",
+    "resizable",
+    "window"
+  ],
+  "homepage": "https://github.com/quasarframework/quasar-ui-qwindow",
+  "bugs": "https://github.com/quasarframework/quasar-ui-qwindow/issues",
+  "license": "MIT",
+  "author": "Jeff Galbraith <jeff@quasar.dev>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/quasarframework/quasar-ui-qwindow.git"
+  },
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/hawkeye64"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "type": "module",
+  "main": "dist/index.js",
+  "imports": {
+    "#q-app": "@quasar/app-vite"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\" && tsc -p tsconfig.build.json",
+    "lint": "oxlint src",
+    "release": "pnpm publish --tag latest",
+    "prepack": "pnpm build"
+  },
+  "dependencies": {
+    "@quasar/quasar-ui-qwindow": "workspace:^"
+  },
+  "devDependencies": {
+    "@quasar/app-vite": "3.0.0",
+    "quasar": "^2.21.1",
+    "typescript": "~6.0.3"
+  },
+  "peerDependencies": {
+    "@quasar/app-vite": ">=3.0.0"
+  },
+  "engines": {
+    "node": ">=22.13",
+    "pnpm": ">=11.5.0"
+  }
+}
