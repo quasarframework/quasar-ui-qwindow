@@ -1,6 +1,6 @@
 {
   "name": "@quasar/quasar-ui-qwindow",
-  "version": "3.0.0-rc.2",
+  "version": "3.0.0",
   "description": "Floating, movable, resizable windows for your Quasar app",
   "keywords": [
     "floating",

@@ -191,7 +191,7 @@ import siteConfig from '../../siteConfig'
 const productName = 'QWindow'
 const logoSrc = '/app-logo.svg'
 const logoAlt = 'QWindow Logo'
-const githubTreeUrl = 'https://github.com/quasarframework/quasar-ui-qwindow/tree/v3-beta'
+const githubTreeUrl = 'https://github.com/quasarframework/quasar-ui-qwindow/tree/dev'
 const githubRepoUrl = 'https://github.com/quasarframework/quasar-ui-qwindow'
 const heroEyebrow = 'Vue 3 + Quasar 2'
 const heroLede =

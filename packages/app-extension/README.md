@@ -12,7 +12,7 @@
 [![X](https://img.shields.io/badge/follow-@jgalbraith64-1DA1F2?style=for-the-badge&logo=x&logoColor=1DA1F2)](https://twitter.com/jgalbraith64)
 
 The QWindow app extension (`@quasar/quasar-app-extension-qwindow`) installs and registers the
-[QWindow UI](https://github.com/quasarframework/quasar-ui-qwindow/tree/v3-beta/packages/ui)
+[QWindow UI](https://github.com/quasarframework/quasar-ui-qwindow/tree/dev/packages/ui)
 component for Quasar CLI Vite applications.
 
 ## Install

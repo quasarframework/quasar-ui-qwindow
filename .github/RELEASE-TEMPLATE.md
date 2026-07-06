@@ -6,7 +6,7 @@ Release drafting notes:
 - Keep the summary short and concrete.
 -->
 
-# QWindow v3.x.x
+# QWindow v3.0.0
 
 Release date: YYYY-MM-DD
 
@@ -35,8 +35,8 @@ Short user-facing summary of what changed for QWindow component/app-extension us
 ## Compatibility
 
 - Node.js: `>=22.13`
-- Quasar: `^2.20.0`
-- Quasar App Vite target: `@quasar/app-vite@3.0.0-rc.3`
+- Quasar: `^2.21.1`
+- Quasar App Vite target: `@quasar/app-vite@3.0.0`
 - npm dist-tag: `latest`
 
 ## Installation
@@ -53,12 +53,10 @@ npm install @quasar/quasar-ui-qwindow
 quasar ext add @quasar/qwindow
 ```
 
-Add the appropriate prerelease tag, such as `@beta`, only when publishing under that dist-tag.
-
 ## Documentation
 
 - Docs: https://qwindow.netlify.app/
-- Installation: https://qwindow.netlify.app/getting-started/installation
+- Installation: https://qwindow.netlify.app/getting-started/installation-types
 - Upgrade Guide: https://qwindow.netlify.app/other/upgrade-guide
 
 ## Full Changelog

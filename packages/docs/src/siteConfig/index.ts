@@ -46,7 +46,7 @@ const codepenQWindowGlobal = `(() => {
       }),
   }
 })()`
-const repoBranch = 'v3-beta'
+const repoBranch = 'dev'
 const productName = 'QWindow'
 
 export interface SocialLink {
