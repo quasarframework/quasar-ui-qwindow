@@ -6,27 +6,32 @@ Release drafting notes:
 - Keep the summary short and concrete.
 -->
 
-# QWindow v3.0.0
+# QWindow v3.0.1
 
-Release date: YYYY-MM-DD
+Release date: 2026-07-21
 
 ## Summary
 
-Short user-facing summary of what changed for QWindow component/app-extension users.
+QWindow 3.0.1 improves SSR and static-generation compatibility by rendering windows in place
+through hydration, then enabling Teleport after the application mounts. It also makes App Extension
+style loading compatible with strict package-manager dependency layouts.
 
 ## What's Changed
 
 **Features:**
 
-- `commitid` Describe new component, app-extension, public API, styling, or integration behavior.
+- None.
 
 **Fixes:**
 
-- `commitid` Describe the bug, who it affected, and what now works correctly.
+- `b00b170` Render QWindow in place during SSR and hydration so Vue does not emit a Teleport entry
+  targeting the populated `#q-app` mount; floating windows begin teleporting after mount.
+- `469d2ca` Load QWindow styles from the App Extension boot file so installation works with strict
+  package-manager dependency layouts such as pnpm.
 
 **Maintenance:**
 
-- `commitid` Include only consumer-relevant maintenance, such as package prep, compatibility updates, or dependency updates that users may notice.
+- `980fe61`, `469d2ca` Refresh the tested Quasar, App Vite, Vue, QPress, and build-tool versions.
 
 ## Breaking Changes
 
@@ -35,8 +40,8 @@ Short user-facing summary of what changed for QWindow component/app-extension us
 ## Compatibility
 
 - Node.js: `>=22.13`
-- Quasar: `^2.21.1`
-- Quasar App Vite target: `@quasar/app-vite@3.0.0`
+- Quasar: `^2.22.0`
+- Quasar App Vite target: `@quasar/app-vite@3.1.0`
 - npm dist-tag: `latest`
 
 ## Installation
@@ -61,7 +66,7 @@ quasar ext add @quasar/qwindow
 
 ## Full Changelog
 
-https://github.com/quasarframework/quasar-ui-qwindow/compare/PREVIOUS_TAG...CURRENT_TAG
+https://github.com/quasarframework/quasar-ui-qwindow/compare/v3.0.0...v3.0.1
 
 ## Donations
 
