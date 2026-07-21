@@ -782,6 +782,7 @@ export default defineComponent({
       })
     const resizeHandle = ref<string>()
     const fullscreenInitiated = ref(false)
+    const canTeleport = ref(false)
     const teleportTarget = ref('#q-app')
 
     const { removeClass, addClass } = useStyle()
@@ -842,6 +843,7 @@ export default defineComponent({
       const doc = getDocument()
       if (doc !== void 0) {
         teleportTarget.value = doc.querySelector('#q-app') === null ? 'body' : '#q-app'
+        canTeleport.value = true
         doc.addEventListener('scroll', onScroll, { passive: true })
         doc.body.addEventListener('mousedown', onMouseDownBody, { passive: false })
       }
@@ -1599,11 +1601,14 @@ export default defineComponent({
     }
 
     function render() {
+      if (canTeleport.value !== true || isEmbedded.value === true) {
+        return renderWindow()
+      }
+
       return h(
         Teleport,
         {
           to: teleportTarget.value,
-          disabled: isEmbedded.value || getDocument() === void 0,
         },
         [renderWindow()],
       )

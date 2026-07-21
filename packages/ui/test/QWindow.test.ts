@@ -107,7 +107,8 @@ describe('QWindow exports', () => {
 
     installSsrQuasarStub(app)
 
-    const html = await renderToString(app)
+    const ssrContext: { teleports?: Record<string, string> } = {}
+    const html = await renderToString(app, ssrContext)
 
     expect(html).toContain('q-window')
     expect(html).toContain('role="region"')
@@ -115,6 +116,7 @@ describe('QWindow exports', () => {
     expect(html).toContain('more_horiz')
     expect(html).toContain('SSR Window')
     expect(html).toContain('SSR window content')
+    expect(ssrContext.teleports).toBeUndefined()
   })
 
   it('models window state transitions and update events in one place', () => {
