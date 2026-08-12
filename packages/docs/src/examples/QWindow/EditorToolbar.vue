@@ -31,10 +31,24 @@
 
         <q-separator vertical dark />
 
-        <q-btn class="toolbar-action" round dense flat icon="format_bold" />
-        <q-btn class="toolbar-action" round dense flat icon="format_italic" />
-        <q-btn class="toolbar-action" round dense flat icon="format_underlined" />
-        <q-btn class="toolbar-action" round dense flat icon="format_color_text" />
+        <q-btn class="toolbar-action" round dense flat icon="format_bold" aria-label="Bold" />
+        <q-btn class="toolbar-action" round dense flat icon="format_italic" aria-label="Italic" />
+        <q-btn
+          class="toolbar-action"
+          round
+          dense
+          flat
+          icon="format_underlined"
+          aria-label="Underline"
+        />
+        <q-btn
+          class="toolbar-action"
+          round
+          dense
+          flat
+          icon="format_color_text"
+          aria-label="Text color"
+        />
 
         <q-separator vertical dark />
 
@@ -44,6 +58,7 @@
           dense
           unelevated
           icon="auto_fix_high"
+          aria-label="Improve selection"
         />
       </div>
     </q-window>

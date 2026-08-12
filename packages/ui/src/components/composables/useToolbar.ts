@@ -142,6 +142,7 @@ export default function useToolbar(
         round: true,
         dense: true,
         icon: props.menuIcon,
+        'aria-label': 'Window actions',
       },
       () => [renderMenu(menuData)],
     )

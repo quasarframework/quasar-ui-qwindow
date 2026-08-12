@@ -113,6 +113,7 @@ describe('QWindow exports', () => {
     expect(html).toContain('q-window')
     expect(html).toContain('role="region"')
     expect(html).toContain('aria-label="SSR Window"')
+    expect(html).toContain('aria-label="Window actions"')
     expect(html).toContain('more_horiz')
     expect(html).toContain('SSR Window')
     expect(html).toContain('SSR window content')
