@@ -37,8 +37,8 @@ dependency optimization. This ensures its Quasar imports use the application's r
 ## Compatibility
 
 - Node.js: `>=22.13`
-- Quasar: `^2.25.0`
-- Quasar App Vite target: `@quasar/app-vite@3.6.0`
+- Quasar: `^2.25.1`
+- Quasar App Vite target: `@quasar/app-vite@3.7.0`
 - npm dist-tag: `latest`
 
 ## Installation
