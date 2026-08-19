@@ -6,15 +6,14 @@ Release drafting notes:
 - Keep the summary short and concrete.
 -->
 
-# QWindow v3.0.1
+# QWindow v3.0.2
 
-Release date: 2026-07-21
+Release date: 2026-08-19
 
 ## Summary
 
-QWindow 3.0.1 improves SSR and static-generation compatibility by rendering windows in place
-through hydration, then enabling Teleport after the application mounts. It also makes App Extension
-style loading compatible with strict package-manager dependency layouts.
+QWindow v3.0.2 improves Quasar CLI Vite integration by keeping the UI package out of Vite
+dependency optimization. This ensures its Quasar imports use the application's runtime instance.
 
 ## What's Changed
 
@@ -24,14 +23,12 @@ style loading compatible with strict package-manager dependency layouts.
 
 **Fixes:**
 
-- `b00b170` Render QWindow in place during SSR and hydration so Vue does not emit a Teleport entry
-  targeting the populated `#q-app` mount; floating windows begin teleporting after mount.
-- `469d2ca` Load QWindow styles from the App Extension boot file so installation works with strict
-  package-manager dependency layouts such as pnpm.
+- `dd2e89a` Exclude the QWindow UI package from Vite dependency optimization when installed through
+  the App Extension, preventing a separately optimized Quasar runtime.
 
 **Maintenance:**
 
-- `980fe61`, `469d2ca` Refresh the tested Quasar, App Vite, Vue, QPress, and build-tool versions.
+- `08cb310` Refresh dependencies and the QPress documentation runtime.
 
 ## Breaking Changes
 
@@ -40,8 +37,8 @@ style loading compatible with strict package-manager dependency layouts.
 ## Compatibility
 
 - Node.js: `>=22.13`
-- Quasar: `^2.22.0`
-- Quasar App Vite target: `@quasar/app-vite@3.1.0`
+- Quasar: `^2.25.0`
+- Quasar App Vite target: `@quasar/app-vite@3.6.0`
 - npm dist-tag: `latest`
 
 ## Installation
@@ -66,7 +63,7 @@ quasar ext add @quasar/qwindow
 
 ## Full Changelog
 
-https://github.com/quasarframework/quasar-ui-qwindow/compare/v3.0.0...v3.0.1
+https://github.com/quasarframework/quasar-ui-qwindow/compare/v3.0.1...v3.0.2
 
 ## Donations
 
