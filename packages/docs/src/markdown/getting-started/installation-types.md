@@ -49,13 +49,13 @@ The App Extension can register QWindow without an import from application source
 If you do not install through the App Extension, install the UI package directly:
 
 ```tabs
-<<| bash pnpm |>>
+<<| bash [icon=pnpm] pnpm |>>
 pnpm add @quasar/quasar-ui-qwindow
-<<| bash bun |>>
+<<| bash [icon=bun] bun |>>
 bun add @quasar/quasar-ui-qwindow
-<<| bash yarn |>>
+<<| bash [icon=yarn] yarn |>>
 yarn add @quasar/quasar-ui-qwindow
-<<| bash npm |>>
+<<| bash [icon=npm] npm |>>
 npm install @quasar/quasar-ui-qwindow
 ```
 
