@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "skills": {
+    "quasar-app-extension-development": {
+      "source": "quasarframework/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/quasar-app-extension-development/SKILL.md",
+      "computedHash": "fe7a2264b0c1c5171f7035f50fc3eb554c984e8825d18b837cc4e6ac142f7df1"
+    },
+    "quasar-bex-development": {
+      "source": "quasarframework/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/quasar-bex-development/SKILL.md",
+      "computedHash": "020e09e82e00e086dcf35668492484f500176f9c5a0d714c7ef79837a73c5fca"
+    },
+    "quasar-capacitor-development": {
+      "source": "quasarframework/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/quasar-capacitor-development/SKILL.md",
+      "computedHash": "bce4f828f16d5bb9ab9f57d900bfaed199f842cfe82550d64f3bb2d88add24f9"
+    },
+    "quasar-cordova-development": {
+      "source": "quasarframework/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/quasar-cordova-development/SKILL.md",
+      "computedHash": "bdd487d34b421bd6d286e1bbaa2201c36ebf1fc20e6dec6ece6e22503a22137d"
+    },
+    "quasar-development": {
+      "source": "quasarframework/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/quasar-development/SKILL.md",
+      "computedHash": "8223ccdcfbdec9026938bdd65d59314da45898f95d5a8d1f94bf5b519acade47"
+    },
+    "quasar-electron-development": {
+      "source": "quasarframework/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/quasar-electron-development/SKILL.md",
+      "computedHash": "592d33599a7d4c499f13bb4206fa862da34bb3c0762332423691e148a3ee5351"
+    },
+    "quasar-pwa-development": {
+      "source": "quasarframework/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/quasar-pwa-development/SKILL.md",
+      "computedHash": "4fd458ae90cf7aee7a992a67499a4bbe73368fc65ea49a179be2f6090861d819"
+    },
+    "quasar-spa-development": {
+      "source": "quasarframework/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/quasar-spa-development/SKILL.md",
+      "computedHash": "592f9e233d829ca005e2851bfdce9a4f4c089cb5585c611356acac310271039a"
+    },
+    "quasar-ssg-development": {
+      "source": "quasarframework/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/quasar-ssg-development/SKILL.md",
+      "computedHash": "70af9270cd093aae99dfc627ef1006f093ddf7d53143db9452b6a6083c95c706"
+    },
+    "quasar-ssr-development": {
+      "source": "quasarframework/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/quasar-ssr-development/SKILL.md",
+      "computedHash": "1c627c3bd185db816cca8a0e36a7768dea0522232465fa6eac9b66bda5490237"
+    }
+  }
+}
