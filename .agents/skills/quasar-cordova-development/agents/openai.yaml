@@ -1,0 +1,4 @@
+interface:
+  display_name: "Quasar Cordova Development"
+  short_description: "Build Quasar mobile apps with Cordova"
+  default_prompt: "Use $quasar-cordova-development to build or configure this Quasar Cordova app."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Quasar SSR Development"
+  short_description: "Build server-rendered Quasar applications"
+  default_prompt: "Use $quasar-ssr-development to build or configure this Quasar SSR application."

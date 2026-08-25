@@ -1,0 +1,4 @@
+interface:
+  display_name: "Quasar Browser Extension Development"
+  short_description: "Build browser extensions with Quasar"
+  default_prompt: "Use $quasar-bex-development to build or configure this Quasar browser extension."

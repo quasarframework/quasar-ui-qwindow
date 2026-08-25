@@ -1,0 +1,4 @@
+interface:
+  display_name: "Quasar App Extension Development"
+  short_description: "Create and maintain Quasar App Extensions"
+  default_prompt: "Use $quasar-app-extension-development to create or maintain this Quasar App Extension."

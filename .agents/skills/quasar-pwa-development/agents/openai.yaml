@@ -1,0 +1,4 @@
+interface:
+  display_name: "Quasar PWA Development"
+  short_description: "Build installable Quasar web applications"
+  default_prompt: "Use $quasar-pwa-development to build or configure this Quasar PWA."

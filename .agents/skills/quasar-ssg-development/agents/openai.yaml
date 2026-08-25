@@ -1,0 +1,4 @@
+interface:
+  display_name: "Quasar SSG Development"
+  short_description: "Build statically generated Quasar sites"
+  default_prompt: "Use $quasar-ssg-development to build or configure this Quasar SSG site."

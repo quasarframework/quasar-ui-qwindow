@@ -1,0 +1,4 @@
+interface:
+  display_name: "Quasar Electron Development"
+  short_description: "Build secure Quasar desktop applications"
+  default_prompt: "Use $quasar-electron-development to build or configure this Quasar Electron app."

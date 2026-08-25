@@ -1,0 +1,4 @@
+interface:
+  display_name: "Quasar SPA Development"
+  short_description: "Build Quasar single-page applications"
+  default_prompt: "Use $quasar-spa-development to build or configure this Quasar SPA."

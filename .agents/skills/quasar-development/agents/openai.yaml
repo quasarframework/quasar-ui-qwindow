@@ -1,0 +1,4 @@
+interface:
+  display_name: "Quasar Development"
+  short_description: "Build and maintain Quasar applications"
+  default_prompt: "Use $quasar-development to build or improve this Quasar application."
