@@ -46,8 +46,8 @@
     "@quasar/quasar-ui-qwindow": "workspace:^"
   },
   "devDependencies": {
-    "@quasar/app-vite": "^3.8.0",
-    "quasar": "^2.26.0",
+    "@quasar/app-vite": "^3.8.4",
+    "quasar": "^2.32.3",
     "typescript": "~6.0.3"
   },
   "peerDependencies": {
